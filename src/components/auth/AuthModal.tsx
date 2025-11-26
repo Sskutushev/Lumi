@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { X, Github, Mail, Loader2, GoogleLogo } from 'lucide-react';
+import { X, Github, Mail, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { supabase } from '../../lib/supabase';
 
 // Simple Google logo component
-const GoogleLogo = () => (
+const GoogleLogoComponent = () => (
   <svg className="w-5 h-5" viewBox="0 0 24 24">
     <path 
       d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" 
@@ -27,10 +28,9 @@ const GoogleLogo = () => (
 
 interface AuthModalProps {
   onClose: () => void;
-  onAuthSuccess?: () => void;
 }
 
-const AuthModal = ({ onClose, onAuthSuccess }: AuthModalProps) => {
+const AuthModal = ({ onClose }: AuthModalProps) => {
   const { t } = useTranslation();
   const [isSignIn, setIsSignIn] = useState(true);
   const [email, setEmail] = useState('');
@@ -41,14 +41,31 @@ const AuthModal = ({ onClose, onAuthSuccess }: AuthModalProps) => {
     e.preventDefault();
     setLoading(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      setLoading(false);
-      onClose();
-      if (onAuthSuccess) {
-        onAuthSuccess();
+    try {
+      let response;
+      if (isSignIn) {
+        // Sign in with email and password
+        response = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+      } else {
+        // Sign up with email and password
+        response = await supabase.auth.signUp({
+          email,
+          password,
+        });
       }
-    }, 1500);
+
+      if (response.error) throw response.error;
+
+      // Close modal after successful auth
+      onClose();
+    } catch (error: any) {
+      console.error('Authentication error:', error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -90,9 +107,21 @@ const AuthModal = ({ onClose, onAuthSuccess }: AuthModalProps) => {
           <div className="space-y-3 mb-6">
             <button
               className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl border border-border hover:bg-bg-secondary transition-colors"
-              onClick={() => console.log('Sign in with Google')}
+              onClick={async () => {
+                try {
+                  const { error } = await supabase.auth.signInWithOAuth({
+                    provider: 'google',
+                    options: {
+                      redirectTo: window.location.origin
+                    }
+                  });
+                  if (error) throw error;
+                } catch (error: any) {
+                  console.error('Error signing in with Google:', error.message);
+                }
+              }}
             >
-              <GoogleLogo />
+              <GoogleLogoComponent />
               <span className="font-medium text-text-primary">
                 {t('common.continueWithGoogle')}
               </span>
@@ -100,7 +129,19 @@ const AuthModal = ({ onClose, onAuthSuccess }: AuthModalProps) => {
 
             <button
               className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl border border-border hover:bg-bg-secondary transition-colors"
-              onClick={() => console.log('Sign in with GitHub')}
+              onClick={async () => {
+                try {
+                  const { error } = await supabase.auth.signInWithOAuth({
+                    provider: 'github',
+                    options: {
+                      redirectTo: window.location.origin
+                    }
+                  });
+                  if (error) throw error;
+                } catch (error: any) {
+                  console.error('Error signing in with GitHub:', error.message);
+                }
+              }}
             >
               <Github className="w-5 h-5" />
               <span className="font-medium text-text-primary">
@@ -138,9 +179,34 @@ const AuthModal = ({ onClose, onAuthSuccess }: AuthModalProps) => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-text-secondary mb-2">
-                {t('common.password')}
-              </label>
+              <div className="flex justify-between items-center mb-2">
+                <label className="block text-sm font-medium text-text-secondary">
+                  {t('common.password')}
+                </label>
+                {isSignIn && (
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      if (email) {
+                        try {
+                          const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                            redirectTo: window.location.origin
+                          });
+                          if (error) throw error;
+                          alert('Password reset link sent to your email');
+                        } catch (error: any) {
+                          console.error('Error resetting password:', error.message);
+                        }
+                      } else {
+                        alert('Please enter your email address');
+                      }
+                    }}
+                    className="text-sm text-accent-primary hover:underline"
+                  >
+                    {t('common.forgotPassword')}
+                  </button>
+                )}
+              </div>
               <input
                 type="password"
                 value={password}

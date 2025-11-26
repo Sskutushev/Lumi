@@ -22,12 +22,17 @@
     "error": "Ошибка",
     "success": "Успешно",
     "darkTheme": "Темная тема",
-    "lightTheme": "Светлая тема"
+    "lightTheme": "Светлая тема",
+    "logout": "Выйти",
+    "toggleTheme": "Сменить тему",
+    "changeLanguage": "Изменить язык",
+    "add": "Добавить",
+    "back": "Назад"
   },
   "landing": {
     "hero": {
-      "title": "Твои задачи. Без шума.",
-      "subtitle": "Минимально. Быстро. Красиво. Всё, что нужно для организации—ничего лишнего.",
+      "title": "Твои задачи. Без шума. Минимально.",
+      "subtitle": "Всё, что нужно для организации—ничего лишнего.",
       "cta": "Начать бесплатно"
     },
     "problems": {
@@ -60,6 +65,14 @@
       "focused": {
         "title": "Фокус в приоритете",
         "description": "Создано, чтобы помочь вам сосредоточиться на важном"
+      },
+      "why": {
+        "title": "Почему Lumi?",
+        "description": "Создан с использованием современных технологий с акцентом на пользовательский опыт."
+      },
+      "security": {
+        "title": "Безопасно",
+        "description": "Данные хранятся безопасно с использованием Supabase"
       }
     },
     "petProject": {
@@ -71,11 +84,99 @@
   "todo": {
     "inbox": "Входящие",
     "today": "Сегодня",
-    "upcoming": "Предстоящие",
-    "important": "Важные",
+    "deadline": "Дедлайн",
+    "overdue": "Просроченные",
+    "all": "Все",
     "projects": "Проекты",
     "quickAdd": "Добавить задачу...",
-    "completed": "Завершённые"
+    "addTaskPlaceholder": "Добавить новую задачу...",
+    "completed": "Завершенные",
+    "searchPlaceholder": "Поиск задач...",
+    "filter": "Фильтр",
+    "sorting": "Сортировка",
+    "filters": "Фильтры",
+    "filterByPriority": "Фильтровать по приоритету",
+    "filterByDate": "Фильтровать по дате",
+    "filterByProject": "Фильтровать по проекту",
+    "sortByDate": "Сортировать по дате",
+    "sortByPriority": "Сортировать по приоритету",
+    "sortByName": "Сортировать по названию",
+    "priority": {
+      "low": "Низкий",
+      "medium": "Средний",
+      "high": "Высокий"
+    },
+    "priorityLabel": "Приоритет",
+    "project": "Проект",
+    "noProject": "Без проекта",
+    "taskDetails": "Детали задачи",
+    "taskTitle": "Название задачи",
+    "startDate": "Дата начала",
+    "dueDate": "Дата выполнения",
+    "description": "Описание",
+    "detailedDescription": "Подробное описание",
+    "descriptionPlaceholder": "Краткое описание...",
+    "detailedDescriptionPlaceholder": "Подробное описание (до 5000 символов)...",
+    "tasks": "Задачи",
+    "taskTitlePlaceholder": "Название задачи...",
+    "dueDatePlaceholder": "Выберите дату выполнения...",
+    "startDatePlaceholder": "Выберите дату начала...",
+    "priorityPlaceholder": "Выберите приоритет...",
+    "projectPlaceholder": "Выберите проект...",
+    "addDescription": "Добавить описание...",
+    "addDetailedDescription": "Добавить подробное описание...",
+    "attachments": "Вложения",
+    "addAttachment": "Добавить вложение...",
+    "labels": "Метки",
+    "addLabel": "Добавить метку...",
+    "comments": "Комментарии",
+    "addComment": "Добавить комментарий...",
+    "history": "История",
+    "created": "Создано",
+    "updated": "Обновлено",
+    "completedDate": "Дата выполнения"
+  },
+  "projects": {
+    "createProject": "Создать проект",
+    "projectName": "Название проекта",
+    "projectDescription": "Описание",
+    "projectNamePlaceholder": "Введите название проекта...",
+    "descriptionPlaceholder": "Введите описание проекта...",
+    "add": "Добавить проект",
+    "create": "Создать",
+    "project": "Проект",
+    "noProject": "Без проекта",
+    "taskDetails": "Детали задачи",
+    "taskTitle": "Название задачи",
+    "startDate": "Дата начала",
+    "dueDate": "Дата выполнения",
+    "description": "Описание",
+    "detailedDescription": "Подробное описание",
+    "descriptionPlaceholder": "Краткое описание...",
+    "detailedDescriptionPlaceholder": "Подробное описание (до 5000 символов)...",
+    "tasks": "Задачи"
+  },
+  "profile": {
+    "settings": "Настройки профиля",
+    "personalInfo": "Личная информация",
+    "name": "Имя",
+    "email": "Email",
+    "account": "Настройки аккаунта",
+    "currentPassword": "Текущий пароль",
+    "newPassword": "Новый пароль",
+    "storage": "Хранилище",
+    "usedStorage": "Использованное хранилище",
+    "activity": "Активность",
+    "lastActive": "Последняя активность",
+    "tasksCompleted": "Выполненных задач",
+    "clickToChange": "Нажмите, чтобы изменить",
+    "emailCannotBeChanged": "Email нельзя изменить",
+    "enterCurrentPassword": "Введите текущий пароль",
+    "enterNewPassword": "Введите новый пароль",
+    "usage": "Использование",
+    "storageUsed": "Использовано хранилища",
+    "updateSuccess": "Профиль успешно обновлен",
+    "updateError": "Ошибка при обновлении профиля"
   },
   "footer": {
     "rights": "© 2025 Lumi. Все права защищены.",

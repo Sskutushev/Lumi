@@ -2,9 +2,11 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { ArrowRight, CheckCircle } from 'lucide-react';
+import { useDynamicImageUpdater } from '../../hooks/useDynamicImageUpdater';
 
 const HeroSection = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  useDynamicImageUpdater(); // Hook for updating images based on theme/language
 
   return (
     <section className="relative min-h-screen flex items-center justify-center px-4 py-16 overflow-hidden">
@@ -44,28 +46,18 @@ const HeroSection = () => {
           <span className="text-sm font-medium text-text-secondary">{t('common.tagline')}</span>
         </motion.div>
 
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-          className="text-4xl md:text-6xl lg:text-7xl font-bold leading-tight max-w-4xl mx-auto"
-        >
-          <span className="bg-gradient-to-r from-accent-primary via-accent-secondary to-accent-tertiary bg-clip-text text-transparent">
-            {t('landing.hero.title')}
-          </span>
-          <br />
-          <span className="text-text-primary">{t('landing.hero.subtitle')}</span>
-        </motion.h1>
-
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="max-w-2xl mx-auto"
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="text-center max-w-4xl mx-auto"
         >
-          <p className="text-lg md:text-xl text-text-secondary">
-            {t('landing.hero.subtitle')}
-          </p>
+          <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold leading-tight mb-4">
+            <span className="text-gradient-animated bg-clip-text">
+              {t('landing.hero.title')}
+            </span>
+          </h1>
+
         </motion.div>
 
         <motion.div
@@ -74,7 +66,7 @@ const HeroSection = () => {
           transition={{ duration: 0.5, delay: 0.3 }}
           className="flex flex-col sm:flex-row items-center justify-center gap-4"
         >
-          <button className="group relative px-8 py-4 rounded-2xl bg-accent-gradient-1 text-white font-semibold shadow-lg shadow-accent-primary/30 hover:shadow-xl hover:shadow-accent-primary/40 hover:scale-105 transition-all duration-300 min-w-[200px]">
+          <button className="group relative px-8 py-4 rounded-2xl bg-gradient-animated text-white font-semibold shadow-lg shadow-accent-primary/30 hover:shadow-xl hover:shadow-accent-primary/40 hover:scale-105 transition-all duration-300 min-w-[200px]">
             <span className="relative z-10 flex items-center justify-center gap-2">
               {t('landing.hero.cta')}
               <ArrowRight className="inline w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -100,14 +92,25 @@ const HeroSection = () => {
                 app.lumi.todo
               </div>
             </div>
-            <div className="aspect-video rounded-xl bg-gradient-to-br from-bg-secondary to-bg-tertiary border border-border flex items-center justify-center">
-              <div className="text-center p-6">
-                <div className="w-16 h-16 mx-auto rounded-2xl bg-accent-gradient-1 flex items-center justify-center mb-4">
-                  <CheckCircle className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-text-primary mb-2">Simple & Clean UI</h3>
-                <p className="text-text-secondary">Focus on what matters most</p>
-              </div>
+            <div className="aspect-video rounded-xl overflow-hidden border border-border">
+              <img
+                id="dynamic-screenshot"
+                data-ru-light="/src/assets/images/ru_light.jpg"
+                data-ru-dark="/src/assets/images/ru_dark.jpg"
+                data-en-light="/src/assets/images/en_light.jpg"
+                data-en-dark="/src/assets/images/en_dark.jpg"
+                src={
+                  i18n.language === 'ru'
+                    ? document.documentElement.classList.contains('dark')
+                      ? '/src/assets/images/ru_dark.jpg'
+                      : '/src/assets/images/ru_light.jpg'
+                    : document.documentElement.classList.contains('dark')
+                      ? '/src/assets/images/en_dark.jpg'
+                      : '/src/assets/images/en_light.jpg'
+                }
+                alt="Application interface"
+                className="w-full h-full object-contain"
+              />
             </div>
           </div>
           <div className="absolute -bottom-1/4 -left-1/4 -right-1/4 h-1/2 -z-10 bg-gradient-to-t from-accent-primary/10 to-transparent blur-3xl" />

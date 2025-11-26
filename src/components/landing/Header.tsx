@@ -25,10 +25,10 @@ const Header = ({ onSignIn, onChangeLanguage, onToggleTheme, currentTheme }: Hea
         <div className="flex items-center justify-between h-12">
           {/* Logo */}
           <div className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-xl bg-accent-gradient-1 flex items-center justify-center shadow-lg">
+            <div className="w-10 h-10 rounded-xl bg-gradient-animated flex items-center justify-center shadow-lg">
               <span className="text-white font-bold text-lg">L</span>
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-accent-primary to-accent-secondary bg-clip-text text-transparent">
+            <span className="text-xl font-bold text-gradient-animated bg-clip-text">
               Lumi
             </span>
           </div>
@@ -48,11 +48,15 @@ const Header = ({ onSignIn, onChangeLanguage, onToggleTheme, currentTheme }: Hea
 
           {/* Right Actions */}
           <div className="hidden md:flex items-center gap-4">
-            <button 
+            <button
               onClick={toggleLanguage}
-              className="px-3 py-1.5 rounded-lg bg-bg-secondary hover:bg-bg-tertiary transition-colors text-sm font-medium"
+              className="p-2 rounded-lg hover:bg-bg-secondary transition-colors flex items-center justify-center"
             >
-              {i18n.language === 'en' ? 'RU' : 'EN'}
+              {i18n.language === 'en' ? (
+                <img src="/src/assets/images/flags/rus.svg" alt="Russian" className="w-5 h-5" />
+              ) : (
+                <img src="/src/assets/images/flags/eng.svg" alt="English" className="w-5 h-5" />
+              )}
             </button>
             
             <button 
@@ -65,9 +69,9 @@ const Header = ({ onSignIn, onChangeLanguage, onToggleTheme, currentTheme }: Hea
               }
             </button>
             
-            <button 
+            <button
               onClick={onSignIn}
-              className="px-4 py-2 rounded-lg bg-accent-gradient-1 text-white font-medium shadow-sm hover:shadow-md transition-all"
+              className="px-4 py-2 rounded-lg bg-gradient-animated text-white font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 min-w-[120px]"
             >
               {t('common.signIn')}
             </button>
@@ -127,11 +131,21 @@ const Header = ({ onSignIn, onChangeLanguage, onToggleTheme, currentTheme }: Hea
               </a>
               
               <div className="flex flex-col gap-4 w-full max-w-xs mt-8">
-                <button 
+                <button
                   onClick={toggleLanguage}
-                  className="px-4 py-2 rounded-lg bg-bg-secondary hover:bg-bg-tertiary transition-colors text-sm font-medium"
+                  className="px-4 py-2 rounded-lg bg-bg-secondary hover:bg-bg-tertiary transition-colors flex items-center gap-2"
                 >
-                  {i18n.language === 'en' ? 'Русский' : 'English'}
+                  {i18n.language === 'en' ? (
+                    <>
+                      <img src="/src/assets/images/flags/rus.svg" alt="Russian" className="w-5 h-5" />
+                      Русский
+                    </>
+                  ) : (
+                    <>
+                      <img src="/src/assets/images/flags/eng.svg" alt="English" className="w-5 h-5" />
+                      English
+                    </>
+                  )}
                 </button>
                 
                 <button
@@ -149,12 +163,12 @@ const Header = ({ onSignIn, onChangeLanguage, onToggleTheme, currentTheme }: Hea
                   )}
                 </button>
                 
-                <button 
+                <button
                   onClick={() => {
                     onSignIn();
                     setIsMenuOpen(false);
                   }}
-                  className="px-4 py-2 rounded-lg bg-accent-gradient-1 text-white font-medium shadow-sm hover:shadow-md transition-all"
+                  className="px-4 py-2 rounded-lg bg-gradient-animated text-white font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 min-w-[120px]"
                 >
                   {t('common.signIn')}
                 </button>

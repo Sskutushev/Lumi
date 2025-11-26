@@ -37,27 +37,6 @@
   --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
 
   --radius: 14px;
-
-  /* HSL эквиваленты для Tailwind */
-  --background: 0 0% 100%;
-  --foreground: 222.2 84% 4.9%;
-  --card: 0 0% 100%;
-  --card-foreground: 222.2 84% 4.9%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 222.2 84% 4.9%;
-  --primary: 240 53% 57%; /* #6366F1 */
-  --primary-foreground: 210 40% 98%;
-  --secondary: 210 40% 96.1%;
-  --secondary-foreground: 222.2 47.4% 11.2%;
-  --muted: 210 40% 96.1%;
-  --muted-foreground: 215.4 16.3% 46.9%;
-  --accent: 240 53% 57%; /* #6366F1 */
-  --accent-foreground: 210 40% 98%;
-  --destructive: 0 84.2% 60.2%;
-  --destructive-foreground: 210 40% 98%;
-  --border: 220 11% 90%; /* #E5E7EB */
-  --input: 220 11% 90%; /* #E5E7EB */
-  --ring: 222.2 84% 4.9%;
 }
 
 .dark {
@@ -97,48 +76,60 @@
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.6);
   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.7);
   --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
-
-  /* HSL эквиваленты для Tailwind */
-  --background: 240 14% 5%; /* #0D0D0F */
-  --foreground: 0 0% 98%; /* #FAFAFA */
-  --card: 240 14% 5%;
-  --card-foreground: 0 0% 98%;
-  --popover: 240 14% 5%;
-  --popover-foreground: 0 0% 98%;
-  --primary: 240 73% 74%; /* #818CF8 */
-  --primary-foreground: 240 14% 5%;
-  --secondary: 230 11% 11%; /* #18181B */
-  --secondary-foreground: 0 0% 98%;
-  --muted: 240 11% 15%; /* #27272A */
-  --muted-foreground: 240 5% 45%; /* #71717A */
-  --accent: 240 73% 74%; /* #818CF8 */
-  --accent-foreground: 240 14% 5%;
-  --destructive: 0 87% 72%; /* #F87171 */
-  --destructive-foreground: 240 14% 5%;
-  --border: 240 9% 25%; /* #3F3F46 */
-  --input: 240 9% 25%; /* #3F3F46 */
-  --ring: 0 0% 98%; /* #FAFAFA */
 }
 
 @layer base {
   * {
-    @apply border-border;
+    border-color: var(--border);
   }
+
   body {
-    @apply bg-background text-foreground;
-    font-family: 'Inter', sans-serif;
     background-color: var(--bg-primary);
     color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
+  }
+
+  /* Исправление цвета текста в инпутах на темной теме */
+  .dark input,
+  .dark textarea,
+  .dark select {
+    color: var(--text-primary) !important;
+  }
+
+  .dark input::placeholder,
+  .dark textarea::placeholder {
+    color: var(--text-tertiary) !important;
+  }
+
+  /* Обеспечение видимости текста в инпутах */
+  input, textarea, select {
+    caret-color: var(--text-primary);
+  }
+
+  .dark input, .dark textarea, .dark select {
+    caret-color: var(--text-primary);
   }
 }
 
-/* Добавим также классы для других элементов */
-@layer utilities {
-  .bg-primary { background-color: var(--bg-primary); }
-  .bg-secondary { background-color: var(--bg-secondary); }
-  .bg-tertiary { background-color: var(--bg-tertiary); }
-  .text-primary { color: var(--text-primary); }
-  .text-secondary { color: var(--text-secondary); }
-  .text-tertiary { color: var(--text-tertiary); }
-  .border-border { border-color: var(--border); }
+/* Анимированный градиент */
+.bg-gradient-animated {
+  background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary), var(--accent-tertiary), var(--accent-primary));
+  background-size: 300% 300%;
+  animation: gradient-move 8s ease infinite;
+}
+
+@keyframes gradient-move {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Анимация градиентного текста */
+.text-gradient-animated {
+  background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary), var(--accent-tertiary), var(--accent-primary));
+  background-size: 300% 300%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-move 8s ease infinite;
 }

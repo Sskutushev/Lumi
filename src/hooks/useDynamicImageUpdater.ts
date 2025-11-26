@@ -1,0 +1,52 @@
+import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+
+// Hook for dynamically updating images based on theme and language
+export const useDynamicImageUpdater = () => {
+  const { i18n } = useTranslation();
+
+  useEffect(() => {
+    const updateDynamicImages = () => {
+      const imgElements = document.querySelectorAll('img[data-ru-light][data-ru-dark][data-en-light][data-en-dark]');
+      const isDark = document.documentElement.classList.contains('dark');
+      const currentLang = i18n.language;
+
+      imgElements.forEach(img => {
+        if (currentLang === 'ru') {
+          img.setAttribute('src', isDark ? img.getAttribute('data-ru-dark')! : img.getAttribute('data-ru-light')!);
+        } else {
+          img.setAttribute('src', isDark ? img.getAttribute('data-en-dark')! : img.getAttribute('data-en-light')!);
+        }
+      });
+    };
+
+    // Update immediately
+    updateDynamicImages();
+
+    // Watch for theme changes
+    const themeObserver = new MutationObserver(() => {
+      updateDynamicImages();
+    });
+
+    themeObserver.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+
+    // Watch for language changes
+    const handleLanguageChange = () => {
+      updateDynamicImages();
+    };
+
+    // Store current language in localStorage
+    localStorage.setItem('language', i18n.language);
+
+    i18n.on('languageChanged', handleLanguageChange);
+
+    // Cleanup
+    return () => {
+      themeObserver.disconnect();
+      i18n.off('languageChanged', handleLanguageChange);
+    };
+  }, [i18n]);
+};

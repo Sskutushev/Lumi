@@ -1,29 +1,66 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { Zap, Heart, Moon, Sun, Lock, Shield } from 'lucide-react';
+import { Check, Heart, Sun, Zap, Moon, Lock, Shield, MoreHorizontal } from 'lucide-react';
+
+interface Benefit {
+  title: string;
+  description: string;
+}
 
 const SolutionBenefits = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const [imageSrc, setImageSrc] = useState('/src/assets/images/en_light.jpg');
 
-  // Icons for benefits
-  const icons = [Zap, Heart, Moon];
-  
-  const benefits = [
+  // Update image source based on language and theme
+  useEffect(() => {
+    const updateImage = () => {
+      const isDark = document.documentElement.classList.contains('dark');
+      if (i18n.language === 'ru') {
+        setImageSrc(isDark ? '/src/assets/images/ru_dark.jpg' : '/src/assets/images/ru_light.jpg');
+      } else {
+        setImageSrc(isDark ? '/src/assets/images/en_dark.jpg' : '/src/assets/images/en_light.jpg');
+      }
+    };
+
+    // Initial setup
+    updateImage();
+
+    // Watch for theme changes
+    const observer = new MutationObserver(updateImage);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+
+    return () => observer.disconnect();
+  }, [i18n.language]);
+
+  // Benefits data
+  const benefits: Benefit[] = [
     {
-      icon: Zap,
       title: t('landing.solution.simple.title'),
       description: t('landing.solution.simple.description'),
     },
     {
-      icon: Heart,
       title: t('landing.solution.free.title'),
       description: t('landing.solution.free.description'),
     },
     {
-      icon: Sun, // Using Sun for brightness/light theme, but could be any icon
       title: t('landing.solution.focused.title'),
       description: t('landing.solution.focused.description'),
+    },
+  ];
+
+  // Additional benefits data
+  const additionalBenefits: Benefit[] = [
+    {
+      title: t('landing.solution.why.title'),
+      description: t('landing.solution.why.description'),
+    },
+    {
+      title: t('landing.solution.security.title'),
+      description: t('landing.solution.security.description'),
     },
   ];
 
@@ -47,28 +84,26 @@ const SolutionBenefits = () => {
             whileInView={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5 }}
             viewport={{ once: true }}
-            className="md:col-span-3 md:row-span-2 rounded-2xl bg-gradient-to-br from-accent-primary/10 to-accent-secondary/10 border border-border p-8 relative overflow-hidden group"
+            className="md:col-span-3 md:row-span-2 rounded-2xl bg-gradient-to-br from-accent-primary/10 to-accent-secondary/10 border border-border p-8"
           >
-            <div className="relative z-10">
-              <div className="w-16 h-16 rounded-2xl bg-accent-gradient-1 flex items-center justify-center mb-6">
-                <Zap className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-2xl font-bold text-text-primary mb-4">
-                {t('landing.solution.simple.title')}
-              </h3>
-              <p className="text-text-secondary mb-6">
-                {t('landing.solution.simple.description')}
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {['Simple UI', 'Quick Setup', 'No Learning Curve', 'Intuitive'].map((tag, idx) => (
-                  <span 
-                    key={idx}
-                    className="px-3 py-1.5 rounded-lg bg-bg-primary/50 text-text-secondary text-sm border border-border"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
+            <div className="w-16 h-16 rounded-2xl bg-accent-gradient-1 flex items-center justify-center mb-6">
+              <Zap className="w-8 h-8 text-white" />
+            </div>
+            <h3 className="text-2xl font-bold text-text-primary mb-4">
+              {t('landing.solution.simple.title')}
+            </h3>
+            <p className="text-text-secondary mb-6">
+              {t('landing.solution.simple.description')}
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {['Simple UI', 'Quick Setup', 'No Learning Curve', 'Intuitive'].map((tag, idx) => (
+                <span
+                  key={idx}
+                  className="px-3 py-1.5 rounded-lg bg-bg-primary/50 text-text-secondary text-sm border border-border"
+                >
+                  {tag}
+                </span>
+              ))}
             </div>
           </motion.div>
 
@@ -86,9 +121,19 @@ const SolutionBenefits = () => {
             <h3 className="text-xl font-bold text-text-primary mb-4">
               {t('landing.solution.free.title')}
             </h3>
-            <p className="text-text-secondary">
+            <p className="text-text-secondary mb-4">
               {t('landing.solution.free.description')}
             </p>
+            <div className="flex flex-wrap gap-2">
+              {['All Features', 'Forever Free', 'No Limits', 'Open Source'].map((tag, idx) => (
+                <span
+                  key={idx}
+                  className="px-3 py-1.5 rounded-lg bg-success/10 text-success text-sm border border-success/20"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
           </motion.div>
 
           {/* Small Cards - Individual Benefits */}
@@ -102,7 +147,7 @@ const SolutionBenefits = () => {
               className="md:col-span-2 rounded-2xl bg-bg-elevated border border-border p-6"
             >
               <div className="w-10 h-10 rounded-lg bg-accent-primary/10 text-accent-primary flex items-center justify-center mb-4">
-                <benefit.icon className="w-5 h-5" />
+                <Sun className="w-5 h-5" />
               </div>
               <h4 className="font-bold text-text-primary mb-2">
                 {benefit.title}
@@ -122,14 +167,14 @@ const SolutionBenefits = () => {
             className="md:col-span-4 rounded-2xl bg-gradient-to-r from-accent-tertiary/10 to-accent-primary/10 border border-border p-8"
           >
             <h3 className="text-xl font-bold text-text-primary mb-4">
-              Why Lumi?
+              {additionalBenefits[0].title}
             </h3>
             <p className="text-text-secondary mb-4">
-              Created with modern technologies and focusing on user experience.
+              {additionalBenefits[0].description}
             </p>
             <div className="flex flex-wrap gap-3">
               {['React', 'TypeScript', 'Supabase', 'Tailwind', 'Framer Motion'].map((tech, idx) => (
-                <div 
+                <div
                   key={idx}
                   className="px-3 py-1.5 rounded-lg bg-bg-primary/50 text-text-secondary border border-border text-sm"
                 >
@@ -151,10 +196,10 @@ const SolutionBenefits = () => {
               <Shield className="w-5 h-5" />
             </div>
             <h4 className="font-bold text-text-primary mb-2">
-              Secure
+              {additionalBenefits[1].title}
             </h4>
             <p className="text-sm text-text-secondary">
-              Data is stored securely with Supabase
+              {additionalBenefits[1].description}
             </p>
           </motion.div>
         </div>

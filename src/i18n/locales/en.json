@@ -22,12 +22,17 @@
     "error": "Error",
     "success": "Success",
     "darkTheme": "Dark Theme",
-    "lightTheme": "Light Theme"
+    "lightTheme": "Light Theme",
+    "logout": "Log Out",
+    "toggleTheme": "Toggle Theme",
+    "changeLanguage": "Change Language",
+    "add": "Add",
+    "back": "Back"
   },
   "landing": {
     "hero": {
-      "title": "Your tasks. Without noise.",
-      "subtitle": "Minimal. Fast. Beautiful. Everything you need to stay organized—nothing you don't.",
+      "title": "Your tasks. Without noise. Minimal.",
+      "subtitle": "Everything you need to stay organized—nothing you don't.",
       "cta": "Get Started Free"
     },
     "problems": {
@@ -60,10 +65,18 @@
       "focused": {
         "title": "Focus First",
         "description": "Designed to help you focus on what matters"
+      },
+      "why": {
+        "title": "Why Lumi?",
+        "description": "Created with modern technologies and focusing on user experience."
+      },
+      "security": {
+        "title": "Secure",
+        "description": "Data is stored securely with Supabase"
       }
     },
     "petProject": {
-      "title": "A Pet Project",
+      "title": "A Practice Project",
       "subtitle": "Created as a practice project with modern technologies",
       "description": "This is a pet project that demonstrates modern web development practices with React, TypeScript, and Supabase. It's completely free to use and open source."
     }
@@ -71,11 +84,99 @@
   "todo": {
     "inbox": "Inbox",
     "today": "Today",
-    "upcoming": "Upcoming",
-    "important": "Important",
+    "deadline": "Deadline",
+    "overdue": "Overdue",
+    "all": "All",
     "projects": "Projects",
     "quickAdd": "Add a task...",
-    "completed": "Completed"
+    "addTaskPlaceholder": "Add a new task...",
+    "completed": "Completed",
+    "searchPlaceholder": "Search tasks...",
+    "filter": "Filter",
+    "sorting": "Sorting",
+    "filters": "Filters",
+    "filterByPriority": "Filter by Priority",
+    "filterByDate": "Filter by Date",
+    "filterByProject": "Filter by Project",
+    "sortByDate": "Sort by Date",
+    "sortByPriority": "Sort by Priority",
+    "sortByName": "Sort by Name",
+    "priority": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High"
+    },
+    "priorityLabel": "Priority",
+    "project": "Project",
+    "noProject": "No project",
+    "taskDetails": "Task Details",
+    "taskTitle": "Task Title",
+    "startDate": "Start Date",
+    "dueDate": "Due Date",
+    "description": "Description",
+    "detailedDescription": "Detailed Description",
+    "descriptionPlaceholder": "Brief description...",
+    "detailedDescriptionPlaceholder": "Detailed description (up to 5000 characters)...",
+    "tasks": "Tasks",
+    "taskTitlePlaceholder": "Task title...",
+    "dueDatePlaceholder": "Select due date...",
+    "startDatePlaceholder": "Select start date...",
+    "priorityPlaceholder": "Select priority...",
+    "projectPlaceholder": "Select project...",
+    "addDescription": "Add description...",
+    "addDetailedDescription": "Add detailed description...",
+    "attachments": "Attachments",
+    "addAttachment": "Add attachment...",
+    "labels": "Labels",
+    "addLabel": "Add label...",
+    "comments": "Comments",
+    "addComment": "Add comment...",
+    "history": "History",
+    "created": "Created",
+    "updated": "Updated",
+    "completedDate": "Completed date"
+  },
+  "projects": {
+    "createProject": "Create Project",
+    "projectName": "Project Name",
+    "projectDescription": "Description",
+    "projectNamePlaceholder": "Enter project name...",
+    "descriptionPlaceholder": "Enter project description...",
+    "add": "Add Project",
+    "create": "Create",
+    "project": "Project",
+    "noProject": "No project",
+    "taskDetails": "Task Details",
+    "taskTitle": "Task Title",
+    "startDate": "Start Date",
+    "dueDate": "Due Date",
+    "description": "Description",
+    "detailedDescription": "Detailed Description",
+    "descriptionPlaceholder": "Brief description...",
+    "detailedDescriptionPlaceholder": "Detailed description (up to 5000 characters)...",
+    "tasks": "Tasks"
+  },
+  "profile": {
+    "settings": "Profile Settings",
+    "personalInfo": "Personal Information",
+    "name": "Name",
+    "email": "Email",
+    "account": "Account Settings",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "storage": "Storage",
+    "usedStorage": "Used Storage",
+    "activity": "Activity",
+    "lastActive": "Last Active",
+    "tasksCompleted": "Tasks Completed",
+    "clickToChange": "Click to change",
+    "emailCannotBeChanged": "Email cannot be changed",
+    "enterCurrentPassword": "Enter current password",
+    "enterNewPassword": "Enter new password",
+    "usage": "Usage",
+    "storageUsed": "Storage Used",
+    "updateSuccess": "Profile updated successfully",
+    "updateError": "Error updating profile"
   },
   "footer": {
     "rights": "© 2025 Lumi. All rights reserved.",
