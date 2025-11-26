@@ -2,7 +2,7 @@
 
 A sleek, intuitive, and beautifully designed todo application that focuses on simplicity and user experience without unnecessary clutter.
 
-## 🌟 Features
+## Features
 
 - **Clean & Minimal UI**: Designed for quick task management without distractions
 - **Light/Dark Theme**: Automatic theme switching with seamless transitions
@@ -15,7 +15,7 @@ A sleek, intuitive, and beautifully designed todo application that focuses on si
 - **Real-time Updates**: Powered by Supabase backend
 - **Open Source**: Completely free to use and contribute to
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **Frontend**: React 18, TypeScript, Vite
 - **Styling**: Tailwind CSS with custom design system
@@ -26,11 +26,11 @@ A sleek, intuitive, and beautifully designed todo application that focuses on si
 - **Backend**: Supabase (Auth, Database, Real-time)
 - **Build Tool**: Vite
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
-- Node.js 18+ 
+- Node.js 18+
 - npm or yarn
 
 ### Installation
@@ -59,7 +59,7 @@ npm run dev
 
 5. Visit `http://localhost:5173` in your browser
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 src/
@@ -76,7 +76,7 @@ src/
 └── types/               # Type definitions
 ```
 
-## 🎨 Design System
+## Design System
 
 Lumi follows a modern design system with:
 
@@ -86,7 +86,7 @@ Lumi follows a modern design system with:
 - **Borders**: Smooth rounded corners with `var(--radius)` variable
 - **Shadows**: Layered shadows for depth perception
 
-## 🌍 Internationalization
+## Internationalization
 
 The application supports both English and Russian languages. Translation keys are managed in the `src/i18n/locales/` directory.
 
@@ -94,17 +94,17 @@ To add a new translation:
 1. Add the key-value pair to `en.json` and `ru.json`
 2. Use the key with the `t` function: `{t('common.signIn')}`
 
-## 🎯 Theming
+## Theming
 
 Lumi supports light and dark themes. Themes can be switched via the theme toggle in the header or automatically based on system preference.
 
 Custom theme variables are defined in `src/styles/globals.css` and can be customized by adjusting the CSS variables.
 
-## 🗂️ Project Management
+## Project Management
 
 Users can create and manage projects to organize their tasks. Each task can belong to a specific project, allowing for better organization and filtering.
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Here's how you can help:
 
@@ -115,11 +115,11 @@ Contributions are welcome! Here's how you can help:
 5. Push to the branch (`git push origin feature/amazing-feature`)
 6. Open a Pull Request
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 💬 Contact
+## Contact
 
 - Portfolio: [https://sskutushev.site](https://sskutushev.site)
 - Telegram: [https://t.me/Sskutushev](https://t.me/Sskutushev)
