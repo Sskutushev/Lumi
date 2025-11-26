@@ -1,0 +1,48 @@
+# Dependencies
+node_modules/
+
+# Build
+dist/
+build/
+.nuxt/
+
+# Environment
+.env*
+!.env.example
+
+# Logs
+*.log
+
+# Runtime
+.nuxt
+.output
+.svelte-kit
+
+# System
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+*.swp
+*.swo
+*~
+
+# Coverage
+coverage/
+.nyc_output/
+
+# Vite
+.vite/
+
+# Temporary files
+tmp/
+temp/
+
+# NPM
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

@@ -1,0 +1,84 @@
+{
+  "common": {
+    "welcome": "Welcome to Lumi",
+    "tagline": "Start organizing your tasks in seconds",
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "getStarted": "Get Started",
+    "orContinueWith": "Or continue with",
+    "continueWithGoogle": "Continue with Google",
+    "continueWithGithub": "Continue with GitHub",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot Password?",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "darkTheme": "Dark Theme",
+    "lightTheme": "Light Theme"
+  },
+  "landing": {
+    "hero": {
+      "title": "Your tasks. Without noise.",
+      "subtitle": "Minimal. Fast. Beautiful. Everything you need to stay organized—nothing you don't.",
+      "cta": "Get Started Free"
+    },
+    "problems": {
+      "title": "Problems in Current Market",
+      "subtitle": "Existing solutions are either too complex or expensive",
+      "complexity": {
+        "title": "Overwhelming Complexity",
+        "description": "Most todo apps have too many features that make them difficult to use"
+      },
+      "pricing": {
+        "title": "High Pricing",
+        "description": "Many tools require expensive subscriptions for basic functionality"
+      },
+      "clutter": {
+        "title": "Interface Clutter",
+        "description": "Too many options and settings that distract from actual work"
+      }
+    },
+    "solution": {
+      "title": "Our Solution & Benefits",
+      "subtitle": "Lumi offers a clean and simple todo experience",
+      "simple": {
+        "title": "Simple & Intuitive",
+        "description": "Clean interface designed for quick task management"
+      },
+      "free": {
+        "title": "Completely Free",
+        "description": "All features available without any cost"
+      },
+      "focused": {
+        "title": "Focus First",
+        "description": "Designed to help you focus on what matters"
+      }
+    },
+    "petProject": {
+      "title": "A Pet Project",
+      "subtitle": "Created as a practice project with modern technologies",
+      "description": "This is a pet project that demonstrates modern web development practices with React, TypeScript, and Supabase. It's completely free to use and open source."
+    }
+  },
+  "todo": {
+    "inbox": "Inbox",
+    "today": "Today",
+    "upcoming": "Upcoming",
+    "important": "Important",
+    "projects": "Projects",
+    "quickAdd": "Add a task...",
+    "completed": "Completed"
+  },
+  "footer": {
+    "rights": "© 2025 Lumi. All rights reserved.",
+    "contact": "Contact"
+  }
+}
