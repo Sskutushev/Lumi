@@ -31,7 +31,7 @@
   },
   "landing": {
     "hero": {
-      "title": "Your tasks. Without noise. Minimal.",
+      "title": "Your tasks. Without noise.",
       "subtitle": "Everything you need to stay organized—nothing you don't.",
       "cta": "Get Started Free"
     },
@@ -52,7 +52,7 @@
       }
     },
     "solution": {
-      "title": "Our Solution & Benefits",
+      "title": "Solution & Benefits",
       "subtitle": "Lumi offers a clean and simple todo experience",
       "simple": {
         "title": "Simple & Intuitive",
@@ -112,7 +112,9 @@
     "taskDetails": "Task Details",
     "taskTitle": "Task Title",
     "startDate": "Start Date",
+    "startDatePlaceholder": "Select start date...",
     "dueDate": "Due Date",
+    "dueDatePlaceholder": "Select due date...",
     "description": "Description",
     "detailedDescription": "Detailed Description",
     "descriptionPlaceholder": "Brief description...",

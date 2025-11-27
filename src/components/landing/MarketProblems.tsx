@@ -48,17 +48,20 @@ const MarketProblems = () => {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
               viewport={{ once: true }}
-              className="bg-bg-secondary/50 backdrop-blur-sm border border-border rounded-2xl p-8 hover:bg-bg-tertiary/50 transition-all duration-300 group"
+              className="relative rounded-2xl bg-bg-secondary/50 backdrop-blur-sm border border-border p-8 hover:bg-bg-tertiary/50 transition-all duration-300 group shadow-lg shadow-accent-primary/10 hover:shadow-2xl hover:shadow-accent-primary/20"
             >
-              <div className="w-14 h-14 rounded-xl flex items-center justify-center mb-6 group-hover:scale-105 transition-transform">
-                <img src={problem.img} alt={problem.title} className="w-10 h-10 object-contain" />
+              <div className="absolute -inset-0.5 bg-gradient-animated rounded-2xl blur opacity-0 group-hover:opacity-50 transition-opacity duration-300 z-0" />
+              <div className="relative z-10">
+                <div className="w-24 h-24 rounded-xl flex items-center justify-center mb-6 group-hover:scale-105 transition-transform duration-300 z-10">
+                  <img src={problem.img} alt={problem.title} className="w-24 h-24 object-contain" />
+                </div>
+                <h3 className="text-xl font-bold text-text-primary mb-4 z-10">
+                  {problem.title}
+                </h3>
+                <p className="text-text-secondary z-10">
+                  {problem.description}
+                </p>
               </div>
-              <h3 className="text-xl font-bold text-text-primary mb-4">
-                {problem.title}
-              </h3>
-              <p className="text-text-secondary">
-                {problem.description}
-              </p>
             </motion.div>
           ))}
         </div>

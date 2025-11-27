@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { Code, Coffee, Sparkles } from 'lucide-react';
+import { Code, Coffee, Sparkles, Github } from 'lucide-react';
 
 const PetProject = () => {
   const { t } = useTranslation();
+  const [isFlipped, setIsFlipped] = useState(false);
 
   return (
     <section id="pet-project" className="py-20 px-4">
@@ -14,13 +15,17 @@ const PetProject = () => {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
           viewport={{ once: true }}
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-accent-primary/10 text-accent-primary text-sm font-medium mb-6"
+          className="inline-flex items-center gap-3 px-6 py-3.5 rounded-full bg-accent-primary/10 text-accent-primary text-base font-medium mb-6"
         >
-          <Coffee className="w-4 h-4" />
-          <span>{t('landing.petProject.title')}</span>
+          <div className="bg-gradient-animated w-8 h-8 rounded-full flex items-center justify-center">
+            <Coffee className="w-5 h-5 text-white" />
+          </div>
+          <span className="text-2xl font-bold text-gradient-animated bg-clip-text">
+            {t('landing.petProject.title')}
+          </span>
         </motion.div>
 
-        <motion.h2 
+        <motion.h2
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
@@ -45,24 +50,78 @@ const PetProject = () => {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3 }}
           viewport={{ once: true }}
-          className="bg-bg-secondary/50 backdrop-blur-sm border border-border rounded-2xl p-8 max-w-2xl mx-auto"
+          className="max-w-2xl mx-auto"
         >
-          <div className="w-16 h-16 rounded-2xl bg-accent-gradient-1 flex items-center justify-center mx-auto mb-6">
-            <Code className="w-8 h-8 text-white" />
-          </div>
-          <h3 className="text-2xl font-bold text-text-primary mb-4">Open Source</h3>
-          <p className="text-text-secondary mb-6">
-            This project is completely open source and available on GitHub for anyone to explore.
-          </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <div className="px-4 py-2 rounded-lg bg-bg-tertiary text-text-secondary text-sm">
-              React & TypeScript
-            </div>
-            <div className="px-4 py-2 rounded-lg bg-bg-tertiary text-text-secondary text-sm">
-              Supabase Backend
-            </div>
-            <div className="px-4 py-2 rounded-lg bg-bg-tertiary text-text-secondary text-sm">
-              Free to Use
+          <div
+            className={`relative cursor-pointer w-full h-80 [perspective:1000px]`}
+            onClick={() => setIsFlipped(!isFlipped)}
+          >
+            <div className={`relative w-full h-full transition-transform duration-700 [transform-style:preserve-3d] ${isFlipped ? '[transform:rotateY(180deg)]' : ''}`}>
+              {/* Front of card */}
+              <div className={`absolute inset-0 bg-bg-secondary/50 backdrop-blur-sm border border-border rounded-2xl p-8 flex flex-col items-center justify-center shadow-lg shadow-accent-primary/10 hover:shadow-2xl hover:shadow-accent-primary/20 [backface-visibility:hidden]`}>
+                <div className="w-16 h-16 rounded-2xl bg-accent-gradient-1 flex items-center justify-center mx-auto mb-6">
+                  <Code className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold text-text-primary mb-4">Open Source</h3>
+                <p className="text-text-secondary mb-6 text-center">
+                  This project is completely open source and available on GitHub for anyone to explore.
+                </p>
+                <div className="flex flex-wrap justify-center gap-4">
+                  <div className="px-4 py-2 rounded-lg bg-bg-tertiary text-text-secondary text-sm">
+                    React & TypeScript
+                  </div>
+                  <div className="px-4 py-2 rounded-lg bg-bg-tertiary text-text-secondary text-sm">
+                    Supabase Backend
+                  </div>
+                  <div className="px-4 py-2 rounded-lg bg-bg-tertiary text-text-secondary text-sm">
+                    Free to Use
+                  </div>
+                </div>
+              </div>
+
+              {/* Back of card */}
+              <div className={`absolute inset-0 bg-bg-secondary/50 backdrop-blur-sm border border-border rounded-2xl p-8 flex flex-col shadow-lg shadow-accent-primary/10 hover:shadow-2xl hover:shadow-accent-primary/20 [backface-visibility:hidden] [transform:rotateY(180deg)]`}>
+                <div className="flex flex-col md:flex-row gap-6 items-center">
+                  <div className="flex flex-col gap-3 flex-1">
+                    <div className="px-4 py-2 rounded-lg bg-bg-tertiary text-text-secondary text-sm">
+                      React & TypeScript
+                    </div>
+                    <div className="px-4 py-2 rounded-lg bg-bg-tertiary text-text-secondary text-sm">
+                      Supabase Backend
+                    </div>
+                    <div className="px-4 py-2 rounded-lg bg-bg-tertiary text-text-secondary text-sm">
+                      Free to Use
+                    </div>
+                  </div>
+
+                  <div className="flex-1 flex flex-col items-center">
+                    {/* Mock code block */}
+                    <div className="bg-bg-tertiary rounded-xl p-4 mb-4 text-left w-full">
+                      <pre className="text-xs text-text-tertiary overflow-x-auto">
+                        <code>{`// Example code from project
+function App() {
+  const [tasks, setTasks] = useState([]);
+  return (
+    <TodoDashboard tasks={tasks} />
+  );
+}`}</code>
+                      </pre>
+                    </div>
+
+                    <a
+                      href="https://github.com/Sskutushev/Lumi"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 group relative px-6 py-3 rounded-xl bg-gradient-animated text-white font-semibold shadow-lg shadow-accent-primary/30 hover:shadow-xl hover:shadow-accent-primary/40 hover:scale-105 transition-all duration-300"
+                    >
+                      <span className="relative z-10 flex items-center justify-center gap-2">
+                        <Github className="w-5 h-5" />
+                        GitHub
+                      </span>
+                    </a>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </motion.div>

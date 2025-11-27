@@ -1,0 +1,89 @@
+Uncaught ReferenceError: currentView is not defined
+    at TaskItem (TodoDashboard.tsx:514:25)
+    at renderWithHooks (chunk-GKJBSOWT.js?v=6462bbf2:11548:26)
+    at mountIndeterminateComponent (chunk-GKJBSOWT.js?v=6462bbf2:14926:21)
+    at beginWork (chunk-GKJBSOWT.js?v=6462bbf2:15914:22)
+    at HTMLUnknownElement.callCallback2 (chunk-GKJBSOWT.js?v=6462bbf2:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-GKJBSOWT.js?v=6462bbf2:3699:24)
+    at invokeGuardedCallback (chunk-GKJBSOWT.js?v=6462bbf2:3733:39)
+    at beginWork$1 (chunk-GKJBSOWT.js?v=6462bbf2:19765:15)
+    at performUnitOfWork (chunk-GKJBSOWT.js?v=6462bbf2:19198:20)
+    at workLoopSync (chunk-GKJBSOWT.js?v=6462bbf2:19137:13)
+TaskItem @ TodoDashboard.tsx:514
+renderWithHooks @ chunk-GKJBSOWT.js?v=6462bbf2:11548
+mountIndeterminateComponent @ chunk-GKJBSOWT.js?v=6462bbf2:14926
+beginWork @ chunk-GKJBSOWT.js?v=6462bbf2:15914
+callCallback2 @ chunk-GKJBSOWT.js?v=6462bbf2:3674
+invokeGuardedCallbackDev @ chunk-GKJBSOWT.js?v=6462bbf2:3699
+invokeGuardedCallback @ chunk-GKJBSOWT.js?v=6462bbf2:3733
+beginWork$1 @ chunk-GKJBSOWT.js?v=6462bbf2:19765
+performUnitOfWork @ chunk-GKJBSOWT.js?v=6462bbf2:19198
+workLoopSync @ chunk-GKJBSOWT.js?v=6462bbf2:19137
+renderRootSync @ chunk-GKJBSOWT.js?v=6462bbf2:19116
+performSyncWorkOnRoot @ chunk-GKJBSOWT.js?v=6462bbf2:18874
+flushSyncCallbacks @ chunk-GKJBSOWT.js?v=6462bbf2:9119
+(anonymous) @ chunk-GKJBSOWT.js?v=6462bbf2:18627
+3TodoDashboard.tsx:514 Uncaught ReferenceError: currentView is not defined
+    at TaskItem (TodoDashboard.tsx:514:25)
+    at renderWithHooks (chunk-GKJBSOWT.js?v=6462bbf2:11548:26)
+    at mountIndeterminateComponent (chunk-GKJBSOWT.js?v=6462bbf2:14926:21)
+    at beginWork (chunk-GKJBSOWT.js?v=6462bbf2:15914:22)
+    at HTMLUnknownElement.callCallback2 (chunk-GKJBSOWT.js?v=6462bbf2:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-GKJBSOWT.js?v=6462bbf2:3699:24)
+    at invokeGuardedCallback (chunk-GKJBSOWT.js?v=6462bbf2:3733:39)
+    at beginWork$1 (chunk-GKJBSOWT.js?v=6462bbf2:19765:15)
+    at performUnitOfWork (chunk-GKJBSOWT.js?v=6462bbf2:19198:20)
+    at workLoopSync (chunk-GKJBSOWT.js?v=6462bbf2:19137:13)
+TaskItem @ TodoDashboard.tsx:514
+renderWithHooks @ chunk-GKJBSOWT.js?v=6462bbf2:11548
+mountIndeterminateComponent @ chunk-GKJBSOWT.js?v=6462bbf2:14926
+beginWork @ chunk-GKJBSOWT.js?v=6462bbf2:15914
+callCallback2 @ chunk-GKJBSOWT.js?v=6462bbf2:3674
+invokeGuardedCallbackDev @ chunk-GKJBSOWT.js?v=6462bbf2:3699
+invokeGuardedCallback @ chunk-GKJBSOWT.js?v=6462bbf2:3733
+beginWork$1 @ chunk-GKJBSOWT.js?v=6462bbf2:19765
+performUnitOfWork @ chunk-GKJBSOWT.js?v=6462bbf2:19198
+workLoopSync @ chunk-GKJBSOWT.js?v=6462bbf2:19137
+renderRootSync @ chunk-GKJBSOWT.js?v=6462bbf2:19116
+recoverFromConcurrentError @ chunk-GKJBSOWT.js?v=6462bbf2:18736
+performSyncWorkOnRoot @ chunk-GKJBSOWT.js?v=6462bbf2:18879
+flushSyncCallbacks @ chunk-GKJBSOWT.js?v=6462bbf2:9119
+(anonymous) @ chunk-GKJBSOWT.js?v=6462bbf2:18627
+3chunk-GKJBSOWT.js?v=6462bbf2:14032 The above error occurred in the <TaskItem> component:
+
+    at TaskItem (http://localhost:5173/src/pages/TodoDashboard.tsx:837:3)
+    at div
+    at div
+    at div
+    at div
+    at div
+    at div
+    at TodoDashboard (http://localhost:5173/src/pages/TodoDashboard.tsx:25:26)
+    at App (http://localhost:5173/src/App.tsx:33:47)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+logCapturedError @ chunk-GKJBSOWT.js?v=6462bbf2:14032
+update.callback @ chunk-GKJBSOWT.js?v=6462bbf2:14052
+callCallback @ chunk-GKJBSOWT.js?v=6462bbf2:11248
+commitUpdateQueue @ chunk-GKJBSOWT.js?v=6462bbf2:11265
+commitLayoutEffectOnFiber @ chunk-GKJBSOWT.js?v=6462bbf2:17093
+commitLayoutMountEffects_complete @ chunk-GKJBSOWT.js?v=6462bbf2:17980
+commitLayoutEffects_begin @ chunk-GKJBSOWT.js?v=6462bbf2:17969
+commitLayoutEffects @ chunk-GKJBSOWT.js?v=6462bbf2:17920
+commitRootImpl @ chunk-GKJBSOWT.js?v=6462bbf2:19353
+commitRoot @ chunk-GKJBSOWT.js?v=6462bbf2:19277
+performSyncWorkOnRoot @ chunk-GKJBSOWT.js?v=6462bbf2:18895
+flushSyncCallbacks @ chunk-GKJBSOWT.js?v=6462bbf2:9119
+(anonymous) @ chunk-GKJBSOWT.js?v=6462bbf2:18627
+chunk-GKJBSOWT.js?v=6462bbf2:9129 Uncaught ReferenceError: currentView is not defined
+    at TaskItem (TodoDashboard.tsx:514:25)
+    at renderWithHooks (chunk-GKJBSOWT.js?v=6462bbf2:11548:26)
+    at mountIndeterminateComponent (chunk-GKJBSOWT.js?v=6462bbf2:14926:21)
+    at beginWork (chunk-GKJBSOWT.js?v=6462bbf2:15914:22)
+    at beginWork$1 (chunk-GKJBSOWT.js?v=6462bbf2:19753:22)
+    at performUnitOfWork (chunk-GKJBSOWT.js?v=6462bbf2:19198:20)
+    at workLoopSync (chunk-GKJBSOWT.js?v=6462bbf2:19137:13)
+    at renderRootSync (chunk-GKJBSOWT.js?v=6462bbf2:19116:15)
+    at recoverFromConcurrentError (chunk-GKJBSOWT.js?v=6462bbf2:18736:28)
+    at performSyncWorkOnRoot (chunk-GKJBSOWT.js?v=6462bbf2:18879:28)

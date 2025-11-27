@@ -92,9 +92,6 @@ const AuthModal = ({ onClose }: AuthModalProps) => {
           </button>
 
           <div className="text-center space-y-4 mb-8">
-            <div className="w-14 h-14 rounded-2xl bg-accent-gradient-1 flex items-center justify-center mx-auto">
-              <span className="text-white font-bold text-xl">L</span>
-            </div>
             <h2 className="text-2xl font-bold text-text-primary">
               {isSignIn ? t('common.signIn') : t('common.signUp')}
             </h2>

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { Check, Heart, Sun, Zap, Moon, Lock, Shield, MoreHorizontal } from 'lucide-react';
 
 interface Benefit {
   title: string;
@@ -10,31 +9,6 @@ interface Benefit {
 
 const SolutionBenefits = () => {
   const { t, i18n } = useTranslation();
-  const [imageSrc, setImageSrc] = useState('/src/assets/images/en_light.jpg');
-
-  // Update image source based on language and theme
-  useEffect(() => {
-    const updateImage = () => {
-      const isDark = document.documentElement.classList.contains('dark');
-      if (i18n.language === 'ru') {
-        setImageSrc(isDark ? '/src/assets/images/ru_dark.jpg' : '/src/assets/images/ru_light.jpg');
-      } else {
-        setImageSrc(isDark ? '/src/assets/images/en_dark.jpg' : '/src/assets/images/en_light.jpg');
-      }
-    };
-
-    // Initial setup
-    updateImage();
-
-    // Watch for theme changes
-    const observer = new MutationObserver(updateImage);
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['class']
-    });
-
-    return () => observer.disconnect();
-  }, [i18n.language]);
 
   // Benefits data
   const benefits: Benefit[] = [
@@ -64,6 +38,29 @@ const SolutionBenefits = () => {
     },
   ];
 
+  // Animation variants for puzzle assembly effect
+  const cardVariants = {
+    hidden: {
+      opacity: 0,
+      scale: 0.8,
+      x: () => Math.random() > 0.5 ? 100 : -100, // Random starting position (left or right)
+      y: () => Math.random() > 0.5 ? 100 : -100, // Random starting position (top or bottom)
+    },
+    visible: (i: number) => ({
+      opacity: 1,
+      scale: 1,
+      x: 0,
+      y: 0,
+      transition: {
+        type: "spring",
+        stiffness: 50,
+        damping: 15,
+        delay: i * 0.1,
+        duration: 0.8
+      }
+    })
+  };
+
   return (
     <section id="solution" className="py-20 px-4 bg-bg-secondary/30">
       <div className="max-w-7xl mx-auto">
@@ -77,29 +74,34 @@ const SolutionBenefits = () => {
         </div>
 
         {/* Bento Grid Layout */}
-        <div className="grid grid-cols-1 md:grid-cols-6 gap-4 auto-rows-fr">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-3 auto-rows-fr">
           {/* Large Card - Features Overview */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
+            custom={0}
+            variants={cardVariants}
+            initial="hidden"
+            whileInView="visible"
             viewport={{ once: true }}
-            className="md:col-span-3 md:row-span-2 rounded-2xl bg-gradient-to-br from-accent-primary/10 to-accent-secondary/10 border border-border p-8"
+            className="md:col-span-2 rounded-xl bg-gradient-to-br from-accent-primary/10 to-accent-secondary/10 border border-border p-3 flex flex-col justify-center text-left"
           >
-            <div className="w-16 h-16 rounded-2xl bg-accent-gradient-1 flex items-center justify-center mb-6">
-              <Zap className="w-8 h-8 text-white" />
+            <div className="w-20 h-20 rounded-xl bg-white/10 flex items-center justify-center mb-2 flex-shrink-0">
+              <img
+                src="/img/Просто-Photoroom.png"
+                alt="Simple"
+                className="w-24 h-24 object-contain"
+              />
             </div>
-            <h3 className="text-2xl font-bold text-text-primary mb-4">
+            <h3 className="text-lg font-bold text-text-primary mb-1">
               {t('landing.solution.simple.title')}
             </h3>
-            <p className="text-text-secondary mb-6">
+            <p className="text-text-secondary mb-2 text-sm">
               {t('landing.solution.simple.description')}
             </p>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap justify-start gap-1">
               {['Simple UI', 'Quick Setup', 'No Learning Curve', 'Intuitive'].map((tag, idx) => (
                 <span
                   key={idx}
-                  className="px-3 py-1.5 rounded-lg bg-bg-primary/50 text-text-secondary text-sm border border-border"
+                  className="px-1.5 py-0.5 rounded bg-bg-primary/50 text-text-secondary border border-border text-xs"
                 >
                   {tag}
                 </span>
@@ -109,26 +111,31 @@ const SolutionBenefits = () => {
 
           {/* Medium Card - Free Benefits */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
+            custom={1}
+            variants={cardVariants}
+            initial="hidden"
+            whileInView="visible"
             viewport={{ once: true }}
-            className="md:col-span-3 rounded-2xl bg-bg-elevated border border-border p-8"
+            className="md:col-span-2 rounded-xl bg-bg-elevated border border-border p-3 flex flex-col justify-center text-left"
           >
-            <div className="w-12 h-12 rounded-xl bg-success/10 text-success flex items-center justify-center mb-6">
-              <Heart className="w-6 h-6" />
+            <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center mb-2 flex-shrink-0">
+              <img
+                src="/img/бесплатно-Photoroom.png"
+                alt="Free"
+                className="w-16 h-16 object-contain"
+              />
             </div>
-            <h3 className="text-xl font-bold text-text-primary mb-4">
+            <h3 className="text-base font-bold text-text-primary mb-1">
               {t('landing.solution.free.title')}
             </h3>
-            <p className="text-text-secondary mb-4">
+            <p className="text-text-secondary mb-2 text-xs">
               {t('landing.solution.free.description')}
             </p>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap justify-start gap-1">
               {['All Features', 'Forever Free', 'No Limits', 'Open Source'].map((tag, idx) => (
                 <span
                   key={idx}
-                  className="px-3 py-1.5 rounded-lg bg-success/10 text-success text-sm border border-success/20"
+                  className="px-1.5 py-0.5 rounded bg-success/10 text-success border border-success/20 text-xs"
                 >
                   {tag}
                 </span>
@@ -137,46 +144,56 @@ const SolutionBenefits = () => {
           </motion.div>
 
           {/* Small Cards - Individual Benefits */}
-          {benefits.slice(2).map((benefit, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 + index * 0.1 }}
-              viewport={{ once: true }}
-              className="md:col-span-2 rounded-2xl bg-bg-elevated border border-border p-6"
-            >
-              <div className="w-10 h-10 rounded-lg bg-accent-primary/10 text-accent-primary flex items-center justify-center mb-4">
-                <Sun className="w-5 h-5" />
-              </div>
-              <h4 className="font-bold text-text-primary mb-2">
-                {benefit.title}
-              </h4>
-              <p className="text-sm text-text-secondary">
-                {benefit.description}
-              </p>
-            </motion.div>
-          ))}
+          <motion.div
+            custom={2}
+            variants={cardVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="md:col-span-1 rounded-xl bg-bg-elevated border border-border p-2 flex flex-col justify-center text-left"
+          >
+            <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center mb-1 flex-shrink-0">
+              <img
+                src="/img/фокус-Photoroom.png"
+                alt="Focus"
+                className="w-14 h-14 object-contain"
+              />
+            </div>
+            <h4 className="font-bold text-text-primary mb-1 text-base">
+              {benefits[2].title}
+            </h4>
+            <p className="text-text-secondary text-xs">
+              {benefits[2].description}
+            </p>
+          </motion.div>
 
           {/* Wide Card - Additional Info */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
+            custom={3}
+            variants={cardVariants}
+            initial="hidden"
+            whileInView="visible"
             viewport={{ once: true }}
-            className="md:col-span-4 rounded-2xl bg-gradient-to-r from-accent-tertiary/10 to-accent-primary/10 border border-border p-8"
+            className="md:col-span-2 rounded-xl bg-gradient-to-r from-accent-tertiary/10 to-accent-primary/10 border border-border p-3 flex flex-col justify-center text-left"
           >
-            <h3 className="text-xl font-bold text-text-primary mb-4">
+            <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center mb-2 flex-shrink-0">
+              <img
+                src="/img/почему-Photoroom.png"
+                alt="Why Lumi"
+                className="w-16 h-16 object-contain"
+              />
+            </div>
+            <h3 className="text-base font-bold text-text-primary mb-2">
               {additionalBenefits[0].title}
             </h3>
-            <p className="text-text-secondary mb-4">
+            <p className="text-text-secondary mb-2 text-xs">
               {additionalBenefits[0].description}
             </p>
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap justify-start gap-1">
               {['React', 'TypeScript', 'Supabase', 'Tailwind', 'Framer Motion'].map((tech, idx) => (
                 <div
                   key={idx}
-                  className="px-3 py-1.5 rounded-lg bg-bg-primary/50 text-text-secondary border border-border text-sm"
+                  className="px-2 py-1 rounded bg-bg-primary/50 text-text-secondary border border-border text-xs"
                 >
                   {tech}
                 </div>
@@ -186,19 +203,24 @@ const SolutionBenefits = () => {
 
           {/* Small Card - Security */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.5 }}
+            custom={4}
+            variants={cardVariants}
+            initial="hidden"
+            whileInView="visible"
             viewport={{ once: true }}
-            className="md:col-span-2 rounded-2xl bg-bg-elevated border border-border p-6"
+            className="md:col-span-1 rounded-xl bg-bg-elevated border border-border p-2 flex flex-col justify-center text-left"
           >
-            <div className="w-10 h-10 rounded-lg bg-info/10 text-info flex items-center justify-center mb-4">
-              <Shield className="w-5 h-5" />
+            <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center mb-1 flex-shrink-0">
+              <img
+                src="/img/секьюри-Photoroom.png"
+                alt="Security"
+                className="w-14 h-14 object-contain"
+              />
             </div>
-            <h4 className="font-bold text-text-primary mb-2">
+            <h4 className="font-bold text-text-primary mb-1 text-base">
               {additionalBenefits[1].title}
             </h4>
-            <p className="text-sm text-text-secondary">
+            <p className="text-text-secondary text-xs">
               {additionalBenefits[1].description}
             </p>
           </motion.div>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Github, Globe, Mail, Linkedin } from 'lucide-react';
+import { Github, Globe, Mail, Linkedin, Send } from 'lucide-react';
 
 const Footer = () => {
   const { t } = useTranslation();
@@ -40,14 +40,14 @@ const Footer = () => {
             >
               <Github className="w-5 h-5 text-text-secondary" />
             </a>
-            <a 
-              href="https://t.me/Sskutushev" 
-              target="_blank" 
+            <a
+              href="https://t.me/Sskutushev"
+              target="_blank"
               rel="noopener noreferrer"
               className="w-10 h-10 rounded-lg bg-bg-secondary hover:bg-bg-tertiary flex items-center justify-center transition-colors"
               aria-label="Telegram"
             >
-              <span className="text-text-secondary font-bold text-sm">t</span>
+              <Send className="w-5 h-5 text-text-secondary" />
             </a>
           </div>
         </div>

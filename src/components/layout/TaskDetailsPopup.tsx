@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { X, Calendar, Flag, Minus, Plus } from 'lucide-react';
+import CalendarDropdown from './CalendarDropdown';
 
 // Define interface for the task
 interface Task {
@@ -108,35 +109,19 @@ const TaskDetailsPopup: React.FC<TaskDetailsPopupProps> = ({
 
             {/* Dates */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-text-secondary mb-2">
-                  {t('todo.startDate') || 'Start Date'}
-                </label>
-                <div className="relative">
-                  <input
-                    type="date"
-                    value={editedTask.startDate || ''}
-                    onChange={(e) => setEditedTask(prev => ({ ...prev, startDate: e.target.value }))}
-                    className="w-full px-4 py-2 rounded-lg border border-border bg-bg-secondary focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20 outline-none transition-all text-text-primary"
-                  />
-                  <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-text-tertiary" />
-                </div>
-              </div>
+              <CalendarDropdown
+                value={editedTask.startDate || ''}
+                onChange={(date) => setEditedTask(prev => ({ ...prev, startDate: date }))}
+                label={t('todo.startDate') || 'Start Date'}
+                placeholder={t('todo.startDatePlaceholder') || 'Select start date...'}
+              />
 
-              <div>
-                <label className="block text-sm font-medium text-text-secondary mb-2">
-                  {t('todo.dueDate') || 'Due Date'}
-                </label>
-                <div className="relative">
-                  <input
-                    type="date"
-                    value={editedTask.dueDate || ''}
-                    onChange={(e) => setEditedTask(prev => ({ ...prev, dueDate: e.target.value }))}
-                    className="w-full px-4 py-2 rounded-lg border border-border bg-bg-secondary focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20 outline-none transition-all text-text-primary"
-                  />
-                  <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-text-tertiary" />
-                </div>
-              </div>
+              <CalendarDropdown
+                value={editedTask.dueDate || ''}
+                onChange={(date) => setEditedTask(prev => ({ ...prev, dueDate: date }))}
+                label={t('todo.dueDate') || 'Due Date'}
+                placeholder={t('todo.dueDatePlaceholder') || 'Select due date...'}
+              />
             </div>
 
             {/* Project Selection */}
@@ -199,7 +184,7 @@ const TaskDetailsPopup: React.FC<TaskDetailsPopupProps> = ({
                     document.addEventListener('mouseup', handleMouseUp);
                   }}
                 >
-                  <Minus className="w-3 h-3 text-text-tertiary absolute -top-1 -right-1 rotate-45" />
+                  <div className="text-text-tertiary absolute -top-1 -right-1 text-xs">◢</div>
                 </div>
               </div>
             </div>
@@ -241,7 +226,7 @@ const TaskDetailsPopup: React.FC<TaskDetailsPopupProps> = ({
                     document.addEventListener('mouseup', handleMouseUp);
                   }}
                 >
-                  <Plus className="w-3 h-3 text-text-tertiary absolute -top-1 -right-1 rotate-45" />
+                  <div className="text-text-tertiary absolute -top-1 -right-1 text-xs">◢</div>
                 </div>
               </div>
             </div>

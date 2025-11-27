@@ -82,6 +82,17 @@ const TodoDashboard: React.FC<TodoDashboardProps> = ({ onSignOut, onProjectSelec
     setTasks(tasks.filter(task => task.id !== id));
   };
 
+  // Check for overdue tasks
+  const today = new Date();
+  const overdueTasks = tasks.filter(task => {
+    if (!task.dueDate || task.completed) return false;
+    const dueDate = new Date(task.dueDate);
+    return dueDate < today;
+  });
+
+  // Check if there are any overdue tasks
+  const hasOverdueTasks = overdueTasks.length > 0;
+
   // Filter tasks based on current view
   const filteredTasks = tasks.filter(task => {
     const today = new Date();
@@ -251,15 +262,24 @@ const TodoDashboard: React.FC<TodoDashboardProps> = ({ onSignOut, onProjectSelec
                   <span>{t('todo.deadline')}</span>
                 </button>
                 <button
-                  className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg ${
+                  className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg relative ${
                     currentView === 'important'
                       ? 'bg-accent-primary/10 text-accent-primary font-medium'
                       : 'hover:bg-bg-tertiary/50 text-text-secondary'
+                  } ${
+                    hasOverdueTasks && currentView !== 'important'
+                      ? 'animate-pulse'
+                      : ''
                   }`}
                   onClick={() => setCurrentView('important')}
                 >
-                  <AlertCircle className="w-5 h-5" />
-                  <span>{t('todo.overdue')}</span>
+                  <AlertCircle className={`w-5 h-5 ${
+                    hasOverdueTasks && currentView !== 'important' ? 'text-error' : ''
+                  }`} />
+                  <span className={`${hasOverdueTasks && currentView !== 'important' ? 'text-error' : ''}`}>{t('todo.overdue')}</span>
+                  {hasOverdueTasks && currentView !== 'important' && (
+                    <div className="absolute inset-0 rounded-lg border border-error animate-ping opacity-75 pointer-events-none"></div>
+                  )}
                 </button>
                 <button
                   className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg ${
@@ -379,23 +399,25 @@ const TodoDashboard: React.FC<TodoDashboardProps> = ({ onSignOut, onProjectSelec
                 </div>
               </div>
 
-              {/* Quick Add */}
-              <div className="relative mb-6">
-                <input
-                  type="text"
-                  value={newTask}
-                  onChange={(e) => setNewTask(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && addTask()}
-                  placeholder={t('todo.addTaskPlaceholder') || 'Add a new task...'}
-                  className="w-full px-4 py-3 rounded-xl border border-border bg-bg-tertiary/50 focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20 outline-none transition-all placeholder:text-text-tertiary text-text-primary"
-                />
-                <button 
-                  onClick={addTask}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg hover:bg-bg-secondary transition-colors"
-                >
-                  <Plus className="w-5 h-5 text-text-secondary" />
-                </button>
-              </div>
+              {/* Quick Add - only show on 'all' view */}
+              {currentView === 'all' && (
+                <div className="relative mb-6">
+                  <input
+                    type="text"
+                    value={newTask}
+                    onChange={(e) => setNewTask(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && addTask()}
+                    placeholder={t('todo.addTaskPlaceholder') || 'Add a new task...'}
+                    className="w-full px-4 py-3 rounded-xl border border-border bg-bg-tertiary/50 focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20 outline-none transition-all placeholder:text-text-tertiary text-text-primary"
+                  />
+                  <button
+                    onClick={addTask}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg hover:bg-bg-secondary transition-colors"
+                  >
+                    <Plus className="w-5 h-5 text-text-secondary" />
+                  </button>
+                </div>
+              )}
 
               {/* Task List */}
               <div className="space-y-3">

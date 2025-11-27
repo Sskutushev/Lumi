@@ -52,9 +52,9 @@ const HeroSection = () => {
           transition={{ duration: 0.5, delay: 0.1 }}
           className="text-center max-w-4xl mx-auto"
         >
-          <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold leading-tight mb-4">
-            <span className="text-gradient-animated bg-clip-text">
-              {t('landing.hero.title')}
+          <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold mb-10 whitespace-nowrap overflow-x-hidden" style={{ lineHeight: '1.2', overflow: 'visible' }}>
+            <span className="text-gradient-animated bg-clip-text inline-block" style={{ lineHeight: '1.2', display: 'inline-block', overflow: 'visible', paddingBottom: '0.1em', whiteSpace: 'nowrap' }}>
+              {t('landing.hero.title').split('.')[0]}. {t('landing.hero.title').split('.').slice(1).join('.').replace(/^[\s.]+/, '')}
             </span>
           </h1>
 

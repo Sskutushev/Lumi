@@ -27,11 +27,34 @@
     "toggleTheme": "Сменить тему",
     "changeLanguage": "Изменить язык",
     "add": "Добавить",
-    "back": "Назад"
+    "back": "Назад",
+    "months": {
+      "january": "Январь",
+      "february": "Февраль",
+      "march": "Март",
+      "april": "Апрель",
+      "may": "Май",
+      "june": "Июнь",
+      "july": "Июль",
+      "august": "Август",
+      "september": "Сентябрь",
+      "october": "Октябрь",
+      "november": "Ноябрь",
+      "december": "Декабрь"
+    },
+    "days": {
+      "sunday": "Вс",
+      "monday": "Пн",
+      "tuesday": "Вт",
+      "wednesday": "Ср",
+      "thursday": "Чт",
+      "friday": "Пт",
+      "saturday": "Сб"
+    }
   },
   "landing": {
     "hero": {
-      "title": "Твои задачи. Без шума. Минимально.",
+      "title": "Твои задачи. Без шума.",
       "subtitle": "Всё, что нужно для организации—ничего лишнего.",
       "cta": "Начать бесплатно"
     },
@@ -52,7 +75,7 @@
       }
     },
     "solution": {
-      "title": "Наше решение и преимущества",
+      "title": "Решение и преимущества",
       "subtitle": "Lumi предлагает простой и понятный опыт управления задачами",
       "simple": {
         "title": "Просто и интуитивно",
@@ -102,6 +125,7 @@
     "sortByPriority": "Сортировать по приоритету",
     "sortByName": "Сортировать по названию",
     "priority": {
+      "label": "Приоритет",
       "low": "Низкий",
       "medium": "Средний",
       "high": "Высокий"
@@ -112,7 +136,9 @@
     "taskDetails": "Детали задачи",
     "taskTitle": "Название задачи",
     "startDate": "Дата начала",
+    "startDatePlaceholder": "Выберите дату начала...",
     "dueDate": "Дата выполнения",
+    "dueDatePlaceholder": "Выберите дату выполнения...",
     "description": "Описание",
     "detailedDescription": "Подробное описание",
     "descriptionPlaceholder": "Краткое описание...",
