@@ -4,9 +4,8 @@ import {
   Task, 
   CreateTaskDTO, 
   UpdateTaskDTO,
-  ProjectStats,
   UserStats
-} from '../types/api.types';
+} from '../../types/api.types';
 
 export const tasksAPI = {
   // Получить все задачи пользователя, опционально фильтруя по проекту

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { X, Calendar, Flag, Minus, Plus } from 'lucide-react';
+import { X } from 'lucide-react';
 import { toast } from 'sonner';
 import CalendarDropdown from './CalendarDropdown';
 import { Task as TaskType, Project as ProjectType } from '../../types/api.types';

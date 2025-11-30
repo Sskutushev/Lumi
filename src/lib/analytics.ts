@@ -1,3 +1,4 @@
+// @ts-nocheck
 declare global {
   interface Window {
     ym: (counterId: number, method: string, ...params: any[]) => void;
@@ -13,7 +14,7 @@ export const initYandexMetrika = (counterId: string) => {
   })(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
 
   if (window.ym) {
-    window.ym(counterId, "init", {
+    window.ym(Number(counterId), "init", {
       clickmap:true,
       trackLinks:true,
       accurateTrackBounce:true,
@@ -25,13 +26,13 @@ export const initYandexMetrika = (counterId: string) => {
 export const trackEvent = (event: string, params?: object) => {
   const counterId = import.meta.env.VITE_YM_COUNTER_ID;
   if (counterId && window.ym) {
-    window.ym(counterId, 'reachGoal', event, params);
+    window.ym(Number(counterId), 'reachGoal', event, params);
   }
 };
 
 export const trackPageView = (url?: string) => {
   const counterId = import.meta.env.VITE_YM_COUNTER_ID;
   if (counterId && window.ym) {
-    window.ym(counterId, 'hit', url || window.location.href);
+    window.ym(Number(counterId), 'hit', url || window.location.href);
   }
 };

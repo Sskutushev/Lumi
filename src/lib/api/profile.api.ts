@@ -4,7 +4,7 @@ import {
   UserProfile,
   UpdateProfileDTO,
   StorageStats
-} from '../types/api.types';
+} from '../../types/api.types';
 
 export const profileAPI = {
   // Создать профиль пользователя

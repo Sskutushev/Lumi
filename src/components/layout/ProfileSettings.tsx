@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { X, User, Camera, Activity, BarChart3, CheckCircle, Calendar, Flag } from 'lucide-react';
+import { X, Camera, Activity, BarChart3 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuthStore } from '../../store/authStore';
 import { profileAPI, formatBytes } from '../../lib/api/profile.api';
 import { tasksAPI } from '../../lib/api/tasks.api';
 import { supabase } from '../../lib/supabase';
-import { UserProfile, StorageStats, UserStats } from '../../types/api.types';
+import { StorageStats, UserStats } from '../../types/api.types';
 
 interface ProfileSettingsProps {
   isOpen: boolean;
@@ -140,19 +140,6 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ isOpen, onClose }) =>
     } finally {
       setIsUpdating(false);
     }
-  };
-
-  // Функция для форматирования байтов
-  const formatBytesLocal = (bytes: number, decimals = 2): string => {
-    if (bytes === 0) return '0 Bytes';
-
-    const k = 1024;
-    const dm = decimals < 0 ? 0 : decimals;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
   };
 
   if (!isOpen) return null;

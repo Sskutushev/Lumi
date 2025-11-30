@@ -5,7 +5,7 @@ import {
   CreateProjectDTO, 
   UpdateProjectDTO,
   ProjectStats
-} from '../types/api.types';
+} from '../../types/api.types';
 
 export const projectsAPI = {
   // Получить все проекты пользователя

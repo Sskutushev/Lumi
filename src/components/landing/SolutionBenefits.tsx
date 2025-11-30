@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { motion } from 'framer-motion';
+import { motion, Variants } from 'framer-motion';
 
 interface Benefit {
   title: string;
@@ -8,7 +7,7 @@ interface Benefit {
 }
 
 const SolutionBenefits = () => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
   // Benefits data
   const benefits: Benefit[] = [
@@ -39,17 +38,15 @@ const SolutionBenefits = () => {
   ];
 
   // Animation variants for puzzle assembly effect
-  const cardVariants = {
+  const cardVariants: Variants = {
     hidden: {
       opacity: 0,
       scale: 0.8,
-      x: () => Math.random() > 0.5 ? 100 : -100, // Random starting position (left or right)
-      y: () => Math.random() > 0.5 ? 100 : -100, // Random starting position (top or bottom)
+      y: 50,
     },
     visible: (i: number) => ({
       opacity: 1,
       scale: 1,
-      x: 0,
       y: 0,
       transition: {
         type: "spring",

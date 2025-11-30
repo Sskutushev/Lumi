@@ -1,6 +1,5 @@
-import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Github, Globe, Mail, Linkedin, Send } from 'lucide-react';
+import { Github, Globe, Send } from 'lucide-react';
 
 const Footer = () => {
   const { t } = useTranslation();

@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { Code, Coffee, Sparkles, Github } from 'lucide-react';
+import { Code, Coffee, Github } from 'lucide-react';
 
 const PetProject = () => {
   const { t } = useTranslation();

@@ -64,11 +64,8 @@ Create a `.env.local` file in the root of the project and add your Supabase proj
 # Required
 VITE_SUPABASE_URL="your_supabase_project_url"
 VITE_SUPABASE_ANON_KEY="your_supabase_anon_key"
-
-# Optional - for production builds
-VITE_APP_URL="http://localhost:5173"
-VITE_YM_COUNTER_ID=""
 ```
+*Note: For TypeScript to recognize `import.meta.env`, ensure your `tsconfig.json` includes `"types": ["vite/client"]` or that you have a `vite-env.d.ts` file in your `src` directory.*
 
 ### 4. Set Up the Database
 
@@ -80,20 +77,15 @@ The database schema, including tables, policies, and functions, is defined in a 
 
 ### 5. Run the Application
 
-Once the setup is complete, you can start the development server.
-
 ```bash
 npm run dev
 ```
 
 The application will be available at `http://localhost:5173`.
 
-## Available Scripts
+## Deployment
 
-- `npm run dev`: Starts the Vite development server.
-- `npm run build`: Compiles the application for production.
-- `npm run lint`: Lints the codebase using ESLint.
-- `npm run test`: Runs the test suite using Vitest.
+This project is configured for continuous deployment on Vercel. Any pushes to the `main` branch will trigger a new deployment.
 
 ## Contact
 

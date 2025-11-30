@@ -1,18 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, MoreHorizontal, CheckCircle, Plus, FolderOpen, AlertCircle, Calendar } from 'lucide-react';
+import { ArrowLeft, MoreHorizontal, CheckCircle, Plus, FolderOpen, Calendar } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { tasksAPI } from '../lib/api/tasks.api';
 import { projectsAPI } from '../lib/api/projects.api';
-import { Task, ProjectStats, UserProfile } from '../types/api.types';
+import { Task, Project, ProjectStats } from '../types/api.types';
 import TaskDetailsPopup from '../components/layout/TaskDetailsPopup';
 
 interface ProjectViewProps {
-  project: {
-    id: string;
-    name: string;
-    description: string;
-  };
+  project: Project;
   onBack: () => void;
 }
 
@@ -317,7 +313,6 @@ const TaskItem = ({ task, onToggleComplete, onEditDetails }: {
   onToggleComplete: (id: string) => void;
   onEditDetails: () => void;
 }) => {
-  const { t } = useTranslation();
   const isOverdue = task.due_date && new Date(task.due_date) < new Date() && !task.completed;
 
   return (

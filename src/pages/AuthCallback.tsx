@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuthStore } from '../../store/authStore';
-import { supabase } from '../../lib/supabase';
+import { supabase } from '../lib/supabase';
 
 const AuthCallback = () => {
   const navigate = useNavigate();
@@ -9,29 +8,25 @@ const AuthCallback = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) {
+        navigate('/');
+      }
+    });
+
+    return () => {
+      subscription?.unsubscribe();
+    };
+  }, [navigate]);
+
+  useEffect(() => {
     const handleAuthCallback = async () => {
       try {
-        // Get URL parameters
-        const urlParams = new URLSearchParams(window.location.search);
+        const urlParams = new URLSearchParams(window.location.hash.substring(1));
         const error_description = urlParams.get('error_description');
         
         if (error_description) {
           throw new Error(error_description);
-        }
-
-        // Get the session which should have been created by Supabase
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-        
-        if (sessionError) {
-          throw sessionError;
-        }
-
-        if (session) {
-          // The user is authenticated, redirect to dashboard
-          navigate('/');
-        } else {
-          // No session found, redirect to login
-          navigate('/login');
         }
       } catch (err: any) {
         console.error('Auth callback error:', err);
@@ -42,7 +37,7 @@ const AuthCallback = () => {
     };
 
     handleAuthCallback();
-  }, [navigate]);
+  }, []);
 
   if (loading) {
     return (

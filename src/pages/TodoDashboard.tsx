@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Plus, Check, Calendar, Flag, Search, Filter, User, LogOut, Sun, Moon, Globe, Trash2, Edit, MoreHorizontal, MoreVertical, List, AlertCircle, CheckCircle } from 'lucide-react';
+import { Plus, Check, Calendar, Flag, Search, Filter, User, LogOut, Sun, Moon, Globe, Trash2, Edit, MoreHorizontal, List, AlertCircle, CheckCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { useAuthStore } from '../store/authStore';
@@ -16,7 +16,7 @@ import { twMerge } from 'tailwind-merge';
 
 interface TodoDashboardProps {
   onSignOut: () => void;
-  onProjectSelect?: (project: { id: string; name: string; description: string }) => void;
+  onProjectSelect?: (project: Project) => void;
 }
 
 const TodoDashboard: React.FC<TodoDashboardProps> = ({ onSignOut, onProjectSelect }) => {
@@ -37,8 +37,6 @@ const TodoDashboard: React.FC<TodoDashboardProps> = ({ onSignOut, onProjectSelec
     project_id: null,
   });
   const [showProjectCreation, setShowProjectCreation] = useState(false);
-  const [newProjectName, setNewProjectName] = useState('');
-  const [newProjectDescription, setNewProjectDescription] = useState('');
 
   const userMenuRef = useRef<HTMLDivElement>(null);
   const filterMenuRef = useRef<HTMLDivElement>(null);
@@ -395,7 +393,7 @@ const EmptyState = () => {
       </div>
       <h3 className="text-lg font-medium text-text-primary mb-1">{t('todo.noTasksTitle')}</h3>
       <p className="text-text-secondary mb-4">{t('todo.noTasksDescription')}</p>
-      <button onClick={() => document.querySelector('input[placeholder*="Add"]')?.focus()} className="px-4 py-2 rounded-lg bg-accent-gradient-1 text-white font-medium">
+      <button onClick={() => (document.querySelector('input[placeholder*="Add"]') as HTMLElement)?.focus()} className="px-4 py-2 rounded-lg bg-accent-gradient-1 text-white font-medium">
         {t('todo.createFirstTask')}
       </button>
     </div>

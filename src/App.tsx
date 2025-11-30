@@ -4,6 +4,7 @@ import { Toaster } from 'sonner';
 import { useTheme } from './hooks/useTheme';
 import { useAuthStore } from './store/authStore';
 import { initYandexMetrika, trackPageView } from './lib/analytics';
+import { Project } from './types/api.types';
 import Header from './components/landing/Header';
 import HeroSection from './components/landing/HeroSection';
 import MarketProblems from './components/landing/MarketProblems';
@@ -24,7 +25,7 @@ function App() {
   const { i18n } = useTranslation();
   const { theme, toggleTheme } = useTheme();
   const [currentView, setCurrentView] = useState<'dashboard' | 'project'>('dashboard');
-  const [selectedProject, setSelectedProject] = useState<{ id: string; name: string; description: string } | null>(null);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
   const changeLanguage = (lng: string) => {
     i18n.changeLanguage(lng);
@@ -39,7 +40,7 @@ function App() {
     setUserProfile(null);
   };
 
-  const handleProjectSelect = (project: { id: string; name: string; description: string }) => {
+  const handleProjectSelect = (project: Project) => {
     setSelectedProject(project);
     setCurrentView('project');
   };

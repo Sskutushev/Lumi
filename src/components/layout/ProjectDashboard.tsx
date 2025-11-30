@@ -1,15 +1,14 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { Check, MoreHorizontal } from 'lucide-react';
 
 interface ProjectDashboardProps {
-  projectId: string;
   projectName: string;
   projectDescription: string;
   onBack: () => void;
 }
 
 const ProjectDashboard: React.FC<ProjectDashboardProps> = ({ 
-  projectId, 
   projectName, 
   projectDescription, 
   onBack 

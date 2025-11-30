@@ -23,7 +23,7 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   variant = 'default'
 }) => {
   return (
-    <AlertDialog.Root open={isOpen} onOpenChange={(open) => !open && onCancel()}>
+    <AlertDialog.Root open={isOpen} onOpenChange={(open: boolean) => !open && onCancel()}>
       <AlertDialog.Portal>
         <AlertDialog.Overlay className="bg-black/50 data-[state=open]:animate-overlayShow fixed inset-0 z-50" />
         <AlertDialog.Content className="data-[state=open]:animate-contentShow fixed top-[50%] left-[50%] max-h-[85vh] w-[90vw] max-w-md translate-x-[-50%] translate-y-[-50%] rounded-2xl bg-bg-primary p-6 shadow-2xl border border-border focus:outline-none z-50">
