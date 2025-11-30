@@ -61,9 +61,12 @@ Create a `.env.local` file in the root of the project and add your Supabase proj
 ```env
 # .env.local
 
-# Required
+# Required for Supabase integration
 VITE_SUPABASE_URL="your_supabase_project_url"
 VITE_SUPABASE_ANON_KEY="your_supabase_anon_key"
+
+# Optional - for Yandex Metrika analytics (replace with your counter ID)
+VITE_YM_COUNTER_ID="your_yandex_metrika_counter_id"
 ```
 *Note: For TypeScript to recognize `import.meta.env`, ensure your `tsconfig.json` includes `"types": ["vite/client"]` or that you have a `vite-env.d.ts` file in your `src` directory.*
 

@@ -1,6 +1,12 @@
 import { useTranslation } from 'react-i18next';
 import { motion, Variants } from 'framer-motion';
 
+import simpleImg from '../../assets/images/simple.png';
+import freeImg from '../../assets/images/free.png';
+import focusImg from '../../assets/images/focus.png';
+import whyImg from '../../assets/images/why.png';
+import secureImg from '../../assets/images/secure.png';
+
 interface Benefit {
   title: string;
   description: string;
@@ -83,7 +89,7 @@ const SolutionBenefits = () => {
           >
             <div className="w-20 h-20 rounded-xl bg-white/10 flex items-center justify-center mb-2 flex-shrink-0">
               <img
-                src="/src/assets/images/simple.png"
+                src={simpleImg}
                 alt="Simple"
                 className="w-24 h-24 object-contain"
               />
@@ -117,7 +123,7 @@ const SolutionBenefits = () => {
           >
             <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center mb-2 flex-shrink-0">
               <img
-                src="/src/assets/images/free.png"
+                src={freeImg}
                 alt="Free"
                 className="w-16 h-16 object-contain"
               />
@@ -151,7 +157,7 @@ const SolutionBenefits = () => {
           >
             <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center mb-1 flex-shrink-0">
               <img
-                src="/src/assets/images/focus.png"
+                src={focusImg}
                 alt="Focus"
                 className="w-14 h-14 object-contain"
               />
@@ -175,7 +181,7 @@ const SolutionBenefits = () => {
           >
             <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center mb-2 flex-shrink-0">
               <img
-                src="/src/assets/images/why.png"
+                src={whyImg}
                 alt="Why Lumi"
                 className="w-16 h-16 object-contain"
               />
@@ -209,7 +215,7 @@ const SolutionBenefits = () => {
           >
             <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center mb-1 flex-shrink-0">
               <img
-                src="/src/assets/images/secure.png"
+                src={secureImg}
                 alt="Security"
                 className="w-14 h-14 object-contain"
               />

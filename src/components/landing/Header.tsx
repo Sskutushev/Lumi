@@ -5,6 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 import { User } from '@supabase/supabase-js';
 import { UserProfile } from '../../types/api.types';
+import engFlag from '../../assets/images/flags/eng.svg';
+import rusFlag from '../../assets/images/flags/rus.svg';
 
 interface HeaderProps {
   user: User | null;
@@ -60,9 +62,9 @@ const Header = ({ user, userProfile, onSignIn, onSignOut, onChangeLanguage, onTo
               className="p-2 rounded-lg hover:bg-bg-secondary transition-colors flex items-center justify-center"
             >
               {i18n.language === 'en' ? (
-                <img src="/src/assets/images/flags/rus.svg" alt="Russian" className="w-5 h-5" />
+                <img src={rusFlag} alt="Russian" className="w-5 h-5" />
               ) : (
-                <img src="/src/assets/images/flags/eng.svg" alt="English" className="w-5 h-5" />
+                <img src={engFlag} alt="English" className="w-5 h-5" />
               )}
             </button>
             
@@ -177,12 +179,12 @@ const Header = ({ user, userProfile, onSignIn, onSignOut, onChangeLanguage, onTo
                 >
                   {i18n.language === 'en' ? (
                     <>
-                      <img src="/src/assets/images/flags/rus.svg" alt="Russian" className="w-5 h-5" />
+                      <img src={rusFlag} alt="Russian" className="w-5 h-5" />
                       Русский
                     </>
                   ) : (
                     <>
-                      <img src="/src/assets/images/flags/eng.svg" alt="English" className="w-5 h-5" />
+                      <img src={engFlag} alt="English" className="w-5 h-5" />
                       English
                     </>
                   )}

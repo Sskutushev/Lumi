@@ -74,7 +74,7 @@ function App() {
       initYandexMetrika(import.meta.env.VITE_YM_COUNTER_ID);
       trackPageView();
     }
-  }, []);
+  }, [import.meta.env.VITE_YM_COUNTER_ID]);
 
   if (loading) {
     return (

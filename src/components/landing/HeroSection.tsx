@@ -2,10 +2,22 @@ import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { ArrowRight, CheckCircle } from 'lucide-react';
 import { useDynamicImageUpdater } from '../../hooks/useDynamicImageUpdater';
+import ruLight from '../../assets/images/ru_light.jpg';
+import ruDark from '../../assets/images/ru_dark.jpg';
+import enLight from '../../assets/images/en_light.jpg';
+import enDark from '../../assets/images/en_dark.jpg';
 
 const HeroSection = () => {
   const { t, i18n } = useTranslation();
   useDynamicImageUpdater(); // Hook for updating images based on theme/language
+
+  const getScreenshot = () => {
+    const isDark = document.documentElement.classList.contains('dark');
+    if (i18n.language === 'ru') {
+      return isDark ? ruDark : ruLight;
+    }
+    return isDark ? enDark : enLight;
+  };
 
   return (
     <section className="relative min-h-screen flex items-center justify-center px-4 py-16 overflow-hidden">
@@ -94,19 +106,7 @@ const HeroSection = () => {
             <div className="aspect-video rounded-xl overflow-hidden border border-border">
               <img
                 id="dynamic-screenshot"
-                data-ru-light="/src/assets/images/ru_light.jpg"
-                data-ru-dark="/src/assets/images/ru_dark.jpg"
-                data-en-light="/src/assets/images/en_light.jpg"
-                data-en-dark="/src/assets/images/en_dark.jpg"
-                src={
-                  i18n.language === 'ru'
-                    ? document.documentElement.classList.contains('dark')
-                      ? '/src/assets/images/ru_dark.jpg'
-                      : '/src/assets/images/ru_light.jpg'
-                    : document.documentElement.classList.contains('dark')
-                      ? '/src/assets/images/en_dark.jpg'
-                      : '/src/assets/images/en_light.jpg'
-                }
+                src={getScreenshot()}
                 alt="Application interface"
                 className="w-full h-full object-contain"
               />

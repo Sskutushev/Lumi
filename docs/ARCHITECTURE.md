@@ -33,7 +33,8 @@ This document provides a high-level overview of the Lumi application's architect
 - **Testing**:
   - **Framework**: Vitest
   - **Libraries**: React Testing Library, `jsdom`
-
+- **Analytics**:
+  - Yandex Metrika
 ---
 
 ## Project Structure
@@ -53,7 +54,8 @@ The project follows a standard Vite + React project structure.
 │   ├── hooks/        # Custom React hooks (e.g., useTheme, useClickOutside)
 │   ├── i18n/         # Internationalization configuration and locales
 │   ├── lib/          # Core libraries and external service integrations
-│   │   └── api/      # Abstraction layer for Supabase API calls
+│   │   ├── api/      # Abstraction layer for Supabase API calls
+│   │   └── analytics.ts # Yandex Metrika integration
 │   ├── pages/        # Top-level page components
 │   ├── store/        # Global state management (Zustand)
 │   ├── styles/       # Global CSS and Tailwind base styles
