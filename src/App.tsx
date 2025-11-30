@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Toaster } from 'sonner';
 import { useTheme } from './hooks/useTheme';
 import { useAuthStore } from './store/authStore';
+import { initYandexMetrika, trackPageView } from './lib/analytics';
 import Header from './components/landing/Header';
 import HeroSection from './components/landing/HeroSection';
 import MarketProblems from './components/landing/MarketProblems';
@@ -12,9 +14,13 @@ import AuthModal from './components/auth/AuthModal';
 import TodoDashboard from './pages/TodoDashboard';
 import ProjectView from './pages/ProjectView';
 
+import { profileAPI } from './lib/api/profile.api';
+import { UserProfile } from './types/api.types';
+
 function App() {
   const [isAuthModalOpen, setAuthModalOpen] = useState(false);
   const { user, loading, checkSession } = useAuthStore();
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const { i18n } = useTranslation();
   const { theme, toggleTheme } = useTheme();
   const [currentView, setCurrentView] = useState<'dashboard' | 'project'>('dashboard');
@@ -30,6 +36,7 @@ function App() {
 
   const handleSignOut = async () => {
     await useAuthStore.getState().signOut();
+    setUserProfile(null);
   };
 
   const handleProjectSelect = (project: { id: string; name: string; description: string }) => {
@@ -46,6 +53,28 @@ function App() {
     checkSession();
   }, [checkSession]);
 
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (user) {
+        try {
+          const profile = await profileAPI.getProfile(user.id);
+          setUserProfile(profile);
+        } catch (error) {
+          console.error("Failed to fetch user profile:", error);
+        }
+      }
+    };
+    fetchProfile();
+  }, [user]);
+
+  // Инициализация Яндекс.Метрики
+  useEffect(() => {
+    if (import.meta.env.PROD && import.meta.env.VITE_YM_COUNTER_ID) {
+      initYandexMetrika(import.meta.env.VITE_YM_COUNTER_ID);
+      trackPageView();
+    }
+  }, []);
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-bg-primary text-text-primary">
@@ -59,23 +88,44 @@ function App() {
 
   if (user) {
     if (currentView === 'project' && selectedProject) {
-      return <ProjectView project={selectedProject} onBack={handleBackToDashboard} />;
+      return (
+        <>
+          <ProjectView project={selectedProject} onBack={handleBackToDashboard} />
+          <Toaster 
+            position="bottom-right"
+            theme={theme === 'dark' ? 'dark' : 'light'}
+            richColors
+            closeButton
+          />
+        </>
+      );
     }
     return (
-      <TodoDashboard
-        onSignOut={handleSignOut}
-        onProjectSelect={handleProjectSelect}
-      />
+      <>
+        <TodoDashboard
+          onSignOut={handleSignOut}
+          onProjectSelect={handleProjectSelect}
+        />
+        <Toaster 
+          position="bottom-right"
+          theme={theme === 'dark' ? 'dark' : 'light'}
+          richColors
+          closeButton
+        />
+      </>
     );
   }
 
   return (
     <div className={`min-h-screen bg-bg-primary text-text-primary ${theme}`}>
-      <Header 
-        onSignIn={handleSignIn} 
-        onChangeLanguage={changeLanguage} 
-        onToggleTheme={toggleTheme} 
-        currentTheme={theme} 
+      <Header
+        user={user}
+        userProfile={userProfile}
+        onSignIn={handleSignIn}
+        onSignOut={handleSignOut}
+        onChangeLanguage={changeLanguage}
+        onToggleTheme={toggleTheme}
+        currentTheme={theme}
       />
       <main>
         <HeroSection />
@@ -89,6 +139,12 @@ function App() {
           onClose={() => setAuthModalOpen(false)}
         />
       )}
+      <Toaster 
+        position="bottom-right"
+        theme={theme === 'dark' ? 'dark' : 'light'}
+        richColors
+        closeButton
+      />
     </div>
   );
 }

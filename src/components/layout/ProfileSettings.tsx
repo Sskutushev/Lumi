@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { X, User, Camera, Activity, BarChart3, CheckCircle, Calendar, Flag } from 'lucide-react';
+import { toast } from 'sonner';
+import { useAuthStore } from '../../store/authStore';
+import { profileAPI, formatBytes } from '../../lib/api/profile.api';
+import { tasksAPI } from '../../lib/api/tasks.api';
 import { supabase } from '../../lib/supabase';
+import { UserProfile, StorageStats, UserStats } from '../../types/api.types';
 
 interface ProfileSettingsProps {
   isOpen: boolean;
@@ -10,6 +15,7 @@ interface ProfileSettingsProps {
 
 const ProfileSettings: React.FC<ProfileSettingsProps> = ({ isOpen, onClose }) => {
   const { t } = useTranslation();
+  const { user } = useAuthStore();
   const [userData, setUserData] = useState({
     name: '',
     email: '',
@@ -18,34 +24,43 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ isOpen, onClose }) =>
     avatar: ''
   });
   const [loading, setLoading] = useState(true);
-  const [storageUsed, setStorageUsed] = useState(0);
-  const [tasksCompleted, setTasksCompleted] = useState(0);
+  const [storageStats, setStorageStats] = useState<StorageStats | null>(null);
+  const [userStats, setUserStats] = useState<UserStats | null>(null);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   useEffect(() => {
-    if (isOpen) {
-      loadUserProfile();
+    if (isOpen && user) {
+      loadProfileData();
     }
-  }, [isOpen]);
+  }, [isOpen, user]);
 
-  const loadUserProfile = async () => {
+  const loadProfileData = async () => {
+    if (!user) return;
+
     setLoading(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        setUserData({
-          name: user.user_metadata?.full_name || user.email?.split('@')[0] || '',
-          email: user.email || '',
-          currentPassword: '',
-          newPassword: '',
-          avatar: user.user_metadata?.avatar_url || ''
-        });
-        
-        // Mock data for storage and tasks (would come from actual database in production)
-        setStorageUsed(Math.floor(Math.random() * 3000)); // Random used storage in MB
-        setTasksCompleted(Math.floor(Math.random() * 50)); // Random completed tasks
-      }
+      // Загружаем данные профиля, статистику хранилища и задач в параллель
+      const [profile, storageStatsData, stats] = await Promise.all([
+        profileAPI.getProfile(user.id),
+        profileAPI.getStorageStats(user.id),
+        tasksAPI.getStats(user.id)
+      ]);
+
+      setUserData(prev => ({
+        ...prev,
+        name: profile.full_name || '',
+        email: user.email || '',
+        currentPassword: '',
+        newPassword: '',
+        avatar: profile.avatar_url || ''
+      }));
+
+      setStorageStats(storageStatsData);
+      setUserStats(stats);
     } catch (error) {
-      console.error('Error loading user profile:', error);
+      console.error('Error loading profile data:', error);
+      // Показываем уведомление пользователю
+      toast.error(t('profile.loadError') || 'Failed to load profile data');
     } finally {
       setLoading(false);
     }
@@ -56,42 +71,88 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ isOpen, onClose }) =>
     setUserData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      // In a real app, this would upload the file to Supabase Storage
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setUserData(prev => ({ ...prev, avatar: reader.result as string }));
-      };
-      reader.readAsDataURL(file);
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!user || !e.target.files || !e.target.files[0]) return;
+
+    const file = e.target.files[0];
+
+    // Проверяем размер файла (макс. 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error(t('profile.avatarTooLarge') || 'Avatar must be less than 5MB');
+      return;
+    }
+
+    // Проверяем тип файла
+    if (!file.type.startsWith('image/')) {
+      toast.error(t('profile.avatarInvalidType') || 'Please select an image file');
+      return;
+    }
+
+    try {
+      const avatarUrl = await profileAPI.uploadAvatar(user.id, file);
+      setUserData(prev => ({ ...prev, avatar: avatarUrl }));
+      toast.success(t('profile.updateSuccess') || 'Avatar updated successfully!');
+    } catch (error) {
+      console.error('Error uploading avatar:', error);
+      toast.error(t('profile.avatarUploadError') || `Failed to upload avatar: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
   const updateProfile = async () => {
+    if (!user) {
+      toast.error('No user logged in');
+      return;
+    }
+
+    setIsUpdating(true);
+    console.log('Updating profile for user:', user.id, 'with data:', userData); // Отладочный лог
     try {
-      // Update user metadata in Supabase Auth
-      const { error } = await supabase.auth.updateUser({
-        data: {
-          full_name: userData.name
-        }
-      });
-      
-      if (error) throw error;
-      
-      // If changing password
-      if (userData.newPassword) {
-        await supabase.auth.updateUser({
+      // Обновляем профиль
+      const updateData: { full_name?: string; avatar_url?: string } = {
+        full_name: userData.name || undefined
+      };
+
+      // Обновляем URL аватара, если он изменился
+      if (userData.avatar) {
+        updateData.avatar_url = userData.avatar;
+      }
+
+      const updatedProfile = await profileAPI.updateProfile(user.id, updateData);
+      console.log('Profile updated successfully:', updatedProfile); // Отладочный лог
+
+      // Если меняется пароль, обновляем его
+      if (userData.newPassword && userData.newPassword.length >= 6) {
+        const { error } = await supabase.auth.updateUser({
           password: userData.newPassword
         });
+
+        if (error) throw error;
+      } else if (userData.newPassword && userData.newPassword.length < 6) {
+        throw new Error('Password must be at least 6 characters long');
       }
-      
-      alert(t('profile.updateSuccess') || 'Profile updated successfully!');
+
+      toast.success(t('profile.updateSuccess') || 'Profile updated successfully!');
       onClose();
     } catch (error: any) {
-      console.error('Error updating profile:', error.message);
-      alert(t('profile.updateError') || 'Error updating profile: ' + error.message);
+      console.error('Error updating profile:', error);
+      console.error('Error details:', error.message, error.code, error.status); // Дополнительная информация
+      toast.error(t('profile.updateError') || 'Error updating profile: ' + error.message);
+    } finally {
+      setIsUpdating(false);
     }
+  };
+
+  // Функция для форматирования байтов
+  const formatBytesLocal = (bytes: number, decimals = 2): string => {
+    if (bytes === 0) return '0 Bytes';
+
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
   };
 
   if (!isOpen) return null;
@@ -106,7 +167,8 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ isOpen, onClose }) =>
           <h2 className="text-xl font-bold text-text-primary">{t('profile.settings')}</h2>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg hover:bg-bg-secondary transition-colors"
+            disabled={isUpdating}
+            className="p-2 rounded-lg hover:bg-bg-secondary transition-colors disabled:opacity-50"
           >
             <X className="w-5 h-5 text-text-secondary" />
           </button>
@@ -122,23 +184,31 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ isOpen, onClose }) =>
               {/* Profile Information */}
               <div className="space-y-6">
                 <h3 className="font-semibold text-text-primary">{t('profile.personalInfo')}</h3>
-                
+
                 <div className="flex flex-col items-center">
                   <div className="relative mb-4">
-                    <div className="w-24 h-24 rounded-full bg-accent-gradient-1 flex items-center justify-center text-white text-2xl font-bold">
-                      {userData.name.charAt(0).toUpperCase()}
-                    </div>
+                    {userData.avatar ? (
+                      <img 
+                        src={userData.avatar} 
+                        alt="Avatar" 
+                        className="w-24 h-24 rounded-full object-cover border-2 border-border"
+                      />
+                    ) : (
+                      <div className="w-24 h-24 rounded-full bg-accent-gradient-1 flex items-center justify-center text-white text-2xl font-bold">
+                        {userData.name.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || 'U'}
+                      </div>
+                    )}
                     <label className="absolute bottom-0 right-0 bg-bg-elevated rounded-full p-2 border border-border cursor-pointer">
                       <Camera className="w-4 h-4 text-text-secondary" />
-                      <input 
-                        type="file" 
-                        className="hidden" 
-                        accept="image/*" 
+                      <input
+                        type="file"
+                        className="hidden"
+                        accept="image/*"
                         onChange={handleAvatarUpload}
                       />
                     </label>
                   </div>
-                  
+
                   <div className="w-full space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-text-secondary mb-2">
@@ -175,7 +245,7 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ isOpen, onClose }) =>
               {/* Account Settings */}
               <div className="space-y-6">
                 <h3 className="font-semibold text-text-primary">{t('profile.account')}</h3>
-                
+
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-text-secondary mb-2">
@@ -215,14 +285,25 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ isOpen, onClose }) =>
                   <div className="space-y-3">
                     <div className="flex justify-between text-sm">
                       <span className="text-text-secondary">{t('profile.storageUsed')}</span>
-                      <span className="text-text-primary">{storageUsed} MB / 10 GB</span>
+                      <span className="text-text-primary">
+                        {storageStats ? `${formatBytes(storageStats.used)} / ${formatBytes(storageStats.limit)}` : 'Loading...'}
+                      </span>
                     </div>
-                    <div className="w-full bg-bg-tertiary rounded-full h-2">
-                      <div 
-                        className="bg-accent-primary h-2 rounded-full" 
-                        style={{ width: `${Math.min(100, (storageUsed / 10000) * 100)}%` }}
-                      ></div>
-                    </div>
+                    {storageStats && (
+                      <div className="w-full bg-bg-tertiary rounded-full h-2">
+                        <div
+                          className={`h-2 rounded-full ${
+                            storageStats.percentage > 90 ? 'bg-error' : 'bg-accent-primary'
+                          }`}
+                          style={{ width: `${Math.min(100, storageStats.percentage)}%` }}
+                        ></div>
+                      </div>
+                    )}
+                    {storageStats && (
+                      <p className="text-xs text-text-tertiary">
+                        {t('profile.storageRemaining')} {formatBytes(storageStats.limit - storageStats.used)} {t('profile.remaining')}
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -237,10 +318,22 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ isOpen, onClose }) =>
                       <span>{t('profile.lastActive')}</span>
                       <span>{new Date().toLocaleDateString()}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span>{t('profile.tasksCompleted')}</span>
-                      <span>{tasksCompleted}</span>
-                    </div>
+                    {userStats && (
+                      <>
+                        <div className="flex justify-between">
+                          <span>{t('profile.tasksCompleted')}</span>
+                          <span>{userStats.completed_tasks}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>{t('dashboard.overdue')}</span>
+                          <span>{userStats.overdue_tasks}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>{t('profile.tasksThisWeek')}</span>
+                          <span>{userStats.tasks_this_week}</span>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
@@ -251,15 +344,24 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ isOpen, onClose }) =>
         <div className="p-6 border-t border-border flex justify-end gap-3">
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-lg bg-bg-secondary text-text-primary hover:bg-bg-tertiary transition-colors"
+            disabled={isUpdating}
+            className="px-4 py-2 rounded-lg bg-bg-secondary text-text-primary hover:bg-bg-tertiary transition-colors disabled:opacity-50"
           >
             {t('common.cancel')}
           </button>
           <button
             onClick={updateProfile}
-            className="px-4 py-2 rounded-lg bg-accent-gradient-1 text-white font-medium hover:shadow-lg transition-shadow"
+            disabled={isUpdating}
+            className="px-4 py-2 rounded-lg bg-accent-gradient-1 text-white font-medium hover:shadow-lg transition-shadow disabled:opacity-50 flex items-center gap-2"
           >
-            {t('common.save')}
+            {isUpdating ? (
+              <>
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"></div>
+                {t('common.saving') || 'Saving...'}
+              </>
+            ) : (
+              t('common.save')
+            )}
           </button>
         </div>
       </div>

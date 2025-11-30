@@ -86,7 +86,7 @@ const SolutionBenefits = () => {
           >
             <div className="w-20 h-20 rounded-xl bg-white/10 flex items-center justify-center mb-2 flex-shrink-0">
               <img
-                src="/img/Просто-Photoroom.png"
+                src="/src/assets/images/simple.png"
                 alt="Simple"
                 className="w-24 h-24 object-contain"
               />
@@ -120,7 +120,7 @@ const SolutionBenefits = () => {
           >
             <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center mb-2 flex-shrink-0">
               <img
-                src="/img/бесплатно-Photoroom.png"
+                src="/src/assets/images/free.png"
                 alt="Free"
                 className="w-16 h-16 object-contain"
               />
@@ -154,7 +154,7 @@ const SolutionBenefits = () => {
           >
             <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center mb-1 flex-shrink-0">
               <img
-                src="/img/фокус-Photoroom.png"
+                src="/src/assets/images/focus.png"
                 alt="Focus"
                 className="w-14 h-14 object-contain"
               />
@@ -178,7 +178,7 @@ const SolutionBenefits = () => {
           >
             <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center mb-2 flex-shrink-0">
               <img
-                src="/img/почему-Photoroom.png"
+                src="/src/assets/images/why.png"
                 alt="Why Lumi"
                 className="w-16 h-16 object-contain"
               />
@@ -212,7 +212,7 @@ const SolutionBenefits = () => {
           >
             <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center mb-1 flex-shrink-0">
               <img
-                src="/img/секьюри-Photoroom.png"
+                src="/src/assets/images/secure.png"
                 alt="Security"
                 className="w-14 h-14 object-contain"
               />

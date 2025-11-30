@@ -27,7 +27,16 @@
     "toggleTheme": "Toggle Theme",
     "changeLanguage": "Change Language",
     "add": "Add",
-    "back": "Back"
+    "back": "Back",
+    "saving": "Saving...",
+    "continue": "Continue",
+    "clear": "Clear",
+    "create": "Create"
+  },
+  "auth": {
+    "signUpSuccess": "📧 Email sent! Please check your email to confirm.",
+    "passwordResetSuccess": "Password reset link sent to your email",
+    "termsAgreement": "By signing up, you agree to our Terms and Privacy Policy."
   },
   "landing": {
     "hero": {
@@ -77,8 +86,10 @@
     },
     "petProject": {
       "title": "A Practice Project",
-      "subtitle": "Created as a practice project with modern technologies",
-      "description": "This is a pet project that demonstrates modern web development practices with React, TypeScript, and Supabase. It's completely free to use and open source."
+      "subtitle": "Developed and implemented in just 3 days",
+      "description": "This pet project demonstrates modern web development practices with React, TypeScript, and Supabase. It's completely free to use and open source.",
+      "realtime_title": "Real-time Functionality",
+      "realtime_desc": "All tasks and projects are updated in real-time across all sessions thanks to Supabase subscriptions."
     }
   },
   "todo": {
@@ -136,7 +147,21 @@
     "history": "History",
     "created": "Created",
     "updated": "Updated",
-    "completedDate": "Completed date"
+    "completedDate": "Completed date",
+    "noTasksTitle": "No tasks yet",
+    "noTasksDescription": "Create your first task to start organizing your workflow",
+    "createFirstTask": "Create Task",
+    "emptyProject": "No tasks in this project",
+    "emptyProjectDescription": "Create a new task or add existing ones from all tasks",
+    "titleRequired": "Title cannot be empty",
+    "saveError": "Error saving task"
+  },
+  "dashboard": {
+    "totalTasks": "Total Tasks",
+    "completed": "Completed",
+    "pending": "Pending",
+    "overdue": "Overdue",
+    "thisWeek": "This Week"
   },
   "projects": {
     "createProject": "Create Project",
@@ -168,17 +193,22 @@
     "newPassword": "New Password",
     "storage": "Storage",
     "usedStorage": "Used Storage",
+    "storageUsed": "Storage Used",
+    "storageRemaining": "Remaining",
+    "remaining": "",
     "activity": "Activity",
     "lastActive": "Last Active",
     "tasksCompleted": "Tasks Completed",
+    "tasksThisWeek": "Tasks This Week",
     "clickToChange": "Click to change",
     "emailCannotBeChanged": "Email cannot be changed",
     "enterCurrentPassword": "Enter current password",
     "enterNewPassword": "Enter new password",
     "usage": "Usage",
-    "storageUsed": "Storage Used",
     "updateSuccess": "Profile updated successfully",
-    "updateError": "Error updating profile"
+    "updateError": "Error updating profile",
+    "avatarUploadError": "Failed to upload avatar",
+    "avatarTooLarge": "Avatar must be less than 5MB"
   },
   "footer": {
     "rights": "© 2025 Lumi. All rights reserved.",

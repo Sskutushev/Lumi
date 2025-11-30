@@ -9,4 +9,16 @@ export default defineConfig({
       "@": "/src",
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom'],
+          'supabase-vendor': ['@supabase/supabase-js'],
+          'ui-vendor': ['framer-motion', 'lucide-react', 'sonner']
+        }
+      }
+    },
+    chunkSizeWarningLimit: 1000
+  }
 })

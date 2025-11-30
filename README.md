@@ -1,130 +1,102 @@
-# Lumi - Modern Todo Application
+# Lumi
 
-A sleek, intuitive, and beautifully designed todo application that focuses on simplicity and user experience without unnecessary clutter.
+Lumi is a modern and minimalist to-do application designed for focus and simplicity. It provides a clean, intuitive interface for managing tasks and projects without unnecessary features. This project was built with a focus on modern web development practices, including a full-featured backend powered by Supabase.
+
+![Lumi Screenshot](https://raw.githubusercontent.com/Sskutushev/Lumi/main/img/pet-project.jpg)
 
 ## Features
 
-- **Clean & Minimal UI**: Designed for quick task management without distractions
-- **Light/Dark Theme**: Automatic theme switching with seamless transitions
-- **Multi-language Support**: English and Russian localization
-- **Responsive Design**: Optimized for all device sizes (mobile, tablet, desktop)
-- **Project Management**: Organize tasks into customizable projects
-- **Task Prioritization**: Set priorities (low, medium, high) for your tasks
-- **Deadline Tracking**: Visualize upcoming and overdue tasks
-- **OAuth Authentication**: Sign in with Google or GitHub
-- **Real-time Updates**: Powered by Supabase backend
-- **Open Source**: Completely free to use and contribute to
+- **Clean & Minimal UI**: A user interface designed for focus and efficiency.
+- **Project Organization**: Group tasks into distinct projects.
+- **Task Prioritization**: Assign priorities (`low`, `medium`, `high`) to tasks.
+- **Due Dates**: Set deadlines for tasks to stay on track.
+- **Authentication**: Secure sign-up and sign-in with email/password, plus OAuth for Google and GitHub.
+- **Real-time Functionality**: Data syncs instantly across sessions, powered by Supabase Realtime.
+- **Theming**: Seamless light and dark mode support.
+- **Internationalization**: Support for English and Russian.
 
 ## Tech Stack
 
 - **Frontend**: React 18, TypeScript, Vite
-- **Styling**: Tailwind CSS with custom design system
-- **Animation**: Framer Motion
-- **Icons**: Lucide React
-- **Internationalization**: i18next
+- **Backend-as-a-Service**: Supabase (PostgreSQL, Auth, Storage, Realtime)
+- **Styling**: Tailwind CSS
+- **UI & Animation**: Framer Motion, Radix UI, Lucide React
 - **State Management**: Zustand
-- **Backend**: Supabase (Auth, Database, Real-time)
-- **Build Tool**: Vite
+- **Internationalization**: `react-i18next`
+- **Testing**: Vitest, React Testing Library
+
+## Project Documentation
+
+For a detailed overview of the project's architecture, database schema, and advanced configurations, please refer to the documentation in the `/docs` directory:
+
+- **[Architecture Overview](./docs/ARCHITECTURE.md)**: A deep dive into the frontend architecture, state management, and API design.
+- **[Database Schema](./docs/DATABASE.md)**: Detailed information on the Supabase PostgreSQL schema, RLS policies, and database functions.
 
 ## Getting Started
 
+To run this project locally, follow these steps.
+
 ### Prerequisites
 
-- Node.js 18+
-- npm or yarn
+- Node.js `v18.0.0` or higher
+- `npm` `v9.0.0` or higher
 
-### Installation
+### 1. Clone the Repository
 
-1. Clone the repository:
 ```bash
 git clone https://github.com/Sskutushev/Lumi.git
 cd Lumi
 ```
 
-2. Install dependencies:
+### 2. Install Dependencies
+
 ```bash
 npm install
 ```
 
-3. Create a `.env.local` file in the root directory with your Supabase credentials:
+### 3. Set Up Environment Variables
+
+Create a `.env.local` file in the root of the project and add your Supabase project credentials. You can find these in your Supabase project dashboard under `Settings > API`.
+
 ```env
-VITE_SUPABASE_URL=your_supabase_project_url
-VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+# .env.local
+
+# Required
+VITE_SUPABASE_URL="your_supabase_project_url"
+VITE_SUPABASE_ANON_KEY="your_supabase_anon_key"
+
+# Optional - for production builds
+VITE_APP_URL="http://localhost:5173"
+VITE_YM_COUNTER_ID=""
 ```
 
-4. Start the development server:
+### 4. Set Up the Database
+
+The database schema, including tables, policies, and functions, is defined in a migration file.
+
+1.  Navigate to the **SQL Editor** in your Supabase project dashboard.
+2.  Open the `supabase/migrations/01_create_tables_and_policies_fixed.sql` file.
+3.  Copy its entire content, paste it into the SQL editor, and click **RUN**. This will set up your database.
+
+### 5. Run the Application
+
+Once the setup is complete, you can start the development server.
+
 ```bash
 npm run dev
 ```
 
-5. Visit `http://localhost:5173` in your browser
+The application will be available at `http://localhost:5173`.
 
-## Project Structure
+## Available Scripts
 
-```
-src/
-├── assets/              # Static assets (images, icons)
-├── components/          # Reusable UI components
-│   ├── auth/            # Authentication components
-│   ├── landing/         # Landing page components
-│   └── layout/          # Layout components
-├── hooks/               # Custom React hooks
-├── i18n/                # Internationalization configurations
-├── pages/               # Page components
-├── store/               # Zustand stores
-├── styles/              # Global styles
-└── types/               # Type definitions
-```
-
-## Design System
-
-Lumi follows a modern design system with:
-
-- **Color Scheme**: Carefully crafted light and dark themes
-- **Typography**: Inter font family with proper hierarchy
-- **Spacing**: Consistent 8-point grid system
-- **Borders**: Smooth rounded corners with `var(--radius)` variable
-- **Shadows**: Layered shadows for depth perception
-
-## Internationalization
-
-The application supports both English and Russian languages. Translation keys are managed in the `src/i18n/locales/` directory.
-
-To add a new translation:
-1. Add the key-value pair to `en.json` and `ru.json`
-2. Use the key with the `t` function: `{t('common.signIn')}`
-
-## Theming
-
-Lumi supports light and dark themes. Themes can be switched via the theme toggle in the header or automatically based on system preference.
-
-Custom theme variables are defined in `src/styles/globals.css` and can be customized by adjusting the CSS variables.
-
-## Project Management
-
-Users can create and manage projects to organize their tasks. Each task can belong to a specific project, allowing for better organization and filtering.
-
-## Contributing
-
-Contributions are welcome! Here's how you can help:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Make your changes
-4. Commit your changes (`git commit -m 'Add amazing feature'`)
-5. Push to the branch (`git push origin feature/amazing-feature`)
-6. Open a Pull Request
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+- `npm run dev`: Starts the Vite development server.
+- `npm run build`: Compiles the application for production.
+- `npm run lint`: Lints the codebase using ESLint.
+- `npm run test`: Runs the test suite using Vitest.
 
 ## Contact
 
-- Portfolio: [https://sskutushev.site](https://sskutushev.site)
-- Telegram: [https://t.me/Sskutushev](https://t.me/Sskutushev)
-- GitHub: [https://github.com/Sskutushev](https://github.com/Sskutushev)
-
----
-
-Made with ❤️ using modern web technologies.
+- **Portfolio**: [https://sskutushev.site](https://sskutushev.site)
+- **Telegram**: [https://t.me/Sskutushev](https://t.me/Sskutushev)
+- **GitHub**: [https://github.com/Sskutushev](https://github.com/Sskutushev)

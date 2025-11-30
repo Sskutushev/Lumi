@@ -80,45 +80,41 @@ const PetProject = () => {
               </div>
 
               {/* Back of card */}
-              <div className={`absolute inset-0 bg-bg-secondary/50 backdrop-blur-sm border border-border rounded-2xl p-8 flex flex-col shadow-lg shadow-accent-primary/10 hover:shadow-2xl hover:shadow-accent-primary/20 [backface-visibility:hidden] [transform:rotateY(180deg)]`}>
-                <div className="flex flex-col md:flex-row gap-6 items-center">
-                  <div className="flex flex-col gap-3 flex-1">
+              <div className={`absolute inset-0 bg-bg-secondary/50 backdrop-blur-sm border border-border rounded-2xl p-8 flex flex-col justify-center shadow-lg shadow-accent-primary/10 hover:shadow-2xl hover:shadow-accent-primary/20 [backface-visibility:hidden] [transform:rotateY(180deg)]`}>
+                <div className="flex flex-col md:flex-row gap-6 items-center w-full">
+                  {/* Left Column */}
+                  <div className="flex flex-col gap-4 flex-1 items-center md:items-start">
                     <div className="px-4 py-2 rounded-lg bg-bg-tertiary text-text-secondary text-sm">
                       React & TypeScript
                     </div>
                     <div className="px-4 py-2 rounded-lg bg-bg-tertiary text-text-secondary text-sm">
-                      Supabase Backend
+                      Supabase Realtime
                     </div>
                     <div className="px-4 py-2 rounded-lg bg-bg-tertiary text-text-secondary text-sm">
-                      Free to Use
+                      Tailwind CSS
                     </div>
-                  </div>
-
-                  <div className="flex-1 flex flex-col items-center">
-                    {/* Mock code block */}
-                    <div className="bg-bg-tertiary rounded-xl p-4 mb-4 text-left w-full">
-                      <pre className="text-xs text-text-tertiary overflow-x-auto">
-                        <code>{`// Example code from project
-function App() {
-  const [tasks, setTasks] = useState([]);
-  return (
-    <TodoDashboard tasks={tasks} />
-  );
-}`}</code>
-                      </pre>
-                    </div>
-
                     <a
                       href="https://github.com/Sskutushev/Lumi"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2 group relative px-6 py-3 rounded-xl bg-gradient-animated text-white font-semibold shadow-lg shadow-accent-primary/30 hover:shadow-xl hover:shadow-accent-primary/40 hover:scale-105 transition-all duration-300"
+                      className="mt-4 flex items-center gap-2 group relative px-6 py-3 rounded-xl bg-gradient-animated text-white font-semibold shadow-lg shadow-accent-primary/30 hover:shadow-xl hover:shadow-accent-primary/40 hover:scale-105 transition-all duration-300"
                     >
-                      <span className="relative z-10 flex items-center justify-center gap-2">
-                        <Github className="w-5 h-5" />
-                        GitHub
-                      </span>
+                      <Github className="w-5 h-5" />
+                      GitHub
                     </a>
+                  </div>
+
+                  {/* Right Column (Code) */}
+                  <div className="flex-1 bg-bg-tertiary rounded-xl p-4 text-left w-full">
+                    <pre className="text-xs text-text-tertiary overflow-x-auto">
+                      <code>{`// Real-time updates
+supabase
+  .channel('tasks')
+  .on('postgres_changes', { event: '*' }, 
+    () => loadTasks()
+  )
+  .subscribe();`}</code>
+                    </pre>
                   </div>
                 </div>
               </div>

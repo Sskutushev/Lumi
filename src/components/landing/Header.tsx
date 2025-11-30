@@ -3,16 +3,23 @@ import { useTranslation } from 'react-i18next';
 import { Moon, Sun, Menu, X, Github, Mail } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
+import { User } from '@supabase/supabase-js';
+import { UserProfile } from '../../types/api.types';
+
 interface HeaderProps {
+  user: User | null;
+  userProfile: UserProfile | null;
   onSignIn: () => void;
+  onSignOut: () => void;
   onChangeLanguage: (lng: string) => void;
   onToggleTheme: () => void;
   currentTheme: string;
 }
 
-const Header = ({ onSignIn, onChangeLanguage, onToggleTheme, currentTheme }: HeaderProps) => {
+const Header = ({ user, userProfile, onSignIn, onSignOut, onChangeLanguage, onToggleTheme, currentTheme }: HeaderProps) => {
   const { t, i18n } = useTranslation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
   const toggleLanguage = () => {
     const newLang = i18n.language === 'en' ? 'ru' : 'en';
@@ -69,12 +76,45 @@ const Header = ({ onSignIn, onChangeLanguage, onToggleTheme, currentTheme }: Hea
               }
             </button>
             
-            <button
-              onClick={onSignIn}
-              className="px-4 py-2 rounded-lg bg-gradient-animated text-white font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 min-w-[120px]"
-            >
-              {t('common.signIn')}
-            </button>
+            {user ? (
+              <div className="relative">
+                <button
+                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                  className="w-10 h-10 rounded-full bg-accent-gradient-1 flex items-center justify-center text-white font-medium overflow-hidden"
+                >
+                  {userProfile?.avatar_url ? (
+                    <img src={userProfile.avatar_url} alt="User Avatar" className="w-full h-full object-cover" />
+                  ) : (
+                    user?.email?.charAt(0).toUpperCase() || 'U'
+                  )}
+                </button>
+                <AnimatePresence>
+                  {isUserMenuOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 10 }}
+                      className="absolute right-0 mt-2 w-48 bg-bg-primary rounded-xl shadow-xl border border-border py-2 z-50"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <button
+                        onClick={onSignOut}
+                        className="w-full text-left px-4 py-2.5 hover:bg-error/10 text-error text-sm flex items-center gap-3"
+                      >
+                        {t('common.logout')}
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            ) : (
+              <button
+                onClick={onSignIn}
+                className="px-4 py-2 rounded-lg bg-gradient-animated text-white font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 min-w-[120px]"
+              >
+                {t('common.signIn')}
+              </button>
+            )}
           </div>
 
           {/* Mobile Menu Button */}

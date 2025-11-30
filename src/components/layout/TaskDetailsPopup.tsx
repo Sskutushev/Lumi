@@ -1,51 +1,53 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { X, Calendar, Flag, Minus, Plus } from 'lucide-react';
+import { toast } from 'sonner';
 import CalendarDropdown from './CalendarDropdown';
-
-// Define interface for the task
-interface Task {
-  id: string;
-  title: string;
-  completed: boolean;
-  dueDate?: string;
-  priority?: 'low' | 'medium' | 'high';
-  description?: string;
-  detailedDescription?: string;
-  startDate?: string;
-  projectId?: string;
-  projectName?: string;
-  tags?: string[];
-}
-
-interface Project {
-  id: string;
-  name: string;
-  description: string;
-  createdAt: string;
-}
+import { Task as TaskType, Project as ProjectType } from '../../types/api.types';
 
 interface TaskDetailsPopupProps {
-  task: Task;
-  projects: Project[];
+  task: TaskType;
+  projects: ProjectType[];
   onClose: () => void;
-  onSave: (updatedTask: Task) => void;
+  onSave: (updatedTask: TaskType) => void;
 }
 
-const TaskDetailsPopup: React.FC<TaskDetailsPopupProps> = ({ 
-  task, 
+const TaskDetailsPopup: React.FC<TaskDetailsPopupProps> = ({
+  task,
   projects = [],
-  onClose, 
-  onSave 
+  onClose,
+  onSave
 }) => {
   const { t } = useTranslation();
-  const [editedTask, setEditedTask] = useState<Task>({ ...task });
-  const [descriptionHeight, setDescriptionHeight] = useState<number>(120); // начальная высота описания
-  const [detailedDescriptionHeight, setDetailedDescriptionHeight] = useState<number>(150); // начальная высота подробного описания
+  const [editedTask, setEditedTask] = useState<TaskType>({ ...task });
+  const [descriptionHeight, setDescriptionHeight] = useState<number>(120);
+  const [detailedDescriptionHeight, setDetailedDescriptionHeight] = useState<number>(150);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSave(editedTask);
+
+    console.log('handleSubmit called'); // Отладочный лог
+    console.log('editedTask:', editedTask); // Отладочный лог
+
+    // Валидация перед сохранением
+    if (!editedTask.title.trim()) {
+      toast.error(t('todo.titleRequired') || 'Title cannot be empty');
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      console.log('Calling onSave function'); // Отладочный лог
+      await onSave(editedTask);
+      console.log('Task saved successfully'); // Отладочный лог
+      toast.success(t('common.save') || 'Task saved successfully!');
+    } catch (error) {
+      console.error('Error saving task:', error);
+      toast.error(t('todo.saveError') || 'Error saving task');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handlePriorityChange = (priority: 'low' | 'medium' | 'high') => {
@@ -79,7 +81,7 @@ const TaskDetailsPopup: React.FC<TaskDetailsPopupProps> = ({
         </div>
 
         <div className="flex-1 overflow-y-auto p-6">
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form id="task-details-form" onSubmit={handleSubmit} className="space-y-6">
             {/* Priority Selector */}
             <div>
               <label className="block text-sm font-medium text-text-secondary mb-2">
@@ -110,15 +112,15 @@ const TaskDetailsPopup: React.FC<TaskDetailsPopupProps> = ({
             {/* Dates */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <CalendarDropdown
-                value={editedTask.startDate || ''}
-                onChange={(date) => setEditedTask(prev => ({ ...prev, startDate: date }))}
+                value={editedTask.start_date || ''}
+                onChange={(date) => setEditedTask(prev => ({ ...prev, start_date: date }))}
                 label={t('todo.startDate') || 'Start Date'}
                 placeholder={t('todo.startDatePlaceholder') || 'Select start date...'}
               />
 
               <CalendarDropdown
-                value={editedTask.dueDate || ''}
-                onChange={(date) => setEditedTask(prev => ({ ...prev, dueDate: date }))}
+                value={editedTask.due_date || ''}
+                onChange={(date) => setEditedTask(prev => ({ ...prev, due_date: date }))}
                 label={t('todo.dueDate') || 'Due Date'}
                 placeholder={t('todo.dueDatePlaceholder') || 'Select due date...'}
               />
@@ -131,8 +133,8 @@ const TaskDetailsPopup: React.FC<TaskDetailsPopupProps> = ({
               </label>
               <div className="relative">
                 <select
-                  value={editedTask.projectId || ''}
-                  onChange={(e) => setEditedTask(prev => ({ ...prev, projectId: e.target.value }))}
+                  value={editedTask.project_id || ''}
+                  onChange={(e) => setEditedTask(prev => ({ ...prev, project_id: e.target.value }))}
                   className="w-full px-4 py-2 rounded-lg border border-border bg-bg-secondary focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20 outline-none transition-all text-text-primary appearance-none"
                 >
                   <option value="">{t('todo.noProject') || 'No project'}</option>
@@ -195,15 +197,15 @@ const TaskDetailsPopup: React.FC<TaskDetailsPopupProps> = ({
                 {t('todo.detailedDescription') || 'Detailed Description'}
               </label>
               <textarea
-                value={editedTask.detailedDescription || ''}
-                onChange={(e) => setEditedTask(prev => ({ ...prev, detailedDescription: e.target.value }))}
+                value={editedTask.detailed_description || ''}
+                onChange={(e) => setEditedTask(prev => ({ ...prev, detailed_description: e.target.value }))}
                 className="w-full px-4 py-2 rounded-lg border border-border bg-bg-secondary focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20 outline-none transition-all text-text-primary min-h-[150px]"
                 style={{ height: `${detailedDescriptionHeight}px` }}
                 placeholder={t('todo.detailedDescriptionPlaceholder') || 'Detailed description (up to 5000 characters)...'}
               />
               <div className="flex justify-between items-center mt-2">
                 <div className="text-xs text-text-tertiary">
-                  {`${editedTask.detailedDescription ? editedTask.detailedDescription.length : 0} / 5000`}
+                  {`${editedTask.detailed_description ? editedTask.detailed_description.length : 0} / 5000`}
                 </div>
                 <div
                   className="resize-handle w-4 h-4 cursor-se-resize relative"
@@ -237,15 +239,25 @@ const TaskDetailsPopup: React.FC<TaskDetailsPopupProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 rounded-lg bg-bg-secondary text-text-primary hover:bg-bg-tertiary transition-colors"
+            disabled={isSaving}
+            className="px-4 py-2 rounded-lg bg-bg-secondary text-text-primary hover:bg-bg-tertiary transition-colors disabled:opacity-50"
           >
             {t('common.cancel') || 'Cancel'}
           </button>
           <button
             type="submit"
-            className="px-4 py-2 rounded-lg bg-accent-gradient-1 text-white font-medium hover:shadow-lg transition-all"
+            form="task-details-form"
+            disabled={isSaving}
+            className="px-4 py-2 rounded-lg bg-accent-gradient-1 text-white font-medium hover:shadow-lg transition-all disabled:opacity-50 flex items-center gap-2"
           >
-            {t('common.save') || 'Save'}
+            {isSaving ? (
+              <>
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"></div>
+                {t('common.saving') || 'Saving...'}
+              </>
+            ) : (
+              t('common.save') || 'Save'
+            )}
           </button>
         </div>
       </div>
