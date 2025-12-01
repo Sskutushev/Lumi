@@ -1,62 +1,96 @@
-# Lumi
+# Lumi - Modern Mid+/Senior Level Task Management Application
 
-Lumi is a modern and minimalist to-do application designed for focus and simplicity. It provides a clean, intuitive interface for managing tasks and projects without unnecessary features. This project was built with a focus on modern web development practices, including a full-featured backend powered by Supabase.
+Lumi is an advanced web application for task management, developed with a focus on clean architecture and modern development practices. The application is built using React with TypeScript and Supabase, emphasizing performance, accessibility, and reliability.
 
 ![Lumi Screenshot](https://raw.githubusercontent.com/Sskutushev/Lumi/main/img/pet-project.jpg)
 
-## Features
+## Key Features
 
-- **Clean & Minimal UI**: A user interface designed for focus and efficiency.
-- **Project Organization**: Group tasks into distinct projects.
-- **Task Prioritization**: Assign priorities (`low`, `medium`, `high`) to tasks.
-- **Due Dates**: Set deadlines for tasks to stay on track.
-- **Authentication**: Secure sign-up and sign-in with email/password, plus OAuth for Google and GitHub.
-- **Real-time Functionality**: Data syncs instantly across sessions, powered by Supabase Realtime.
-- **Theming**: Seamless light and dark mode support.
-- **Internationalization**: Support for English and Russian.
+### Architectural Enhancements
 
-## Tech Stack
+- **React Query Integration**: For efficient state management and data caching, significantly reducing API calls and improving responsiveness.
+- **Race Condition Fixes**: Implemented in the API layer using a robust UPSERT approach to ensure data consistency.
+- **Rendering Optimization**: Achieved through extensive use of `useMemo`, `useCallback`, and `React.memo` to minimize unnecessary re-renders.
+- **Comprehensive Error Handling**: A centralized system with various error types and detailed logging ensures a smooth user experience and aids debugging.
+
+### Performance
+
+- **Lazy Loading**: Components are loaded lazily to reduce the initial bundle size and improve Time-to-Interactive.
+- **Code Splitting**: Optimizes loading by splitting the application into smaller, on-demand chunks.
+- **Memoization**: Extensive use of `useMemo` and `useCallback` for computations and callbacks.
+- **Performance Analytics**: Integrated monitoring to track and analyze application performance.
+
+### Security
+
+- **Data Validation**: Robust input validation using Zod schemas prevents common vulnerabilities.
+- **User Input Sanitization**: Sanitizes user-provided data to protect against XSS attacks.
+- **Authentication Token Verification**: Secure handling of authentication tokens.
+- **RLS (Row Level Security)**: Implemented in Supabase to ensure data isolation.
+- **XSS and CSRF Protection**: Measures in place to guard against cross-site scripting and request forgery.
+
+### Accessibility (A11y)
+
+- **Full Keyboard Navigation Support**: Ensures all interactive elements are accessible via keyboard.
+- **ARIA Attributes**: Used to provide semantic information for screen readers.
+- **High Contrast Colors**: Adheres to WCAG guidelines for readability.
+- **Adaptive Design**: Responsive design for various screen sizes.
+- **Focus Management System**: Guides user focus for improved usability.
+
+### Real-time Interaction
+
+- **Real-time Data Synchronization**: Achieved through Supabase Realtime subscriptions, providing instant updates across clients.
+- **Presence Support**: (Planned) To track online statuses of users.
+- **Inter-tab Synchronization**: Uses BroadcastChannel API to synchronize data across multiple browser tabs for the same user.
+
+### Advanced Functionality
+
+- **Advanced Filtering and Sorting**: Powerful filtering and sorting options for tasks, including custom criteria.
+- **Saved Filters**: Allows users to save and quickly access their preferred filter presets.
+- **PWA Support**: Progressive Web App capabilities with offline mode and installability for an app-like experience.
+- **Monitoring and Analytics**: Integrated with Sentry for error tracking and Yandex Metrika for user behavior analytics.
+
+## Technologies Used
 
 - **Frontend**: React 18, TypeScript, Vite
-- **Backend-as-a-Service**: Supabase (PostgreSQL, Auth, Storage, Realtime)
-- **Styling**: Tailwind CSS
-- **UI & Animation**: Framer Motion, Radix UI, Lucide React
-- **State Management**: Zustand
-- **Internationalization**: `react-i18next`
-- **Testing**: Vitest, React Testing Library
+- **State Management**: Zustand, @tanstack/react-query
+- **Backend**: Supabase (PostgreSQL, Auth, Storage, Realtime)
+- **Styling**: Tailwind CSS, Framer Motion
+- **Testing**: Vitest, React Testing Library (E2E with Cypress/Playwright planned)
+- **I18n**: react-i18next
+- **Icons**: Lucide React
+- **Analytics & Monitoring**: Sentry, Yandex Metrika
+- **Code Quality**: Prettier, ESLint, Husky, Lint-staged, Commitlint
 
-## Project Documentation
+## Documentation
 
-For a detailed overview of the project's architecture, database schema, and advanced configurations, please refer to the documentation in the `/docs` directory:
+Detailed documentation is available in the `/docs/` folder:
 
-- **[Architecture Overview](./docs/ARCHITECTURE.md)**: A deep dive into the frontend architecture, state management, and API design.
-- **[Database Schema](./docs/DATABASE.md)**: Detailed information on the Supabase PostgreSQL schema, RLS policies, and database functions.
+- **[Architecture](./docs/ARCHITECTURE.md)**: Detailed overview of the application's architecture.
+- **[Database](./docs/DATABASE.md)**: Database schema, RLS policies, and trigger functions.
+- **[API](./docs/API.md)**: Documentation for the API interaction layer.
+- **[Getting Started](./docs/GETTING_STARTED.md)**: Instructions for setting up and running the project.
+- **[Contributing](./docs/CONTRIBUTING.md)**: Guidelines for contributing to the project.
+- **[Deployment](./docs/DEPLOYMENT.md)**: Procedures for deploying the application.
+- **[Troubleshooting](./docs/TROUBLESHOOTING.md)**: Solutions to common issues.
+- **[Performance](./docs/PERFORMANCE.md)**: Details on performance optimizations.
 
 ## Getting Started
 
-To run this project locally, follow these steps.
-
-### Prerequisites
+### Requirements
 
 - Node.js `v18.0.0` or higher
 - `npm` `v9.0.0` or higher
+- Git
 
-### 1. Clone the Repository
-
-```bash
-git clone https://github.com/Sskutushev/Lumi.git
-cd Lumi
-```
-
-### 2. Install Dependencies
+### 1. Installation
 
 ```bash
 npm install
 ```
 
-### 3. Set Up Environment Variables
+### 2. Environment Variables
 
-Create a `.env.local` file in the root of the project and add your Supabase project credentials. You can find these in your Supabase project dashboard under `Settings > API`.
+Create a `.env.local` file in the project root based on `.env.example`:
 
 ```env
 # .env.local
@@ -65,20 +99,22 @@ Create a `.env.local` file in the root of the project and add your Supabase proj
 VITE_SUPABASE_URL="your_supabase_project_url"
 VITE_SUPABASE_ANON_KEY="your_supabase_anon_key"
 
-# Optional - for Yandex Metrika analytics (replace with your counter ID)
+# Optional - for Yandex Metrika analytics
 VITE_YM_COUNTER_ID="your_yandex_metrika_counter_id"
+
+# Optional - for Sentry error tracking
+VITE_SENTRY_DSN="your_sentry_dsn"
 ```
-*Note: For TypeScript to recognize `import.meta.env`, ensure your `tsconfig.json` includes `"types": ["vite/client"]` or that you have a `vite-env.d.ts` file in your `src` directory.*
 
-### 4. Set Up the Database
+### 3. Database Setup
 
-The database schema, including tables, policies, and functions, is defined in a migration file.
+Execute the SQL script from the migrations folder in your Supabase console's SQL Editor to set up the database schema, RLS, and functions:
 
-1.  Navigate to the **SQL Editor** in your Supabase project dashboard.
-2.  Open the `supabase/migrations/01_create_tables_and_policies_fixed.sql` file.
-3.  Copy its entire content, paste it into the SQL editor, and click **RUN**. This will set up your database.
+`supabase/migrations/01_create_tables_and_policies_fixed.sql`
 
-### 5. Run the Application
+Refer to the [Database Documentation](./docs/DATABASE.md) for more details.
+
+### 4. Running the Application
 
 ```bash
 npm run dev
@@ -86,9 +122,17 @@ npm run dev
 
 The application will be available at `http://localhost:5173`.
 
-## Deployment
+### 5. Running Tests
 
-This project is configured for continuous deployment on Vercel. Any pushes to the `main` branch will trigger a new deployment.
+```bash
+npm test
+```
+
+Refer to the [Contributing Guide](./docs/CONTRIBUTING.md) for more details on testing.
+
+## Project Status
+
+The project is in a highly developed state, with most planned features implemented and optimized for production use. All core functionalities are in place, and the application adheres to Mid+/Senior level development standards. Further enhancements include completing E2E testing and comprehensive JSDoc comments.
 
 ## Contact
 

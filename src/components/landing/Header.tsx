@@ -16,9 +16,19 @@ interface HeaderProps {
   onChangeLanguage: (lng: string) => void;
   onToggleTheme: () => void;
   currentTheme: string;
+  onOpenProfileSettings?: () => void;
 }
 
-const Header = ({ user, userProfile, onSignIn, onSignOut, onChangeLanguage, onToggleTheme, currentTheme }: HeaderProps) => {
+const Header = ({
+  user,
+  userProfile,
+  onSignIn,
+  onSignOut,
+  onChangeLanguage,
+  onToggleTheme,
+  currentTheme,
+  onOpenProfileSettings,
+}: HeaderProps) => {
   const { t, i18n } = useTranslation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
@@ -37,20 +47,27 @@ const Header = ({ user, userProfile, onSignIn, onSignOut, onChangeLanguage, onTo
             <div className="w-10 h-10 rounded-xl bg-gradient-animated flex items-center justify-center shadow-lg">
               <span className="text-white font-bold text-lg">L</span>
             </div>
-            <span className="text-xl font-bold text-gradient-animated bg-clip-text">
-              Lumi
-            </span>
+            <span className="text-xl font-bold text-gradient-animated bg-clip-text">Lumi</span>
           </div>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-8">
-            <a href="#problems" className="text-text-secondary hover:text-text-primary transition-colors text-sm font-medium">
+            <a
+              href="#problems"
+              className="text-text-secondary hover:text-text-primary transition-colors text-sm font-medium"
+            >
               {t('landing.problems.title')}
             </a>
-            <a href="#solution" className="text-text-secondary hover:text-text-primary transition-colors text-sm font-medium">
+            <a
+              href="#solution"
+              className="text-text-secondary hover:text-text-primary transition-colors text-sm font-medium"
+            >
               {t('landing.solution.title')}
             </a>
-            <a href="#pet-project" className="text-text-secondary hover:text-text-primary transition-colors text-sm font-medium">
+            <a
+              href="#pet-project"
+              className="text-text-secondary hover:text-text-primary transition-colors text-sm font-medium"
+            >
               {t('landing.petProject.title')}
             </a>
           </nav>
@@ -67,17 +84,18 @@ const Header = ({ user, userProfile, onSignIn, onSignOut, onChangeLanguage, onTo
                 <img src={engFlag} alt="English" className="w-5 h-5" />
               )}
             </button>
-            
-            <button 
+
+            <button
               onClick={onToggleTheme}
               className="p-2 rounded-lg hover:bg-bg-secondary transition-colors"
             >
-              {currentTheme === 'light' ? 
-                <Moon className="w-5 h-5 text-text-secondary" /> : 
+              {currentTheme === 'light' ? (
+                <Moon className="w-5 h-5 text-text-secondary" />
+              ) : (
                 <Sun className="w-5 h-5 text-text-secondary" />
-              }
+              )}
             </button>
-            
+
             {user ? (
               <div className="relative">
                 <button
@@ -85,7 +103,11 @@ const Header = ({ user, userProfile, onSignIn, onSignOut, onChangeLanguage, onTo
                   className="w-10 h-10 rounded-full bg-accent-gradient-1 flex items-center justify-center text-white font-medium overflow-hidden"
                 >
                   {userProfile?.avatar_url ? (
-                    <img src={userProfile.avatar_url} alt="User Avatar" className="w-full h-full object-cover" />
+                    <img
+                      src={userProfile.avatar_url}
+                      alt="User Avatar"
+                      className="w-full h-full object-cover"
+                    />
                   ) : (
                     user?.email?.charAt(0).toUpperCase() || 'U'
                   )}
@@ -99,6 +121,40 @@ const Header = ({ user, userProfile, onSignIn, onSignOut, onChangeLanguage, onTo
                       className="absolute right-0 mt-2 w-48 bg-bg-primary rounded-xl shadow-xl border border-border py-2 z-50"
                       onClick={(e) => e.stopPropagation()}
                     >
+                      <button
+                        onClick={() => {
+                          if (onOpenProfileSettings) {
+                            onOpenProfileSettings();
+                          }
+                          setIsUserMenuOpen(false);
+                        }}
+                        className="w-full text-left px-4 py-2.5 hover:bg-bg-secondary text-text-primary text-sm flex items-center gap-3"
+                      >
+                        {t('profile.settings')}
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          onToggleTheme();
+                          setIsUserMenuOpen(false);
+                        }}
+                        className="w-full text-left px-4 py-2.5 hover:bg-bg-secondary text-text-primary text-sm flex items-center gap-3"
+                      >
+                        {currentTheme === 'light' ? t('common.darkTheme') : t('common.lightTheme')}
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          toggleLanguage();
+                          setIsUserMenuOpen(false);
+                        }}
+                        className="w-full text-left px-4 py-2.5 hover:bg-bg-secondary text-text-primary text-sm flex items-center gap-3"
+                      >
+                        {i18n.language === 'en' ? t('common.russian') : t('common.english')}
+                      </button>
+
+                      <hr className="my-2 border-border" />
+
                       <button
                         onClick={onSignOut}
                         className="w-full text-left px-4 py-2.5 hover:bg-error/10 text-error text-sm flex items-center gap-3"
@@ -148,30 +204,30 @@ const Header = ({ user, userProfile, onSignIn, onSignOut, onChangeLanguage, onTo
                 <X className="w-6 h-6 text-text-secondary" />
               </button>
             </div>
-            
+
             <nav className="flex flex-col items-center gap-6 py-6">
-              <a 
-                href="#problems" 
+              <a
+                href="#problems"
                 className="text-lg font-medium text-text-secondary hover:text-text-primary transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 {t('landing.problems.title')}
               </a>
-              <a 
-                href="#solution" 
+              <a
+                href="#solution"
                 className="text-lg font-medium text-text-secondary hover:text-text-primary transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 {t('landing.solution.title')}
               </a>
-              <a 
-                href="#pet-project" 
+              <a
+                href="#pet-project"
                 className="text-lg font-medium text-text-secondary hover:text-text-primary transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 {t('landing.petProject.title')}
               </a>
-              
+
               <div className="flex flex-col gap-4 w-full max-w-xs mt-8">
                 <button
                   onClick={toggleLanguage}
@@ -189,7 +245,7 @@ const Header = ({ user, userProfile, onSignIn, onSignOut, onChangeLanguage, onTo
                     </>
                   )}
                 </button>
-                
+
                 <button
                   onClick={onToggleTheme}
                   className="px-4 py-2 rounded-lg bg-bg-secondary hover:bg-bg-tertiary transition-colors text-sm font-medium flex items-center justify-center gap-2"
@@ -204,7 +260,7 @@ const Header = ({ user, userProfile, onSignIn, onSignOut, onChangeLanguage, onTo
                     </>
                   )}
                 </button>
-                
+
                 <button
                   onClick={() => {
                     onSignIn();

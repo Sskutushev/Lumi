@@ -315,17 +315,22 @@ CREATE TRIGGER update_tasks_updated_at
 CREATE OR REPLACE FUNCTION create_profile_for_new_user()
 RETURNS TRIGGER
 LANGUAGE plpgsql
+SECURITY DEFINER
 AS $$
 BEGIN
     INSERT INTO users_profile (id, full_name, avatar_url, storage_used)
     VALUES (
         NEW.id,
-        CASE 
-            WHEN NEW.raw_user_meta_data ? 'full_name' 
-            THEN NEW.raw_user_meta_data->>'full_name' 
-            ELSE NEW.raw_user_meta_data->>'name'
-        END,
-        NEW.raw_user_meta_data->>'avatar_url',
+        -- Используем COALESCE для безопасного извлечения данных.
+        -- Пробуем 'full_name', затем 'name', затем email, и в крайнем случае пустую строку.
+        COALESCE(
+            NEW.raw_user_meta_data->>'full_name',
+            NEW.raw_user_meta_data->>'name',
+            NEW.email,
+            ''
+        ),
+        -- Для avatar_url также используем COALESCE, возвращая NULL если ничего нет.
+        COALESCE(NEW.raw_user_meta_data->>'avatar_url', NULL),
         0
     );
     RETURN NEW;
@@ -341,7 +346,7 @@ CREATE TRIGGER on_auth_user_created
 
 -- Дополнительная политика для Storage (разрешаем пользователям загружать в их папки)
 INSERT INTO storage.buckets (id, name, public, avif_autodetection, file_size_limit, allowed_mime_types)
-VALUES ('avatars', 'avatars', true, false, 5242880, 
+VALUES ('avatars', 'avatars', true, false, 5242880,
         '{"image/png", "image/jpg", "image/jpeg", "image/gif", "image/webp"}')
 ON CONFLICT (id) DO NOTHING;
 

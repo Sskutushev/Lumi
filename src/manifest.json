@@ -1,0 +1,22 @@
+{
+  "name": "Lumi Todo",
+  "short_name": "Lumi",
+  "description": "Productivity application with advanced task management",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#818cf8",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/src/assets/images/logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/src/assets/images/logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}

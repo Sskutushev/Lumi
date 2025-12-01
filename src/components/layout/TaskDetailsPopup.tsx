@@ -16,7 +16,7 @@ const TaskDetailsPopup: React.FC<TaskDetailsPopupProps> = ({
   task,
   projects = [],
   onClose,
-  onSave
+  onSave,
 }) => {
   const { t } = useTranslation();
   const [editedTask, setEditedTask] = useState<TaskType>({ ...task });
@@ -38,10 +38,22 @@ const TaskDetailsPopup: React.FC<TaskDetailsPopupProps> = ({
 
     setIsSaving(true);
     try {
+      // Создаем копию задачи для сохранения, чтобы безопасно форматировать даты
+      const taskToSave = { ...editedTask };
+
+      // Преобразуем даты в ISO строку, если они существуют
+      if (taskToSave.start_date) {
+        taskToSave.start_date = new Date(taskToSave.start_date).toISOString();
+      }
+      if (taskToSave.due_date) {
+        taskToSave.due_date = new Date(taskToSave.due_date).toISOString();
+      }
+
       console.log('Calling onSave function'); // Отладочный лог
-      await onSave(editedTask);
+      await onSave(taskToSave);
       console.log('Task saved successfully'); // Отладочный лог
       toast.success(t('common.save') || 'Task saved successfully!');
+      onClose(); // Закрываем попап после успешного сохранения
     } catch (error) {
       console.error('Error saving task:', error);
       toast.error(t('todo.saveError') || 'Error saving task');
@@ -51,7 +63,7 @@ const TaskDetailsPopup: React.FC<TaskDetailsPopupProps> = ({
   };
 
   const handlePriorityChange = (priority: 'low' | 'medium' | 'high') => {
-    setEditedTask(prev => ({ ...prev, priority }));
+    setEditedTask((prev) => ({ ...prev, priority }));
   };
 
   return (
@@ -74,7 +86,7 @@ const TaskDetailsPopup: React.FC<TaskDetailsPopupProps> = ({
           <input
             type="text"
             value={editedTask.title}
-            onChange={(e) => setEditedTask(prev => ({ ...prev, title: e.target.value }))}
+            onChange={(e) => setEditedTask((prev) => ({ ...prev, title: e.target.value }))}
             className="w-full text-2xl font-bold bg-transparent border-none focus:outline-none focus:ring-0 p-0 text-text-primary"
             placeholder={t('todo.taskTitle') || 'Task title...'}
           />
@@ -88,7 +100,7 @@ const TaskDetailsPopup: React.FC<TaskDetailsPopupProps> = ({
                 {t('todo.priority.label') || 'Priority'}
               </label>
               <div className="flex gap-2">
-                {(['low', 'medium', 'high'] as const).map(priority => (
+                {(['low', 'medium', 'high'] as const).map((priority) => (
                   <button
                     key={priority}
                     type="button"
@@ -113,14 +125,14 @@ const TaskDetailsPopup: React.FC<TaskDetailsPopupProps> = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <CalendarDropdown
                 value={editedTask.start_date || ''}
-                onChange={(date) => setEditedTask(prev => ({ ...prev, start_date: date }))}
+                onChange={(date) => setEditedTask((prev) => ({ ...prev, start_date: date }))}
                 label={t('todo.startDate') || 'Start Date'}
                 placeholder={t('todo.startDatePlaceholder') || 'Select start date...'}
               />
 
               <CalendarDropdown
                 value={editedTask.due_date || ''}
-                onChange={(date) => setEditedTask(prev => ({ ...prev, due_date: date }))}
+                onChange={(date) => setEditedTask((prev) => ({ ...prev, due_date: date }))}
                 label={t('todo.dueDate') || 'Due Date'}
                 placeholder={t('todo.dueDatePlaceholder') || 'Select due date...'}
               />
@@ -134,19 +146,30 @@ const TaskDetailsPopup: React.FC<TaskDetailsPopupProps> = ({
               <div className="relative">
                 <select
                   value={editedTask.project_id || ''}
-                  onChange={(e) => setEditedTask(prev => ({ ...prev, project_id: e.target.value }))}
+                  onChange={(e) =>
+                    setEditedTask((prev) => ({ ...prev, project_id: e.target.value }))
+                  }
                   className="w-full px-4 py-2 rounded-lg border border-border bg-bg-secondary focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20 outline-none transition-all text-text-primary appearance-none"
                 >
                   <option value="">{t('todo.noProject') || 'No project'}</option>
-                  {projects.map(project => (
+                  {projects.map((project) => (
                     <option key={project.id} value={project.id}>
                       {project.name}
                     </option>
                   ))}
                 </select>
                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-text-tertiary">
-                  <svg className="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                  <svg
+                    className="h-4 w-4"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                      clipRule="evenodd"
+                    />
                   </svg>
                 </div>
               </div>
@@ -159,7 +182,9 @@ const TaskDetailsPopup: React.FC<TaskDetailsPopupProps> = ({
               </label>
               <textarea
                 value={editedTask.description || ''}
-                onChange={(e) => setEditedTask(prev => ({ ...prev, description: e.target.value }))}
+                onChange={(e) =>
+                  setEditedTask((prev) => ({ ...prev, description: e.target.value }))
+                }
                 className="w-full px-4 py-2 rounded-lg border border-border bg-bg-secondary focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20 outline-none transition-all text-text-primary min-h-[120px]"
                 style={{ height: `${descriptionHeight}px` }}
                 placeholder={t('todo.descriptionPlaceholder') || 'Brief description...'}
@@ -198,10 +223,15 @@ const TaskDetailsPopup: React.FC<TaskDetailsPopupProps> = ({
               </label>
               <textarea
                 value={editedTask.detailed_description || ''}
-                onChange={(e) => setEditedTask(prev => ({ ...prev, detailed_description: e.target.value }))}
+                onChange={(e) =>
+                  setEditedTask((prev) => ({ ...prev, detailed_description: e.target.value }))
+                }
                 className="w-full px-4 py-2 rounded-lg border border-border bg-bg-secondary focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20 outline-none transition-all text-text-primary min-h-[150px]"
                 style={{ height: `${detailedDescriptionHeight}px` }}
-                placeholder={t('todo.detailedDescriptionPlaceholder') || 'Detailed description (up to 5000 characters)...'}
+                placeholder={
+                  t('todo.detailedDescriptionPlaceholder') ||
+                  'Detailed description (up to 5000 characters)...'
+                }
               />
               <div className="flex justify-between items-center mt-2">
                 <div className="text-xs text-text-tertiary">

@@ -69,14 +69,47 @@ const AuthModal = ({ onClose }: AuthModalProps) => {
       if (!isSignIn && response.data.session === null) {
         // User needs to confirm email
         setIsSuccess(true);
-        setSuccessMessage(t('auth.signUpSuccess') || '📧 Письмо отправлено! Проверьте почту для подтверждения.');
+        setSuccessMessage(
+          t('auth.signUpSuccess') || '📧 Письмо отправлено! Проверьте почту для подтверждения.'
+        );
       } else {
         // Close modal after successful auth
         onClose();
       }
     } catch (error: any) {
-      console.error('Authentication error:', error.message);
-      setErrorMessage(error.message || 'Authentication failed');
+      console.error('Authentication error details:', {
+        message: error.message,
+        code: error.code,
+        status: error.status,
+        error,
+      });
+
+      // Более информативное сообщение об ошибке
+      let errorMessage = error.message || 'Authentication failed';
+
+      if (error.code === '23505') {
+        // Duplicate key error
+        errorMessage = 'User with this email already exists';
+      } else if (
+        error.message?.includes('database') ||
+        error.message?.includes('saving new user')
+      ) {
+        // Пользователь может продолжать использование, даже если профиль не был создан сразу
+        if (error.message.includes('saving new user')) {
+          errorMessage =
+            'Registration was successful, but there was an issue with profile creation. Please try logging in again shortly.';
+        } else {
+          errorMessage = 'Database error occurred. Please try again later.';
+        }
+      } else if (error.status === 500) {
+        errorMessage = 'Server error occurred. Please try again later.';
+      } else if (error.code === 'unexpected_failure') {
+        // В случае ошибки создания профиля, пользователь все равно может войти после подтверждения
+        errorMessage =
+          'Registration successful! Please check your email to confirm your account before logging in.';
+      }
+
+      setErrorMessage(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -91,7 +124,7 @@ const AuthModal = ({ onClose }: AuthModalProps) => {
     try {
       setLoading(true);
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: window.location.origin
+        redirectTo: window.location.origin,
       });
 
       if (error) throw error;
@@ -110,8 +143,8 @@ const AuthModal = ({ onClose }: AuthModalProps) => {
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`
-        }
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
       });
       if (error) throw error;
     } catch (error: any) {
@@ -141,15 +174,13 @@ const AuthModal = ({ onClose }: AuthModalProps) => {
                 <CheckCircle className="w-8 h-8 text-success" />
               </div>
             </div>
-            
+
             <h3 className="text-xl font-bold text-text-primary mb-2">
               {t('common.success') || 'Success'}
             </h3>
-            
-            <p className="text-text-secondary mb-6">
-              {successMessage}
-            </p>
-            
+
+            <p className="text-text-secondary mb-6">{successMessage}</p>
+
             <button
               onClick={() => {
                 setIsSuccess(false);
@@ -172,6 +203,8 @@ const AuthModal = ({ onClose }: AuthModalProps) => {
       exit={{ opacity: 0 }}
       className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
       onClick={onClose}
+      aria-modal="true"
+      role="dialog"
     >
       <motion.div
         initial={{ scale: 0.9, opacity: 0 }}
@@ -179,13 +212,15 @@ const AuthModal = ({ onClose }: AuthModalProps) => {
         exit={{ scale: 0.9, opacity: 0 }}
         className="relative w-full max-w-md bg-bg-primary rounded-2xl shadow-2xl border border-border overflow-hidden"
         onClick={(e) => e.stopPropagation()}
+        role="document"
       >
         <div className="p-8">
           <button
             onClick={onClose}
             className="absolute top-4 right-4 w-8 h-8 rounded-lg hover:bg-bg-secondary flex items-center justify-center transition-colors"
+            aria-label={t('common.closeModal')}
           >
-            <X className="w-5 h-5 text-text-secondary" />
+            <X className="w-5 h-5 text-text-secondary" aria-hidden="true" />
           </button>
 
           <div className="text-center space-y-4 mb-8">
@@ -202,8 +237,9 @@ const AuthModal = ({ onClose }: AuthModalProps) => {
             <button
               className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl border border-border hover:bg-bg-secondary transition-colors"
               onClick={() => handleOAuthSignIn('google')}
+              aria-label={t('common.signInWithGoogle')}
             >
-              <GoogleLogoComponent />
+              <GoogleLogoComponent aria-hidden="true" />
               <span className="font-medium text-text-primary">
                 {t('common.continueWithGoogle')}
               </span>
@@ -212,8 +248,9 @@ const AuthModal = ({ onClose }: AuthModalProps) => {
             <button
               className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl border border-border hover:bg-bg-secondary transition-colors"
               onClick={() => handleOAuthSignIn('github')}
+              aria-label={t('common.signInWithGithub')}
             >
-              <Github className="w-5 h-5" />
+              <Github className="w-5 h-5" aria-hidden="true" />
               <span className="font-medium text-text-primary">
                 {t('common.continueWithGithub')}
               </span>
@@ -235,22 +272,25 @@ const AuthModal = ({ onClose }: AuthModalProps) => {
           {/* Email Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-text-secondary mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-text-secondary mb-2">
                 {t('common.email')}
               </label>
               <input
+                id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 className="w-full px-4 py-3 rounded-xl border border-border bg-bg-secondary focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20 outline-none transition-all text-text-primary"
                 placeholder="you@example.com"
+                aria-required="true"
+                aria-invalid={errorMessage ? 'true' : 'false'}
               />
             </div>
 
             <div>
               <div className="flex justify-between items-center mb-2">
-                <label className="block text-sm font-medium text-text-secondary">
+                <label htmlFor="password" className="block text-sm font-medium text-text-secondary">
                   {t('common.password')}
                 </label>
                 {isSignIn && (
@@ -259,6 +299,7 @@ const AuthModal = ({ onClose }: AuthModalProps) => {
                     onClick={handleResetPassword}
                     disabled={loading}
                     className="text-sm text-accent-primary hover:underline disabled:opacity-50"
+                    aria-label={t('common.resetPassword')}
                   >
                     {t('common.forgotPassword')}
                   </button>
@@ -266,32 +307,39 @@ const AuthModal = ({ onClose }: AuthModalProps) => {
               </div>
               <div className="relative">
                 <input
-                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   className="w-full px-4 py-3 rounded-xl border border-border bg-bg-secondary focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20 outline-none transition-all text-text-primary pr-10"
                   placeholder="••••••••"
+                  aria-required="true"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute inset-y-0 right-0 pr-3 flex items-center text-text-secondary hover:text-text-primary"
+                  aria-label={showPassword ? t('common.hidePassword') : t('common.showPassword')}
+                  aria-pressed={showPassword}
                 >
-                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  {showPassword ? (
+                    <EyeOff className="h-5 w-5" aria-hidden="true" />
+                  ) : (
+                    <Eye className="h-5 w-5" aria-hidden="true" />
+                  )}
                 </button>
               </div>
             </div>
 
             {errorMessage && (
-              <div className="text-sm text-error p-3 bg-error/10 rounded-lg">
-                {errorMessage}
-              </div>
+              <div className="text-sm text-error p-3 bg-error/10 rounded-lg">{errorMessage}</div>
             )}
 
             {!isSignIn && (
               <div className="text-xs text-text-tertiary">
-                {t('auth.termsAgreement') || 'By signing up, you agree to our Terms and Privacy Policy.'}
+                {t('auth.termsAgreement') ||
+                  'By signing up, you agree to our Terms and Privacy Policy.'}
               </div>
             )}
 
@@ -299,9 +347,13 @@ const AuthModal = ({ onClose }: AuthModalProps) => {
               type="submit"
               disabled={loading}
               className="w-full px-4 py-3.5 rounded-xl bg-accent-gradient-1 text-white font-semibold shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all disabled:opacity-50 flex items-center justify-center"
+              aria-busy={loading}
             >
               {loading ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" aria-hidden="true" />
+                  <span className="sr-only">{t('common.loading')}</span>
+                </>
               ) : isSignIn ? (
                 t('common.signIn')
               ) : (

@@ -1,38 +1,46 @@
 import React from 'react';
 import { AlertCircle, RotateCcw } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { ErrorHandler } from '../lib/errors/ErrorHandler';
+import { Logger } from '../lib/errors/logger';
+import { AppError } from '../lib/errors/errorTypes';
+import { errorMessages } from '../lib/errors/errorMessages';
 
 interface ErrorBoundaryState {
   hasError: boolean;
-  error: Error | null;
+  appError: AppError | null;
 }
 
 interface ErrorBoundaryProps {
   children: React.ReactNode;
-  fallback?: React.ComponentType<{ error: Error | null; resetError: () => void }>;
+  fallback?: React.ComponentType<{ appError: AppError | null; resetError: () => void }>;
 }
 
 class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
-    this.state = { hasError: false, error: null };
+    this.state = { hasError: false, appError: null };
   }
 
-  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
-    return { hasError: true, error };
+  static getDerivedStateFromError(error: any): ErrorBoundaryState {
+    const appError = ErrorHandler.handle(error);
+    return { hasError: true, appError };
   }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('ErrorBoundary caught an error:', error, errorInfo);
+  componentDidCatch(error: any, errorInfo: React.ErrorInfo) {
+    const appError = ErrorHandler.handle(error);
+    this.setState({ appError });
+    Logger.error('ErrorBoundary caught an error:', { error: appError, errorInfo });
   }
 
   resetError = () => {
-    this.setState({ hasError: false, error: null });
+    this.setState({ hasError: false, appError: null });
   };
 
   render() {
     if (this.state.hasError) {
       const FallbackComponent = this.props.fallback || DefaultErrorFallback;
-      return <FallbackComponent error={this.state.error} resetError={this.resetError} />;
+      return <FallbackComponent appError={this.state.appError} resetError={this.resetError} />;
     }
 
     return this.props.children;
@@ -40,35 +48,73 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
 }
 
 interface ErrorFallbackProps {
-  error: Error | null;
+  appError: AppError | null;
   resetError: () => void;
 }
 
-const DefaultErrorFallback: React.FC<ErrorFallbackProps> = ({ error, resetError }) => (
-  <div className="min-h-screen flex items-center justify-center bg-bg-primary p-4">
-    <div className="text-center max-w-md w-full space-y-6">
-      <div className="w-16 h-16 rounded-full bg-error/10 flex items-center justify-center mx-auto">
-        <AlertCircle className="w-8 h-8 text-error" />
-      </div>
-      
-      <div className="space-y-2">
-        <h2 className="text-xl font-bold text-text-primary">Что-то пошло не так</h2>
-        <p className="text-text-secondary">
-          {error?.message || 'Произошла непредвиденная ошибка. Пожалуйста, попробуйте еще раз.'}
-        </p>
-      </div>
+const DefaultErrorFallback: React.FC<ErrorFallbackProps> = ({ appError, resetError }) => {
+  const { i18n } = useTranslation();
+  const lang = i18n.language || 'en';
 
-      <div className="pt-4">
-        <button
-          onClick={resetError}
-          className="px-4 py-2 rounded-lg bg-accent-gradient-1 text-white font-medium hover:shadow-lg transition-all flex items-center gap-2 mx-auto"
-        >
-          <RotateCcw className="w-4 h-4" />
-          Попробовать снова
-        </button>
+  // Получаем пользовательское сообщение об ошибке в зависимости от типа ошибки
+  const getErrorMessage = () => {
+    if (!appError) return 'Произошла непредвиденная ошибка. Пожалуйста, попробуйте еще раз.';
+
+    // Используем специфичное сообщение для типа ошибки
+    const message = errorMessages[appError.type]?.[lang];
+    if (message) return message;
+
+    // Возвращаем оригинальное сообщение, если нет перевода
+    return appError.message || 'Произошла непредвиденная ошибка.';
+  };
+
+  // Показываем техническую информацию об ошибке только в dev mode
+  const shouldShowDetails = process.env.NODE_ENV !== 'production' && appError?.originalError;
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-bg-primary p-4">
+      <div className="text-center max-w-md w-full space-y-6">
+        <div className="w-16 h-16 rounded-full bg-error/10 flex items-center justify-center mx-auto">
+          <AlertCircle className="w-8 h-8 text-error" />
+        </div>
+
+        <div className="space-y-2">
+          <h2 className="text-xl font-bold text-text-primary">Что-то пошло не так</h2>
+          <p className="text-text-secondary">{getErrorMessage()}</p>
+
+          {shouldShowDetails && (
+            <details className="text-left text-xs text-text-tertiary mt-4 p-3 bg-bg-secondary rounded-lg">
+              <summary className="cursor-pointer">Технические детали</summary>
+              <div className="mt-2">
+                <p>
+                  <strong>Тип ошибки:</strong> {appError?.type}
+                </p>
+                <p>
+                  <strong>Статус:</strong> {appError?.status}
+                </p>
+                <p>
+                  <strong>URL:</strong> {appError?.url}
+                </p>
+                <p>
+                  <strong>Оригинальная ошибка:</strong> {String(appError?.originalError)}
+                </p>
+              </div>
+            </details>
+          )}
+        </div>
+
+        <div className="pt-4">
+          <button
+            onClick={resetError}
+            className="px-4 py-2 rounded-lg bg-accent-gradient-1 text-white font-medium hover:shadow-lg transition-all flex items-center gap-2 mx-auto"
+          >
+            <RotateCcw className="w-4 h-4" />
+            Попробовать снова
+          </button>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default ErrorBoundary;

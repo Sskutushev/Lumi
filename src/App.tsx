@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { useTranslation } from 'react-i18next';
 import { Toaster } from 'sonner';
 import { useTheme } from './hooks/useTheme';
 import { useAuthStore } from './store/authStore';
 import { initYandexMetrika, trackPageView } from './lib/analytics';
 import { Project } from './types/api.types';
+import { queryClient } from './lib/query/queryClient';
 import Header from './components/landing/Header';
 import HeroSection from './components/landing/HeroSection';
 import MarketProblems from './components/landing/MarketProblems';
@@ -12,14 +15,16 @@ import SolutionBenefits from './components/landing/SolutionBenefits';
 import PetProject from './components/landing/PetProject';
 import Footer from './components/landing/Footer';
 import AuthModal from './components/auth/AuthModal';
-import TodoDashboard from './pages/TodoDashboard';
-import ProjectView from './pages/ProjectView';
+import { LazyTodoDashboardPage, LazyProjectViewPage } from './pages/LazyPages';
 
 import { profileAPI } from './lib/api/profile.api';
 import { UserProfile } from './types/api.types';
+import NetworkStatus from './components/common/NetworkStatus';
+import ProfileSettings from './components/layout/ProfileSettings';
 
 function App() {
   const [isAuthModalOpen, setAuthModalOpen] = useState(false);
+  const [showProfileSettings, setShowProfileSettings] = useState(false);
   const { user, loading, checkSession } = useAuthStore();
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const { i18n } = useTranslation();
@@ -45,6 +50,10 @@ function App() {
     setCurrentView('project');
   };
 
+  const handleOpenProfileSettings = () => {
+    setShowProfileSettings(true);
+  };
+
   const handleBackToDashboard = () => {
     setCurrentView('dashboard');
     setSelectedProject(null);
@@ -58,10 +67,15 @@ function App() {
     const fetchProfile = async () => {
       if (user) {
         try {
+          // Задержка для уверенности, что пользователь полностью создан
+          await new Promise((resolve) => setTimeout(resolve, 500));
+
           const profile = await profileAPI.getProfile(user.id);
           setUserProfile(profile);
         } catch (error) {
-          console.error("Failed to fetch user profile:", error);
+          console.error('Failed to fetch user profile:', error);
+          // Не останавливаем приложение из-за ошибки получения профиля
+          // Пользователь может продолжать использовать приложение
         }
       }
     };
@@ -91,8 +105,8 @@ function App() {
     if (currentView === 'project' && selectedProject) {
       return (
         <>
-          <ProjectView project={selectedProject} onBack={handleBackToDashboard} />
-          <Toaster 
+          <LazyProjectViewPage project={selectedProject} onBack={handleBackToDashboard} />
+          <Toaster
             position="bottom-right"
             theme={theme === 'dark' ? 'dark' : 'light'}
             richColors
@@ -103,11 +117,8 @@ function App() {
     }
     return (
       <>
-        <TodoDashboard
-          onSignOut={handleSignOut}
-          onProjectSelect={handleProjectSelect}
-        />
-        <Toaster 
+        <LazyTodoDashboardPage onSignOut={handleSignOut} onProjectSelect={handleProjectSelect} />
+        <Toaster
           position="bottom-right"
           theme={theme === 'dark' ? 'dark' : 'light'}
           richColors
@@ -118,35 +129,42 @@ function App() {
   }
 
   return (
-    <div className={`min-h-screen bg-bg-primary text-text-primary ${theme}`}>
-      <Header
-        user={user}
-        userProfile={userProfile}
-        onSignIn={handleSignIn}
-        onSignOut={handleSignOut}
-        onChangeLanguage={changeLanguage}
-        onToggleTheme={toggleTheme}
-        currentTheme={theme}
-      />
-      <main>
-        <HeroSection />
-        <MarketProblems />
-        <SolutionBenefits />
-        <PetProject />
-      </main>
-      <Footer />
-      {isAuthModalOpen && (
-        <AuthModal
-          onClose={() => setAuthModalOpen(false)}
+    <QueryClientProvider client={queryClient}>
+      <div className={`min-h-screen bg-bg-primary text-text-primary ${theme}`}>
+        <Header
+          user={user}
+          userProfile={userProfile}
+          onSignIn={handleSignIn}
+          onSignOut={handleSignOut}
+          onChangeLanguage={changeLanguage}
+          onToggleTheme={toggleTheme}
+          currentTheme={theme}
+          onOpenProfileSettings={handleOpenProfileSettings}
         />
-      )}
-      <Toaster 
-        position="bottom-right"
-        theme={theme === 'dark' ? 'dark' : 'light'}
-        richColors
-        closeButton
-      />
-    </div>
+        <main>
+          <HeroSection />
+          <MarketProblems />
+          <SolutionBenefits />
+          <PetProject />
+        </main>
+        <Footer />
+        {isAuthModalOpen && <AuthModal onClose={() => setAuthModalOpen(false)} />}
+        {showProfileSettings && (
+          <ProfileSettings
+            isOpen={showProfileSettings}
+            onClose={() => setShowProfileSettings(false)}
+          />
+        )}
+        <Toaster
+          position="bottom-right"
+          theme={theme === 'dark' ? 'dark' : 'light'}
+          richColors
+          closeButton
+        />
+        <NetworkStatus />
+      </div>
+      <ReactQueryDevtools initialIsOpen={false} />
+    </QueryClientProvider>
   );
 }
 

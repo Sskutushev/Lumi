@@ -1,33 +1,34 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import './accessibility.css';
 
 :root {
   /* Светлая тема */
-  --bg-primary: #FFFFFF;
-  --bg-secondary: #F7F8FA;
-  --bg-tertiary: #ECEEF1;
-  --bg-elevated: #FFFFFF;
-  --text-primary: #1A1D1F;
-  --text-secondary: #6F767E;
-  --text-tertiary: #9A9FA5;
-  --text-disabled: #D0D3D9;
+  --bg-primary: #ffffff;
+  --bg-secondary: #f7f8fa;
+  --bg-tertiary: #eceef1;
+  --bg-elevated: #ffffff;
+  --text-primary: #1a1d1f;
+  --text-secondary: #6f767e;
+  --text-tertiary: #9a9fa5;
+  --text-disabled: #d0d3d9;
 
-  --accent-primary: #6366F1;
-  --accent-secondary: #8B5CF6;
-  --accent-tertiary: #EC4899;
+  --accent-primary: #6366f1;
+  --accent-secondary: #8b5cf6;
+  --accent-tertiary: #ec4899;
 
   --accent-gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   --accent-gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
   --accent-gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
 
-  --success: #10B981;
-  --error: #EF4444;
-  --warning: #F59E0B;
-  --info: #3B82F6;
+  --success: #10b981;
+  --error: #ef4444;
+  --warning: #f59e0b;
+  --info: #3b82f6;
 
-  --border: #E5E7EB;
-  --border-hover: #D1D5DB;
+  --border: #e5e7eb;
+  --border-hover: #d1d5db;
 
   --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
   --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.08);
@@ -41,18 +42,18 @@
 
 .dark {
   /* Темная тема */
-  --bg-primary: #0D0D0F;
-  --bg-secondary: #18181B;
-  --bg-tertiary: #27272A;
-  --bg-elevated: #1F1F23;
-  --text-primary: #FAFAFA;
-  --text-secondary: #A1A1AA;
-  --text-tertiary: #71717A;
-  --text-disabled: #52525B;
+  --bg-primary: #0d0d0f;
+  --bg-secondary: #18181b;
+  --bg-tertiary: #27272a;
+  --bg-elevated: #1f1f23;
+  --text-primary: #fafafa;
+  --text-secondary: #a1a1aa;
+  --text-tertiary: #71717a;
+  --text-disabled: #52525b;
 
-  --accent-primary: #818CF8;
-  --accent-secondary: #A78BFA;
-  --accent-tertiary: #F472B6;
+  --accent-primary: #818cf8;
+  --accent-secondary: #a78bfa;
+  --accent-tertiary: #f472b6;
 
   --accent-gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   --accent-gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
@@ -62,13 +63,13 @@
   --glow-secondary: 0 0 20px rgba(167, 139, 250, 0.4);
   --glow-accent: 0 0 30px rgba(129, 140, 248, 0.5);
 
-  --success: #34D399;
-  --error: #F87171;
-  --warning: #FBBF24;
-  --info: #60A5FA;
+  --success: #34d399;
+  --error: #f87171;
+  --warning: #fbbf24;
+  --info: #60a5fa;
 
-  --border: #3F3F46;
-  --border-hover: #52525B;
+  --border: #3f3f46;
+  --border-hover: #52525b;
 
   --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
   --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.4);
@@ -102,41 +103,87 @@
   }
 
   /* Обеспечение видимости текста в инпутах */
-  input, textarea, select {
+  input,
+  textarea,
+  select {
     caret-color: var(--text-primary);
   }
 
-  .dark input, .dark textarea, .dark select {
+  .dark input,
+  .dark textarea,
+  .dark select {
     caret-color: var(--text-primary);
+  }
+
+  /* Улучшенные фокус стили для доступности */
+  button:focus-visible,
+  input:focus-visible,
+  a:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  [tabindex]:focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* Альтернатива для фокуса если :focus-visible не поддерживается */
+  button:focus,
+  input:focus,
+  a:focus,
+  select:focus,
+  textarea:focus,
+  [tabindex]:focus {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 2px;
+    border-radius: 4px;
   }
 }
 
 /* Анимированный градиент */
 .bg-gradient-animated {
-  background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary), var(--accent-tertiary), var(--accent-primary));
+  background: linear-gradient(
+    90deg,
+    var(--accent-primary),
+    var(--accent-secondary),
+    var(--accent-tertiary),
+    var(--accent-primary)
+  );
   background-size: 300% 300%;
   animation: gradient-move 8s ease infinite;
 }
 
 @keyframes gradient-move {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 /* Анимация пульсации для просроченных задач */
 @keyframes pulse-glow {
-  0%, 100% {
-    box-shadow: 0 0 3px rgba(239, 68, 68, 0.5), 0 0 5px rgba(239, 68, 68, 0.3);
+  0%,
+  100% {
+    box-shadow:
+      0 0 3px rgba(239, 68, 68, 0.5),
+      0 0 5px rgba(239, 68, 68, 0.3);
   }
   50% {
-    box-shadow: 0 0 7px rgba(239, 68, 68, 0.7), 0 0 10px rgba(239, 68, 68, 0.5);
+    box-shadow:
+      0 0 7px rgba(239, 68, 68, 0.7),
+      0 0 10px rgba(239, 68, 68, 0.5);
   }
 }
 
 /* Медленная пульсация */
 @keyframes pulse-slow {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {
@@ -146,7 +193,8 @@
 
 /* Обводка пульсации */
 @keyframes pulse-outline {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
   }
   50% {
@@ -194,7 +242,13 @@
 
 /* Анимация градиентного текста */
 .text-gradient-animated {
-  background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary), var(--accent-tertiary), var(--accent-primary));
+  background: linear-gradient(
+    90deg,
+    var(--accent-primary),
+    var(--accent-secondary),
+    var(--accent-tertiary),
+    var(--accent-primary)
+  );
   background-size: 300% 300%;
   background-clip: text;
   -webkit-background-clip: text;
@@ -210,7 +264,7 @@
   border-radius: calc(var(--radius) + 4px) !important;
 }
 
-[data-sonner-toast][data-styled="true"] {
+[data-sonner-toast][data-styled='true'] {
   box-shadow: var(--shadow-lg) !important;
 }
 
@@ -226,35 +280,35 @@
   color: var(--accent-primary) !important;
 }
 
-[data-sonner-toast][data-type="success"] {
+[data-sonner-toast][data-type='success'] {
   border-color: var(--success) !important;
 }
 
-[data-sonner-toast][data-type="success"] [data-icon] {
+[data-sonner-toast][data-type='success'] [data-icon] {
   color: var(--success) !important;
 }
 
-[data-sonner-toast][data-type="error"] {
+[data-sonner-toast][data-type='error'] {
   border-color: var(--error) !important;
 }
 
-[data-sonner-toast][data-type="error"] [data-icon] {
+[data-sonner-toast][data-type='error'] [data-icon] {
   color: var(--error) !important;
 }
 
-[data-sonner-toast][data-type="warning"] {
+[data-sonner-toast][data-type='warning'] {
   border-color: var(--warning) !important;
 }
 
-[data-sonner-toast][data-type="warning"] [data-icon] {
+[data-sonner-toast][data-type='warning'] [data-icon] {
   color: var(--warning) !important;
 }
 
-[data-sonner-toast][data-type="info"] {
+[data-sonner-toast][data-type='info'] {
   border-color: var(--info) !important;
 }
 
-[data-sonner-toast][data-type="info"] [data-icon] {
+[data-sonner-toast][data-type='info'] [data-icon] {
   color: var(--info) !important;
 }
 

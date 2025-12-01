@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { X, Camera, Activity, BarChart3 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -7,6 +7,7 @@ import { profileAPI, formatBytes } from '../../lib/api/profile.api';
 import { tasksAPI } from '../../lib/api/tasks.api';
 import { supabase } from '../../lib/supabase';
 import { StorageStats, UserStats } from '../../types/api.types';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface ProfileSettingsProps {
   isOpen: boolean;
@@ -21,20 +22,15 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ isOpen, onClose }) =>
     email: '',
     currentPassword: '',
     newPassword: '',
-    avatar: ''
+    avatar: '',
   });
   const [loading, setLoading] = useState(true);
   const [storageStats, setStorageStats] = useState<StorageStats | null>(null);
   const [userStats, setUserStats] = useState<UserStats | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    if (isOpen && user) {
-      loadProfileData();
-    }
-  }, [isOpen, user]);
-
-  const loadProfileData = async () => {
+  const loadProfileData = useCallback(async () => {
     if (!user) return;
 
     setLoading(true);
@@ -43,16 +39,16 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ isOpen, onClose }) =>
       const [profile, storageStatsData, stats] = await Promise.all([
         profileAPI.getProfile(user.id),
         profileAPI.getStorageStats(user.id),
-        tasksAPI.getStats(user.id)
+        tasksAPI.getStats(user.id),
       ]);
 
-      setUserData(prev => ({
+      setUserData((prev) => ({
         ...prev,
         name: profile.full_name || '',
         email: user.email || '',
         currentPassword: '',
         newPassword: '',
-        avatar: profile.avatar_url || ''
+        avatar: profile.avatar_url || '',
       }));
 
       setStorageStats(storageStatsData);
@@ -64,11 +60,17 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ isOpen, onClose }) =>
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, t]);
+
+  useEffect(() => {
+    if (isOpen) {
+      loadProfileData();
+    }
+  }, [isOpen, loadProfileData]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setUserData(prev => ({ ...prev, [name]: value }));
+    setUserData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -89,12 +91,19 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ isOpen, onClose }) =>
     }
 
     try {
-      const avatarUrl = await profileAPI.uploadAvatar(user.id, file);
-      setUserData(prev => ({ ...prev, avatar: avatarUrl }));
+      const updatedProfile = await profileAPI.uploadAvatar(user.id, file);
+
+      // Обновляем и локальное состояние, и кэш React Query
+      setUserData((prev) => ({ ...prev, avatar: updatedProfile.avatar_url }));
+      queryClient.setQueryData(['profile', user.id], updatedProfile);
+
       toast.success(t('profile.updateSuccess') || 'Avatar updated successfully!');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error uploading avatar:', error);
-      toast.error(t('profile.avatarUploadError') || `Failed to upload avatar: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      toast.error(
+        t('profile.avatarUploadError') ||
+          `Failed to upload avatar: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   };
 
@@ -105,29 +114,51 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ isOpen, onClose }) =>
     }
 
     setIsUpdating(true);
-    console.log('Updating profile for user:', user.id, 'with data:', userData); // Отладочный лог
+    console.log('Updating profile for user:', user.id); // Отладочный лог
     try {
-      // Обновляем профиль
-      const updateData: { full_name?: string; avatar_url?: string } = {
-        full_name: userData.name || undefined
-      };
-
-      // Обновляем URL аватара, если он изменился
+      // Создаем объект для обновления, добавляя поля только если они действительны
+      const updateData: { full_name?: string; avatar_url?: string } = {};
+      if (userData.name) {
+        updateData.full_name = userData.name;
+      }
       if (userData.avatar) {
         updateData.avatar_url = userData.avatar;
       }
 
-      const updatedProfile = await profileAPI.updateProfile(user.id, updateData);
-      console.log('Profile updated successfully:', updatedProfile); // Отладочный лог
+      console.log('Data to send:', updateData); // ЛОГ 1: Что мы отправляем
+
+      // Проверяем, есть ли что обновлять
+      if (Object.keys(updateData).length === 0 && !userData.newPassword) {
+        toast.info('No changes to save.');
+        onClose();
+        return;
+      }
+
+      if (Object.keys(updateData).length > 0) {
+        const updatedProfile = await profileAPI.updateProfile(user.id, updateData);
+        console.log('API response:', updatedProfile); // ЛОГ 2: Что мы получили в ответ
+
+        // Вручную обновляем кэш, так как есть проблемы с получением свежих данных
+        if (updatedProfile) {
+          queryClient.setQueryData(['profile', user.id], updatedProfile);
+        } else {
+          // Если по какой-то причине ответ пуст, делаем классическую инвалидацию
+          queryClient.invalidateQueries({ queryKey: ['profile', user.id] });
+        }
+      }
 
       // Если меняется пароль, обновляем его
       if (userData.newPassword && userData.newPassword.length >= 6) {
         const { error } = await supabase.auth.updateUser({
-          password: userData.newPassword
+          password: userData.newPassword,
         });
 
         if (error) throw error;
-      } else if (userData.newPassword && userData.newPassword.length < 6) {
+      } else if (
+        userData.newPassword &&
+        userData.newPassword.length > 0 &&
+        userData.newPassword.length < 6
+      ) {
         throw new Error('Password must be at least 6 characters long');
       }
 
@@ -175,14 +206,16 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ isOpen, onClose }) =>
                 <div className="flex flex-col items-center">
                   <div className="relative mb-4">
                     {userData.avatar ? (
-                      <img 
-                        src={userData.avatar} 
-                        alt="Avatar" 
+                      <img
+                        src={userData.avatar}
+                        alt="Avatar"
                         className="w-24 h-24 rounded-full object-cover border-2 border-border"
                       />
                     ) : (
                       <div className="w-24 h-24 rounded-full bg-accent-gradient-1 flex items-center justify-center text-white text-2xl font-bold">
-                        {userData.name.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || 'U'}
+                        {userData.name.charAt(0).toUpperCase() ||
+                          user?.email?.charAt(0).toUpperCase() ||
+                          'U'}
                       </div>
                     )}
                     <label className="absolute bottom-0 right-0 bg-bg-elevated rounded-full p-2 border border-border cursor-pointer">
@@ -273,7 +306,9 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ isOpen, onClose }) =>
                     <div className="flex justify-between text-sm">
                       <span className="text-text-secondary">{t('profile.storageUsed')}</span>
                       <span className="text-text-primary">
-                        {storageStats ? `${formatBytes(storageStats.used)} / ${formatBytes(storageStats.limit)}` : 'Loading...'}
+                        {storageStats
+                          ? `${formatBytes(storageStats.used)} / ${formatBytes(storageStats.limit)}`
+                          : 'Loading...'}
                       </span>
                     </div>
                     {storageStats && (
@@ -288,7 +323,9 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ isOpen, onClose }) =>
                     )}
                     {storageStats && (
                       <p className="text-xs text-text-tertiary">
-                        {t('profile.storageRemaining')} {formatBytes(storageStats.limit - storageStats.used)} {t('profile.remaining')}
+                        {t('profile.storageRemaining')}{' '}
+                        {formatBytes(storageStats.limit - storageStats.used)}{' '}
+                        {t('profile.remaining')}
                       </p>
                     )}
                   </div>

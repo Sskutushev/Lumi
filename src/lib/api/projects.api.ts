@@ -1,11 +1,9 @@
 // API слой для проектов
 import { supabase } from '../supabase';
-import { 
-  Project, 
-  CreateProjectDTO, 
-  UpdateProjectDTO,
-  ProjectStats
-} from '../../types/api.types';
+import { Project, CreateProjectDTO, UpdateProjectDTO, ProjectStats } from '../../types/api.types';
+import { projectInputSchema, validateUserInput, sanitizeInput } from '../security/securityUtils';
+import { ErrorHandler } from '../errors/ErrorHandler'; // Added import
+import { Logger } from '../errors/logger'; // Added import
 
 export const projectsAPI = {
   // Получить все проекты пользователя
@@ -20,51 +18,68 @@ export const projectsAPI = {
       if (error) throw error;
       return data as Project[];
     } catch (error) {
-      console.error('Failed to get projects:', error);
-      throw new Error('Failed to get projects');
+      Logger.error('Failed to get projects:', error); // Modified
+      throw ErrorHandler.handle(error); // Modified
     }
   },
 
   // Получить проект по ID
   async getById(id: string): Promise<Project> {
     try {
-      const { data, error } = await supabase
-        .from('projects')
-        .select('*')
-        .eq('id', id)
-        .single();
+      const { data, error } = await supabase.from('projects').select('*').eq('id', id).single();
 
       if (error) throw error;
       return data as Project;
     } catch (error) {
-      console.error('Failed to get project:', error);
-      throw new Error('Failed to get project');
+      Logger.error('Failed to get project:', error); // Modified
+      throw ErrorHandler.handle(error); // Modified
     }
   },
 
   // Создать проект
   async create(project: CreateProjectDTO): Promise<Project> {
     try {
+      // Валидируем входные данные
+      validateUserInput(project, projectInputSchema);
+
+      // Санитизируем название и описание
+      const sanitizedProject = {
+        ...project,
+        name: sanitizeInput(project.name),
+        description: project.description ? sanitizeInput(project.description) : undefined,
+      };
+
       const { data, error } = await supabase
         .from('projects')
-        .insert([project])
+        .insert([sanitizedProject])
         .select()
         .single();
 
       if (error) throw error;
       return data as Project;
     } catch (error) {
-      console.error('Failed to create project:', error);
-      throw new Error('Failed to create project');
+      Logger.error('Failed to create project:', error); // Modified
+      throw ErrorHandler.handle(error); // Modified
     }
   },
 
   // Обновить проект
   async update(id: string, updates: UpdateProjectDTO): Promise<Project> {
     try {
+      // Валидируем входные данные (создаем схему обновления)
+      const updateSchema = projectInputSchema.partial(); // Используем частичную схему для обновления
+      validateUserInput(updates, updateSchema);
+
+      // Санитизируем название и описание, если они присутствуют
+      const sanitizedUpdates = {
+        ...updates,
+        name: updates.name ? sanitizeInput(updates.name) : undefined,
+        description: updates.description ? sanitizeInput(updates.description) : undefined,
+      };
+
       const { data, error } = await supabase
         .from('projects')
-        .update(updates)
+        .update(sanitizedUpdates)
         .eq('id', id)
         .select()
         .single();
@@ -72,23 +87,20 @@ export const projectsAPI = {
       if (error) throw error;
       return data as Project;
     } catch (error) {
-      console.error('Failed to update project:', error);
-      throw new Error('Failed to update project');
+      Logger.error('Failed to update project:', error); // Modified
+      throw ErrorHandler.handle(error); // Modified
     }
   },
 
   // Удалить проект
   async delete(id: string): Promise<void> {
     try {
-      const { error } = await supabase
-        .from('projects')
-        .delete()
-        .eq('id', id);
+      const { error } = await supabase.from('projects').delete().eq('id', id);
 
       if (error) throw error;
     } catch (error) {
-      console.error('Failed to delete project:', error);
-      throw new Error('Failed to delete project');
+      Logger.error('Failed to delete project:', error); // Modified
+      throw ErrorHandler.handle(error); // Modified
     }
   },
 
@@ -117,11 +129,11 @@ export const projectsAPI = {
       return {
         total: data.tasks_count,
         completed: data.completed_tasks_count,
-        overdue: overdueTasks.length
+        overdue: overdueTasks.length,
       };
     } catch (error) {
-      console.error('Failed to get project stats:', error);
-      throw new Error('Failed to get project stats');
+      Logger.error('Failed to get project stats:', error); // Modified
+      throw ErrorHandler.handle(error); // Modified
     }
-  }
+  },
 };

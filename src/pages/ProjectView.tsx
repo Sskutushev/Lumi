@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react'; // Added useCallback, useMemo
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, MoreHorizontal, CheckCircle, Plus, FolderOpen, Calendar } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
@@ -22,23 +22,18 @@ const ProjectView: React.FC<ProjectViewProps> = ({ project, onBack }) => {
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
-  useEffect(() => {
-    if (user && project.id) {
-      loadProjectData();
-    }
-  }, [user, project.id]);
-
-  const loadProjectData = async () => {
+  const loadProjectData = useCallback(async () => {
+    // Wrapped with useCallback
     if (!user || !project.id) return;
-    
+
     setLoading(true);
     try {
       // Загружаем задачи проекта и статистику в параллель
       const [tasks, stats] = await Promise.all([
         tasksAPI.getAll(user.id, project.id),
-        projectsAPI.getStats(project.id)
+        projectsAPI.getStats(project.id),
       ]);
-      
+
       setProjectTasks(tasks);
       setProjectStats(stats);
     } catch (error) {
@@ -47,85 +42,91 @@ const ProjectView: React.FC<ProjectViewProps> = ({ project, onBack }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, project.id]); // Dependencies for useCallback
 
-  const updateTask = async (id: string, updates: Partial<Task>) => {
+  useEffect(() => {
+    if (user && project.id) {
+      loadProjectData();
+    }
+  }, [user, project.id, loadProjectData]); // Added loadProjectData to dependencies
+
+  const updateTask = useCallback(async (id: string, updates: Partial<Task>) => {
+    // Wrapped with useCallback
     try {
       const updatedTask = await tasksAPI.update(id, updates);
-      setProjectTasks(prev => prev.map(task => 
-        task.id === id ? updatedTask : task
-      ));
+      setProjectTasks((prev) => prev.map((task) => (task.id === id ? updatedTask : task)));
     } catch (error) {
       console.error('Error updating task:', error);
     }
-  };
+  }, []); // Dependencies for useCallback
 
-  const toggleTaskCompletion = async (taskId: string) => {
-    try {
-      const currentTask = projectTasks.find(task => task.id === taskId);
-      if (!currentTask) return;
+  const toggleTaskCompletion = useCallback(
+    async (taskId: string) => {
+      // Wrapped with useCallback
+      try {
+        const currentTask = projectTasks.find((task) => task.id === taskId);
+        if (!currentTask) return;
 
-      // Оптимистичное обновление
-      setProjectTasks(prev => prev.map(task =>
-        task.id === taskId ? { ...task, completed: !task.completed } : task
-      ));
+        // Оптимистичное обновление
+        setProjectTasks((prev) =>
+          prev.map((task) => (task.id === taskId ? { ...task, completed: !task.completed } : task))
+        );
 
-      // Обновление через API
-      const updatedTask = await tasksAPI.update(taskId, {
-        completed: !currentTask.completed
-      });
-
-      // Обновляем в состоянии с ответом API
-      setProjectTasks(prev => prev.map(task =>
-        task.id === taskId ? updatedTask : task
-      ));
-
-      // Обновляем статистику
-      if (projectStats) {
-        setProjectStats({
-          total: projectStats.total,
-          completed: currentTask.completed 
-            ? projectStats.completed - 1 
-            : projectStats.completed + 1,
-          overdue: projectStats.overdue
+        // Обновление через API
+        const updatedTask = await tasksAPI.update(taskId, {
+          completed: !currentTask.completed,
         });
-      }
-    } catch (error) {
-      console.error('Error toggling task completion:', error);
-      // Откат оптимистичного обновления при ошибке
-      setProjectTasks(prev => prev.map(task =>
-        task.id === taskId ? { ...task, completed: !task.completed } : task
-      ));
-    }
-  };
 
-  const createTask = async () => {
+        // Обновляем в состоянии с ответом API
+        setProjectTasks((prev) => prev.map((task) => (task.id === taskId ? updatedTask : task)));
+
+        // Обновляем статистику
+        if (projectStats) {
+          setProjectStats((prevStats) => ({
+            total: prevStats!.total,
+            completed: currentTask.completed ? prevStats!.completed - 1 : prevStats!.completed + 1,
+            overdue: prevStats!.overdue,
+          }));
+        }
+      } catch (error) {
+        console.error('Error toggling task completion:', error);
+        // Откат оптимистичного обновления при ошибке
+        setProjectTasks((prev) =>
+          prev.map((task) => (task.id === taskId ? { ...task, completed: !task.completed } : task))
+        );
+      }
+    },
+    [projectTasks, projectStats]
+  ); // Dependencies for useCallback
+
+  const createTask = useCallback(async () => {
+    // Wrapped with useCallback
     if (!user || !newTaskTitle.trim()) return;
 
     try {
       const newTask = await tasksAPI.create({
         user_id: user.id,
         project_id: project.id,
-        title: newTaskTitle.trim()
+        title: newTaskTitle.trim(),
       });
 
-      setProjectTasks(prev => [newTask, ...prev]);
+      setProjectTasks((prev) => [newTask, ...prev]);
       setNewTaskTitle('');
       setShowTaskCreation(false);
 
       // Обновляем статистику
       if (projectStats) {
-        setProjectStats({
-          total: projectStats.total + 1,
-          completed: projectStats.completed,
-          overdue: projectStats.overdue
-        });
+        setProjectStats((prevStats) => ({
+          total: prevStats!.total + 1,
+          completed: prevStats!.completed,
+          overdue: prevStats!.overdue,
+        }));
       }
     } catch (error) {
       console.error('Error creating task:', error);
       // Возможно, добавить уведомление пользователю
     }
-  };
+  }, [user, newTaskTitle, project.id, projectStats]); // Dependencies for useCallback
 
   // Компонент пустого состояния
   const EmptyState = () => (
@@ -137,7 +138,8 @@ const ProjectView: React.FC<ProjectViewProps> = ({ project, onBack }) => {
         {t('todo.emptyProject') || 'No tasks in this project'}
       </h3>
       <p className="text-text-secondary mb-4">
-        {t('todo.emptyProjectDescription') || 'Create a new task or add existing ones from all tasks'}
+        {t('todo.emptyProjectDescription') ||
+          'Create a new task or add existing ones from all tasks'}
       </p>
       <div className="flex gap-3 justify-center">
         <button
@@ -202,31 +204,37 @@ const ProjectView: React.FC<ProjectViewProps> = ({ project, onBack }) => {
           >
             <ArrowLeft className="w-5 h-5" /> {t('common.back')}
           </button>
-
           <div className="text-center flex-1 max-w-lg mx-auto">
             <h1 className="text-3xl font-bold text-text-primary">{project.name}</h1>
             <p className="text-text-secondary mt-1">{project.description}</p>
           </div>
-
           <div className="w-10"></div> {/* Spacer for alignment */}
         </header>
 
         {/* Project Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
           <div className="bg-bg-secondary/50 rounded-2xl p-6 border border-border">
-            <h3 className="text-text-secondary text-sm font-medium mb-1">{t('dashboard.totalTasks')}</h3>
+            <h3 className="text-text-secondary text-sm font-medium mb-1">
+              {t('dashboard.totalTasks')}
+            </h3>
             <p className="text-2xl font-bold text-text-primary">
               {projectStats ? projectStats.total : projectTasks.length}
             </p>
           </div>
           <div className="bg-bg-secondary/50 rounded-2xl p-6 border border-border">
-            <h3 className="text-text-secondary text-sm font-medium mb-1">{t('dashboard.completed')}</h3>
+            <h3 className="text-text-secondary text-sm font-medium mb-1">
+              {t('dashboard.completed')}
+            </h3>
             <p className="text-2xl font-bold text-success">
-              {projectStats ? projectStats.completed : projectTasks.filter(t => t.completed).length}
+              {projectStats
+                ? projectStats.completed
+                : projectTasks.filter((t) => t.completed).length}
             </p>
           </div>
           <div className="bg-bg-secondary/50 rounded-2xl p-6 border border-border">
-            <h3 className="text-text-secondary text-sm font-medium mb-1">{t('dashboard.overdue')}</h3>
+            <h3 className="text-text-secondary text-sm font-medium mb-1">
+              {t('dashboard.overdue')}
+            </h3>
             <p className="text-2xl font-bold text-error">
               {projectStats ? projectStats.overdue : 0}
             </p>
@@ -237,7 +245,7 @@ const ProjectView: React.FC<ProjectViewProps> = ({ project, onBack }) => {
         <div className="bg-bg-secondary/50 rounded-2xl p-6 border border-border">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-bold text-text-primary">{t('todo.tasks')}</h2>
-            <button 
+            <button
               onClick={() => setShowTaskCreation(!showTaskCreation)}
               className="px-4 py-2 bg-accent-gradient-1 text-white rounded-lg font-medium hover:shadow-lg transition-shadow flex items-center gap-2"
             >
@@ -281,7 +289,7 @@ const ProjectView: React.FC<ProjectViewProps> = ({ project, onBack }) => {
               <EmptyState />
             ) : (
               projectTasks.map((task) => (
-                <TaskItem
+                <MemoizedTaskItem // Using MemoizedTaskItem
                   key={task.id}
                   task={task}
                   onToggleComplete={toggleTaskCompletion}
@@ -308,61 +316,68 @@ const ProjectView: React.FC<ProjectViewProps> = ({ project, onBack }) => {
   );
 };
 
-const TaskItem = ({ task, onToggleComplete, onEditDetails }: {
-  task: Task;
-  onToggleComplete: (id: string) => void;
-  onEditDetails: () => void;
-}) => {
-  const isOverdue = task.due_date && new Date(task.due_date) < new Date() && !task.completed;
+const MemoizedTaskItem = React.memo(
+  ({
+    task,
+    onToggleComplete,
+    onEditDetails,
+  }: {
+    task: Task;
+    onToggleComplete: (id: string) => void;
+    onEditDetails: () => void;
+  }) => {
+    const isOverdue = task.due_date && new Date(task.due_date) < new Date() && !task.completed;
 
-  return (
-    <div
-      className={`flex items-center gap-4 p-4 rounded-xl border cursor-pointer ${
-        task.completed
-          ? 'border-border bg-bg-tertiary/30 opacity-60'
-          : 'border-border hover:border-border-hover hover:shadow-sm'
-      } ${isOverdue ? 'glow-error' : ''}`}
-      onClick={onEditDetails}
-    >
-      <button 
-        onClick={(e) => {
-          e.stopPropagation(); // Prevent opening popup when completing task
-          onToggleComplete(task.id);
-        }}
-        className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center flex-shrink-0 ${
+    return (
+      <div
+        className={`flex items-center gap-4 p-4 rounded-xl border cursor-pointer ${
           task.completed
-            ? 'bg-accent-gradient-1 border-transparent'
-            : 'border-border hover:border-accent-primary'
-        }`}
+            ? 'border-border bg-bg-tertiary/30 opacity-60'
+            : 'border-border hover:border-border-hover hover:shadow-sm'
+        } ${isOverdue ? 'glow-error' : ''}`}
+        onClick={onEditDetails}
       >
-        {task.completed && <CheckCircle className="w-4 h-4 text-white" />}
-      </button>
+        <button
+          onClick={(e) => {
+            e.stopPropagation(); // Prevent opening popup when completing task
+            onToggleComplete(task.id);
+          }}
+          className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center flex-shrink-0 ${
+            task.completed
+              ? 'bg-accent-gradient-1 border-transparent'
+              : 'border-border hover:border-accent-primary'
+          }`}
+        >
+          {task.completed && <CheckCircle className="w-4 h-4 text-white" />}
+        </button>
 
-      <p className={`flex-1 font-medium ${
-        task.completed ? 'line-through text-text-tertiary' : 'text-text-primary'
-      }`}>
-        {task.title}
-      </p>
+        <p
+          className={`flex-1 font-medium ${
+            task.completed ? 'line-through text-text-tertiary' : 'text-text-primary'
+          }`}
+        >
+          {task.title}
+        </p>
 
-      {task.due_date && (
-        <div className="flex items-center gap-1 text-xs text-text-secondary">
-          <Calendar className="w-3.5 h-3.5" />
-          <span>{new Date(task.due_date).toLocaleDateString()}</span>
-        </div>
-      )}
+        {task.due_date && (
+          <div className="flex items-center gap-1 text-xs text-text-secondary">
+            <Calendar className="w-3.5 h-3.5" />
+            <span>{new Date(task.due_date).toLocaleDateString()}</span>
+          </div>
+        )}
 
-      <button 
-        className="p-1.5 rounded-md hover:bg-bg-tertiary/50"
-        onClick={(e) => {
-          e.stopPropagation();
-          onEditDetails();
-        }}
-      >
-        <MoreHorizontal className="w-5 h-5 text-text-secondary" />
-      </button>
-    </div>
-  );
-};
-
+        <button
+          className="p-1.5 rounded-md hover:bg-bg-tertiary/50"
+          onClick={(e) => {
+            e.stopPropagation();
+            onEditDetails();
+          }}
+        >
+          <MoreHorizontal className="w-5 h-5 text-text-secondary" />
+        </button>
+      </div>
+    );
+  }
+);
 
 export default ProjectView;

@@ -1,170 +1,114 @@
-# Lumi Database Schema
+# Lumi Database Documentation
 
-This document outlines the database schema, policies, and functions for the Lumi application, managed by Supabase.
+## Schema Overview
 
-## Table of Contents
+The Lumi application uses a PostgreSQL database managed by Supabase. The schema is designed to support user profiles, projects, and tasks, with appropriate relationships and constraints.
 
-- [Schema](#schema)
-  - [users_profile](#users_profile)
-  - [projects](#projects)
-  - [tasks](#tasks)
-- [Row Level Security (RLS) Policies](#row-level-security-rls-policies)
-  - [users_profile Policies](#users_profile-policies)
-  - [projects Policies](#projects-policies)
-  - [tasks Policies](#tasks-policies)
-- [Storage](#storage)
-  - [buckets: avatars](#buckets-avatars)
-  - [Storage Policies](#storage-policies)
-- [Database Functions](#database-functions)
-  - [calculate_user_storage()](#calculate_user_storage)
-  - [update_project_stats()](#update_project_stats)
-  - [create_profile_for_new_user()](#create_profile_for_new_user)
-  - [update_updated_at_column()](#update_updated_at_column)
-- [Database Triggers](#database-triggers)
-  - [on_auth_user_created](#on_auth_user_created)
-  - [user_storage_trigger](#user_storage_trigger)
-  - [project_stats_trigger](#project_stats_trigger)
-  - [updated_at Triggers](#updated_at-triggers)
+### Table `users_profile`
 
----
+Stores user-specific profile information.
 
-## Schema
+- `id` (UUID): Primary key, references `auth.users(id)` with `ON DELETE CASCADE`. This links the profile directly to the Supabase authentication user.
+- `full_name` (TEXT): The full name of the user.
+- `avatar_url` (TEXT): URL to the user's avatar image, stored in Supabase Storage.
+- `storage_used` (BIGINT, DEFAULT 0): Tracks the amount of storage (in bytes) used by the user for tasks.
+- `created_at` (TIMESTAMP WITH TIME ZONE, DEFAULT NOW()): Timestamp of profile creation.
+- `updated_at` (TIMESTAMP WITH TIME ZONE, DEFAULT NOW()): Timestamp of the last profile update.
 
-### `users_profile`
+### Table `projects`
 
-Stores user profile information, linked to the `auth.users` table.
+Stores user-created projects.
 
-| Column         | Type                     | Constraints                               | Description                               |
-|----------------|--------------------------|-------------------------------------------|-------------------------------------------|
-| `id`           | `UUID`                   | **Primary Key**, Foreign Key to `auth.users.id` | Links to the authentication user record.  |
-| `full_name`    | `TEXT`                   |                                           | The user's full name.                     |
-| `avatar_url`   | `TEXT`                   |                                           | URL for the user's avatar image.          |
-| `storage_used` | `BIGINT`                 | `DEFAULT 0`                               | Total storage used by the user in bytes.  |
-| `created_at`   | `TIMESTAMP WITH TIME ZONE` | `DEFAULT NOW()`                           | Timestamp of profile creation.            |
-| `updated_at`   | `TIMESTAMP WITH TIME ZONE` | `DEFAULT NOW()`                           | Timestamp of the last profile update.     |
+- `id` (UUID, PRIMARY KEY, DEFAULT `gen_random_uuid()`): Unique identifier for the project.
+- `user_id` (UUID, NOT NULL): Foreign key referencing `auth.users(id)` with `ON DELETE CASCADE`, indicating the owner of the project.
+- `name` (TEXT, NOT NULL, CHECK `LENGTH(name) <= 100`): Name of the project, with a maximum length of 100 characters.
+- `description` (TEXT, CHECK `LENGTH(description) <= 500`): Optional description of the project, max 500 characters.
+- `tasks_count` (INTEGER, DEFAULT 0): Total number of tasks within this project. Updated by a trigger.
+- `completed_tasks_count` (INTEGER, DEFAULT 0): Number of completed tasks within this project. Updated by a trigger.
+- `created_at` (TIMESTAMP WITH TIME ZONE, DEFAULT NOW()): Timestamp of project creation.
+- `updated_at` (TIMESTAMP WITH TIME ZONE, DEFAULT NOW()): Timestamp of the last project update.
 
-### `projects`
+### Table `tasks`
 
-Stores user-created projects to organize tasks.
+Stores individual tasks associated with users and optionally projects.
 
-| Column                  | Type                     | Constraints                               | Description                               |
-|-------------------------|--------------------------|-------------------------------------------|-------------------------------------------|
-| `id`                    | `UUID`                   | **Primary Key**, `DEFAULT gen_random_uuid()`| Unique identifier for the project.        |
-| `user_id`               | `UUID`                   | **Not Null**, Foreign Key to `auth.users.id`  | The user who owns the project.            |
-| `name`                  | `TEXT`                   | **Not Null**, `LENGTH <= 100`             | The name of the project.                  |
-| `description`           | `TEXT`                   | `LENGTH <= 500`                           | A brief description of the project.       |
-| `tasks_count`           | `INTEGER`                | `DEFAULT 0`                               | Total number of tasks in the project.     |
-| `completed_tasks_count` | `INTEGER`                | `DEFAULT 0`                               | Number of completed tasks in the project. |
-| `created_at`            | `TIMESTAMP WITH TIME ZONE` | `DEFAULT NOW()`                           | Timestamp of project creation.            |
-| `updated_at`            | `TIMESTAMP WITH TIME ZONE` | `DEFAULT NOW()`                           | Timestamp of the last project update.     |
-
-### `tasks`
-
-Stores individual to-do items.
-
-| Column                 | Type                     | Constraints                               | Description                               |
-|------------------------|--------------------------|-------------------------------------------|-------------------------------------------|
-| `id`                   | `UUID`                   | **Primary Key**, `DEFAULT gen_random_uuid()`| Unique identifier for the task.           |
-| `user_id`              | `UUID`                   | **Not Null**, Foreign Key to `auth.users.id`  | The user who owns the task.               |
-| `project_id`           | `UUID`                   | Foreign Key to `projects.id` (on delete SET NULL) | The project this task belongs to.         |
-| `title`                | `TEXT`                   | **Not Null**, `LENGTH <= 200`             | The title of the task.                    |
-| `description`          | `TEXT`                   | `LENGTH <= 1000`                          | A short description of the task.          |
-| `detailed_description` | `TEXT`                   | `LENGTH <= 5000`                          | A more detailed description of the task.  |
-| `completed`            | `BOOLEAN`                | `DEFAULT FALSE`                           | Whether the task is completed.            |
-| `priority`             | `TEXT`                   | `DEFAULT 'medium'`, `CHECK IN ('low', 'medium', 'high')` | The priority of the task.                 |
-| `start_date`           | `DATE`                   |                                           | The start date of the task.               |
-| `due_date`             | `DATE`                   |                                           | The due date of the task.                 |
-| `created_at`           | `TIMESTAMP WITH TIME ZONE` | `DEFAULT NOW()`                           | Timestamp of task creation.               |
-| `updated_at`           | `TIMESTAMP WITH TIME ZONE` | `DEFAULT NOW()`                           | Timestamp of the last task update.        |
-
----
+- `id` (UUID, PRIMARY KEY, DEFAULT `gen_random_uuid()`): Unique identifier for the task.
+- `user_id` (UUID, NOT NULL): Foreign key referencing `auth.users(id)` with `ON DELETE CASCADE`, indicating the owner of the task.
+- `project_id` (UUID, REFERENCES `projects(id)` `ON DELETE SET NULL`): Optional foreign key linking the task to a project. If the project is deleted, this field is set to NULL.
+- `title` (TEXT, NOT NULL, CHECK `LENGTH(title) <= 200`): Title of the task, max 200 characters.
+- `description` (TEXT, CHECK `LENGTH(description) <= 1000`): Short description of the task, max 1000 characters.
+- `detailed_description` (TEXT, CHECK `LENGTH(detailed_description) <= 5000`): Detailed description of the task, max 5000 characters.
+- `completed` (BOOLEAN, DEFAULT FALSE): Status of the task (completed or not).
+- `priority` (TEXT, DEFAULT 'medium', CHECK `priority IN ('low', 'medium', 'high')`): Priority level of the task.
+- `start_date` (DATE): Optional start date for the task.
+- `due_date` (DATE): Optional due date for the task.
+- `created_at` (TIMESTAMP WITH TIME ZONE, DEFAULT NOW()): Timestamp of task creation.
+- `updated_at` (TIMESTAMP WITH TIME ZONE, DEFAULT NOW()): Timestamp of the last task update.
 
 ## Row Level Security (RLS) Policies
 
-RLS is enabled for all tables (`users_profile`, `projects`, `tasks`) to ensure data privacy.
+RLS is enabled for `users_profile`, `projects`, and `tasks` tables to ensure data isolation and security. Policies are defined to allow users to only access and modify their own data.
 
 ### `users_profile` Policies
 
-- **Users can view own profile**: Allows authenticated users to `SELECT` their own profile.
-- **Users can update own profile**: Allows authenticated users to `UPDATE` their own profile.
-- **Users can insert own profile**: Allows authenticated users to `INSERT` their own profile record.
+- **"Users can view own profile"**: Allows authenticated users to `SELECT` their own profile based on `auth.uid() = id`.
+- **"Users can update own profile"**: Allows authenticated users to `UPDATE` their own profile based on `auth.uid() = id`.
+- **"Users can insert own profile"**: Allows authenticated users to `INSERT` their own profile based on `auth.uid() = id`.
 
 ### `projects` Policies
 
-- **Users can view own projects**: Allows authenticated users to `SELECT` their own projects.
-- **Users can insert own projects**: Allows authenticated users to `INSERT` projects for themselves.
-- **Users can update own projects**: Allows authenticated users to `UPDATE` their own projects.
-- **Users can delete own projects**: Allows authenticated users to `DELETE` their own projects.
+- **"Users can view own projects"**: Allows authenticated users to `SELECT` their own projects based on `auth.uid() = user_id`.
+- **"Users can insert own projects"**: Allows authenticated users to `INSERT` their own projects based on `auth.uid() = user_id`.
+- **"Users can update own projects"**: Allows authenticated users to `UPDATE` their own projects based on `auth.uid() = user_id`.
+- **"Users can delete own projects"**: Allows authenticated users to `DELETE` their own projects based on `auth.uid() = user_id`.
 
 ### `tasks` Policies
 
-- **Users can view own tasks**: Allows authenticated users to `SELECT` their own tasks.
-- **Users can insert own tasks**: Allows authenticated users to `INSERT` tasks for themselves.
-- **Users can update own tasks**: Allows authenticated users to `UPDATE` their own tasks.
-- **Users can delete own tasks**: Allows authenticated users to `DELETE` their own tasks.
+- **"Users can view own tasks"**: Allows authenticated users to `SELECT` their own tasks based on `auth.uid() = user_id`.
+- **"Users can insert own tasks"**: Allows authenticated users to `INSERT` their own tasks based on `auth.uid() = user_id`.
+- **"Users can update own tasks"**: Allows authenticated users to `UPDATE` their own tasks based on `auth.uid() = user_id`.
+- **"Users can delete own tasks"**: Allows authenticated users to `DELETE` their own tasks based on `auth.uid() = user_id`.
 
----
+## Trigger Functions
 
-## Storage
-
-### Buckets: `avatars`
-
-A public bucket for storing user avatar images.
-
-- **File Size Limit**: 5MB
-- **Allowed MIME types**: `image/png`, `image/jpg`, `image/jpeg`, `image/gif`, `image/webp`
-
-### Storage Policies
-
-- **Allow users to read own avatars**: Allows authenticated users to `SELECT` any avatar.
-- **Allow users to insert own avatars**: Allows authenticated users to `INSERT` an avatar into a folder matching their `user_id`.
-- **Allow users to update own avatars**: Allows authenticated users to `UPDATE` an avatar in a folder matching their `user_id`.
-- **Allow users to delete own avatars**: Allows authenticated users to `DELETE` an avatar from a folder matching their `user_id`.
-
----
-
-## Database Functions
-
-### `calculate_user_storage()`
-
-- **Returns**: `BIGINT`
-- **Description**: Calculates the total storage used by a user based on the `LENGTH` of text fields in their tasks.
-
-### `update_project_stats()`
-
-- **Returns**: `VOID`
-- **Description**: Updates the `tasks_count` and `completed_tasks_count` for a given project.
+Several PostgreSQL functions and triggers are implemented to automate data management and maintain data integrity.
 
 ### `create_profile_for_new_user()`
 
-- **Returns**: `TRIGGER`
-- **Description**: Automatically creates a new `users_profile` record when a new user signs up in `auth.users`. It populates the profile with metadata from the user registration if available.
+- **Purpose**: Automatically creates a corresponding entry in the `users_profile` table whenever a new user registers via Supabase Auth.
+- **Mechanism**: This function is triggered `AFTER INSERT` on `auth.users`. It inserts a new row into `users_profile` using the new user's `id` and extracts `full_name` and `avatar_url` from `raw_user_meta_data`.
+- **`SECURITY DEFINER`**: Crucially, this function is defined with `SECURITY DEFINER`. This allows the function to execute with the privileges of the user who created it (typically a database superuser), bypassing RLS policies on `users_profile` for this specific operation. This ensures that profile creation succeeds even when the newly registered user does not yet have explicit RLS permissions to insert into `users_profile`.
+
+### `calculate_user_storage(user_id_param UUID)`
+
+- **Purpose**: Calculates the total storage (in bytes) used by a specific user based on the length of text fields in their tasks.
+- **Mechanism**: Sums the lengths of `title`, `description`, and `detailed_description` for all tasks belonging to `user_id_param`.
+
+### `update_project_stats(project_id_param UUID)`
+
+- **Purpose**: Updates the `tasks_count` and `completed_tasks_count` for a given project.
+- **Mechanism**: Counts tasks and completed tasks associated with `project_id_param` and updates the `projects` table.
+
+### `update_user_storage_trigger()`
+
+- **Purpose**: Automatically updates the `storage_used` field in `users_profile` whenever tasks are inserted, updated, or deleted.
+- **Trigger**: `AFTER INSERT OR UPDATE OR DELETE ON tasks FOR EACH ROW`.
+- **Mechanism**: Calculates the size difference based on `NEW` and `OLD` task data and adjusts the `storage_used` for the relevant user.
+
+### `update_project_stats_trigger()`
+
+- **Purpose**: Automatically updates project statistics (`tasks_count`, `completed_tasks_count`) when tasks associated with a project are modified.
+- **Trigger**: `AFTER INSERT OR UPDATE OR DELETE ON tasks FOR EACH ROW`.
+- **Mechanism**: Calls `update_project_stats()` for the affected project(s). Handles cases where a task's `project_id` changes.
 
 ### `update_updated_at_column()`
 
-- **Returns**: `TRIGGER`
-- **Description**: A generic function that updates the `updated_at` column to the current timestamp.
+- **Purpose**: Generic function to automatically set the `updated_at` timestamp to `NOW()` before an update operation.
+- **Trigger**: `BEFORE UPDATE` on `users_profile`, `projects`, and `tasks` tables.
 
----
+## Supabase Storage Policies
 
-## Database Triggers
+The project utilizes Supabase Storage for managing user avatars.
 
-### `on_auth_user_created`
-
-- **Event**: `AFTER INSERT` on `auth.users`
-- **Action**: Executes `create_profile_for_new_user()` to create a corresponding user profile.
-
-### `user_storage_trigger`
-
-- **Event**: `AFTER INSERT OR UPDATE OR DELETE` on `tasks`
-- **Action**: Executes `update_user_storage_trigger()` which dynamically recalculates the user's `storage_used` in their `users_profile` based on the size of task text fields.
-
-### `project_stats_trigger`
-
-- **Event**: `AFTER INSERT OR UPDATE OR DELETE` on `tasks`
-- **Action**: Executes `update_project_stats_trigger()` which calls `update_project_stats()` to keep project statistics up-to-date when tasks are added, removed, or moved between projects.
-
-### `updated_at` Triggers
-
-- **Event**: `BEFORE UPDATE` on `users_profile`, `projects`, and `tasks`.
-- **Action**: Executes `update_updated_at_column()` to automatically set the `updated_at` field on every update.
+- **Bucket `avatars`**: A public bucket named 'avatars' is created, allowing image files (`png`, `jpg`, `jpeg`, `gif`, `webp`) up to 5MB.
+- **Policies**: RLS policies are applied to `storage.objects` within the `avatars` bucket to ensure users can only read, insert, update, and delete their own avatars, identified by a folder named after their `auth.uid()`.

@@ -9,11 +9,11 @@ interface CalendarDropdownProps {
   placeholder: string;
 }
 
-const CalendarDropdown: React.FC<CalendarDropdownProps> = ({ 
-  value, 
-  onChange, 
-  label, 
-  placeholder 
+const CalendarDropdown: React.FC<CalendarDropdownProps> = ({
+  value,
+  onChange,
+  label,
+  placeholder,
 }) => {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
@@ -72,17 +72,17 @@ const CalendarDropdown: React.FC<CalendarDropdownProps> = ({
     const firstDayOfMonth = new Date(year, month, 1).getDay();
 
     const days = [];
-    
+
     // Add empty cells for days before the first day of the month
     for (let i = 0; i < firstDayOfMonth; i++) {
       days.push(null);
     }
-    
+
     // Add days of the month
     for (let day = 1; day <= daysInMonth; day++) {
       days.push(new Date(year, month, day));
     }
-    
+
     return days;
   };
 
@@ -114,21 +114,27 @@ const CalendarDropdown: React.FC<CalendarDropdownProps> = ({
 
   // Navigate to next/previous month
   const prevMonth = () => {
-    const newDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, currentDate.getDate());
+    const newDate = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth() - 1,
+      currentDate.getDate()
+    );
     setCurrentDate(newDate);
   };
 
   const nextMonth = () => {
-    const newDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, currentDate.getDate());
+    const newDate = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth() + 1,
+      currentDate.getDate()
+    );
     setCurrentDate(newDate);
   };
 
   return (
     <div className="relative" ref={dropdownRef}>
-      <label className="block text-sm font-medium text-text-secondary mb-2">
-        {label}
-      </label>
-      
+      <label className="block text-sm font-medium text-text-secondary mb-2">{label}</label>
+
       <div className="relative">
         <input
           type="text"
@@ -153,35 +159,50 @@ const CalendarDropdown: React.FC<CalendarDropdownProps> = ({
             <>
               <div className="flex items-center justify-between mb-4">
                 <button
-                  onClick={prevMonth}
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    prevMonth();
+                  }}
                   className="p-1 rounded hover:bg-bg-secondary"
                 >
                   <ChevronLeft className="w-5 h-5 text-text-secondary" />
                 </button>
-                
+
                 <div className="flex gap-2">
                   <button
-                    onClick={() => setView('months')}
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setView('months');
+                    }}
                     className="font-medium text-text-primary hover:underline"
                   >
                     {months[currentDate.getMonth()]}
                   </button>
                   <button
-                    onClick={() => setView('years')}
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setView('years');
+                    }}
                     className="font-medium text-text-primary hover:underline"
                   >
                     {currentDate.getFullYear()}
                   </button>
                 </div>
-                
+
                 <button
-                  onClick={nextMonth}
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    nextMonth();
+                  }}
                   className="p-1 rounded hover:bg-bg-secondary"
                 >
                   <ChevronRight className="w-5 h-5 text-text-secondary" />
                 </button>
               </div>
-
               <div className="grid grid-cols-7 gap-1 mb-2">
                 {weekdays.map((day, index) => (
                   <div key={index} className="text-center text-xs text-text-tertiary py-1">
@@ -198,13 +219,16 @@ const CalendarDropdown: React.FC<CalendarDropdownProps> = ({
                     disabled={!day}
                     className={`
                       w-8 h-8 rounded-full text-sm flex items-center justify-center
-                      ${!day 
-                        ? 'invisible' 
-                        : selectedDate && day && day.toDateString() === selectedDate.toDateString()
-                          ? 'bg-accent-primary text-white'
-                          : day && day.toDateString() === new Date().toDateString()
-                            ? 'bg-bg-secondary text-text-primary'
-                            : 'text-text-secondary hover:bg-bg-secondary'
+                      ${
+                        !day
+                          ? 'invisible'
+                          : selectedDate &&
+                              day &&
+                              day.toDateString() === selectedDate.toDateString()
+                            ? 'bg-accent-primary text-white'
+                            : day && day.toDateString() === new Date().toDateString()
+                              ? 'bg-bg-secondary text-text-primary'
+                              : 'text-text-secondary hover:bg-bg-secondary'
                       }
                     `}
                   >
@@ -224,14 +248,14 @@ const CalendarDropdown: React.FC<CalendarDropdownProps> = ({
                 >
                   <ChevronLeft className="w-5 h-5 text-text-secondary" />
                 </button>
-                
+
                 <button
                   onClick={() => setView('years')}
                   className="font-medium text-text-primary hover:underline"
                 >
                   {currentDate.getFullYear()}
                 </button>
-                
+
                 <button
                   onClick={() => handleYearChange(currentDate.getFullYear() + 1)}
                   className="p-1 rounded hover:bg-bg-secondary"
@@ -247,9 +271,10 @@ const CalendarDropdown: React.FC<CalendarDropdownProps> = ({
                     onClick={() => handleMonthChange(index)}
                     className={`
                       py-2 text-sm rounded-lg
-                      ${currentDate.getMonth() === index
-                        ? 'bg-accent-primary text-white'
-                        : 'text-text-secondary hover:bg-bg-secondary'
+                      ${
+                        currentDate.getMonth() === index
+                          ? 'bg-accent-primary text-white'
+                          : 'text-text-secondary hover:bg-bg-secondary'
                       }
                     `}
                   >
@@ -269,11 +294,11 @@ const CalendarDropdown: React.FC<CalendarDropdownProps> = ({
                 >
                   <ChevronLeft className="w-5 h-5 text-text-secondary" />
                 </button>
-                
+
                 <div className="font-medium text-text-primary">
                   {currentDate.getFullYear() - 6} - {currentDate.getFullYear() + 5}
                 </div>
-                
+
                 <button
                   onClick={() => handleYearChange(currentDate.getFullYear() + 12)}
                   className="p-1 rounded hover:bg-bg-secondary"
@@ -284,19 +309,20 @@ const CalendarDropdown: React.FC<CalendarDropdownProps> = ({
 
               <div className="grid grid-cols-3 gap-2 max-h-60 overflow-y-auto">
                 {years
-                  .filter(year => 
-                    year >= currentDate.getFullYear() - 6 && 
-                    year <= currentDate.getFullYear() + 5
+                  .filter(
+                    (year) =>
+                      year >= currentDate.getFullYear() - 6 && year <= currentDate.getFullYear() + 5
                   )
-                  .map(year => (
+                  .map((year) => (
                     <button
                       key={year}
                       onClick={() => handleYearChange(year)}
                       className={`
                         py-2 text-sm rounded-lg
-                        ${currentDate.getFullYear() === year
-                          ? 'bg-accent-primary text-white'
-                          : 'text-text-secondary hover:bg-bg-secondary'
+                        ${
+                          currentDate.getFullYear() === year
+                            ? 'bg-accent-primary text-white'
+                            : 'text-text-secondary hover:bg-bg-secondary'
                         }
                       `}
                     >
