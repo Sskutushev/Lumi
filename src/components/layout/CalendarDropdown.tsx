@@ -243,21 +243,33 @@ const CalendarDropdown: React.FC<CalendarDropdownProps> = ({
             <>
               <div className="flex items-center justify-between mb-4">
                 <button
-                  onClick={() => handleYearChange(currentDate.getFullYear() - 1)}
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleYearChange(currentDate.getFullYear() - 1);
+                  }}
                   className="p-1 rounded hover:bg-bg-secondary"
                 >
                   <ChevronLeft className="w-5 h-5 text-text-secondary" />
                 </button>
 
                 <button
-                  onClick={() => setView('years')}
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setView('years');
+                  }}
                   className="font-medium text-text-primary hover:underline"
                 >
                   {currentDate.getFullYear()}
                 </button>
 
                 <button
-                  onClick={() => handleYearChange(currentDate.getFullYear() + 1)}
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleYearChange(currentDate.getFullYear() + 1);
+                  }}
                   className="p-1 rounded hover:bg-bg-secondary"
                 >
                   <ChevronRight className="w-5 h-5 text-text-secondary" />
@@ -268,7 +280,11 @@ const CalendarDropdown: React.FC<CalendarDropdownProps> = ({
                 {months.map((month, index) => (
                   <button
                     key={index}
-                    onClick={() => handleMonthChange(index)}
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleMonthChange(index);
+                    }}
                     className={`
                       py-2 text-sm rounded-lg
                       ${
@@ -289,7 +305,11 @@ const CalendarDropdown: React.FC<CalendarDropdownProps> = ({
             <>
               <div className="flex items-center justify-between mb-4">
                 <button
-                  onClick={() => handleYearChange(currentDate.getFullYear() - 12)}
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleYearChange(currentDate.getFullYear() - 12);
+                  }}
                   className="p-1 rounded hover:bg-bg-secondary"
                 >
                   <ChevronLeft className="w-5 h-5 text-text-secondary" />
@@ -300,7 +320,11 @@ const CalendarDropdown: React.FC<CalendarDropdownProps> = ({
                 </div>
 
                 <button
-                  onClick={() => handleYearChange(currentDate.getFullYear() + 12)}
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleYearChange(currentDate.getFullYear() + 12);
+                  }}
                   className="p-1 rounded hover:bg-bg-secondary"
                 >
                   <ChevronRight className="w-5 h-5 text-text-secondary" />
@@ -316,7 +340,11 @@ const CalendarDropdown: React.FC<CalendarDropdownProps> = ({
                   .map((year) => (
                     <button
                       key={year}
-                      onClick={() => handleYearChange(year)}
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleYearChange(year);
+                      }}
                       className={`
                         py-2 text-sm rounded-lg
                         ${
