@@ -102,8 +102,15 @@ const TaskItem = React.memo(
           ) : (
             <p
               className={`cursor-pointer font-medium ${task.completed ? 'line-through text-text-tertiary' : 'text-text-primary'}`}
-              onClick={() => onEditDetails(task)}
-              onKeyDown={(e) => e.key === 'Enter' && onEditDetails(task)}
+              onClick={() => setIsEditing(true)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  setIsEditing(true);
+                } else if (e.key === ' ') {
+                  e.preventDefault();
+                  onEditDetails(task);
+                }
+              }}
               tabIndex={0}
               aria-label={`${task.title} ${task.completed ? t('todo.completed') : t('todo.pending')}`}
             >
