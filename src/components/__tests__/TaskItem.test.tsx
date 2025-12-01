@@ -2,168 +2,122 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import TaskItem from '../layout/TaskItem'; // Путь к компоненту TaskItem
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import TaskItem from '../TaskItem';
 import { Task } from '../../types/api.types';
 
+// Мокаем react-i18next
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => key, // Возвращаем ключ вместо перевода
+  }),
+}));
+
 // Мокаем хуки и зависимости
-const mockOnUpdate = jest.fn();
-const mockOnDelete = jest.fn();
-const mockOnToggleComplete = jest.fn();
-const mockOnEditDetails = jest.fn();
+const mockOnUpdate = vi.fn();
+const mockOnDelete = vi.fn();
+const mockOnToggleComplete = vi.fn();
+const mockOnEditDetails = vi.fn();
 
 const mockTask: Task = {
   id: '1',
   user_id: 'user1',
   title: 'Test Task',
+  description: 'Test description',
+  detailed_description: null,
   completed: false,
-  created_at: '2023-01-01T00:00:00Z',
-  updated_at: '2023-01-01T00:00:00Z',
   priority: 'medium',
+  start_date: null,
   due_date: '2023-12-31',
   project_id: 'project1',
-  description: 'Test description',
+  created_at: '2023-01-01T00:00:00Z',
+  updated_at: '2023-01-01T00:00:00Z',
+};
+
+// Обертка для рендера, если понадобится контекст
+const renderTaskItem = (task: Task) => {
+  return render(
+    <TaskItem
+      task={task}
+      onUpdate={mockOnUpdate}
+      onDelete={mockOnDelete}
+      onToggleComplete={mockOnToggleComplete}
+      onEditDetails={mockOnEditDetails}
+    />
+  );
 };
 
 describe('TaskItem Component', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders task title correctly', () => {
-    render(
-      <TaskItem
-        task={mockTask}
-        onUpdate={mockOnUpdate}
-        onDelete={mockOnDelete}
-        onToggleComplete={mockOnToggleComplete}
-        onEditDetails={mockOnEditDetails}
-      />
-    );
-
+    renderTaskItem(mockTask);
     expect(screen.getByText('Test Task')).toBeInTheDocument();
   });
 
   it('calls onToggleComplete when checkbox is clicked', () => {
-    render(
-      <TaskItem
-        task={mockTask}
-        onUpdate={mockOnUpdate}
-        onDelete={mockOnDelete}
-        onToggleComplete={mockOnToggleComplete}
-        onEditDetails={mockOnEditDetails}
-      />
-    );
+    renderTaskItem(mockTask);
 
-    const checkbox = screen.getByRole('button');
+    const checkbox = screen.getByRole('checkbox');
     fireEvent.click(checkbox);
 
     expect(mockOnToggleComplete).toHaveBeenCalledWith('1');
   });
 
   it('displays priority badge when priority is set', () => {
-    render(
-      <TaskItem
-        task={mockTask}
-        onUpdate={mockOnUpdate}
-        onDelete={mockOnDelete}
-        onToggleComplete={mockOnToggleComplete}
-        onEditDetails={mockOnEditDetails}
-      />
-    );
-
-    expect(screen.getByText('medium')).toBeInTheDocument();
+    renderTaskItem(mockTask);
+    // Используем t() для получения ключа, который и будет отрендерен
+    expect(screen.getByText('todo.priority.medium')).toBeInTheDocument();
   });
 
   it('displays due date when due_date is set', () => {
-    render(
-      <TaskItem
-        task={mockTask}
-        onUpdate={mockOnUpdate}
-        onDelete={mockOnDelete}
-        onToggleComplete={mockOnToggleComplete}
-        onEditDetails={mockOnEditDetails}
-      />
-    );
-
+    renderTaskItem(mockTask);
     expect(screen.getByText('2023-12-31')).toBeInTheDocument();
   });
 
   it('shows edit and delete options in dropdown', async () => {
-    render(
-      <TaskItem
-        task={mockTask}
-        onUpdate={mockOnUpdate}
-        onDelete={mockOnDelete}
-        onToggleComplete={mockOnToggleComplete}
-        onEditDetails={mockOnEditDetails}
-      />
-    );
+    renderTaskItem(mockTask);
 
-    const moreOptionsButton = screen.getByRole('button', { name: '' });
+    // Используем aria-label для надежного поиска кнопки
+    const moreOptionsButton = screen.getByLabelText('todo.moreOptions');
     fireEvent.click(moreOptionsButton);
 
+    // Ожидаем появления кнопок в меню
     await waitFor(() => {
-      expect(screen.getByText('edit')).toBeInTheDocument();
-      expect(screen.getByText('delete')).toBeInTheDocument();
+      expect(screen.getByRole('menuitem', { name: 'common.edit' })).toBeInTheDocument();
+      expect(screen.getByRole('menuitem', { name: 'common.delete' })).toBeInTheDocument();
     });
   });
 
   it('calls onEditDetails when edit option is clicked', async () => {
-    render(
-      <TaskItem
-        task={mockTask}
-        onUpdate={mockOnUpdate}
-        onDelete={mockOnDelete}
-        onToggleComplete={mockOnToggleComplete}
-        onEditDetails={mockOnEditDetails}
-      />
-    );
+    renderTaskItem(mockTask);
 
-    const moreOptionsButton = screen.getByRole('button', { name: '' });
+    const moreOptionsButton = screen.getByLabelText('todo.moreOptions');
     fireEvent.click(moreOptionsButton);
 
-    await waitFor(() => {
-      const editButton = screen.getByText('edit');
-      fireEvent.click(editButton);
-    });
+    const editButton = await screen.findByRole('menuitem', { name: 'common.edit' });
+    fireEvent.click(editButton);
 
     expect(mockOnEditDetails).toHaveBeenCalledWith(mockTask);
   });
 
   it('calls onDelete when delete option is clicked', async () => {
-    render(
-      <TaskItem
-        task={mockTask}
-        onUpdate={mockOnUpdate}
-        onDelete={mockOnDelete}
-        onToggleComplete={mockOnToggleComplete}
-        onEditDetails={mockOnEditDetails}
-      />
-    );
+    renderTaskItem(mockTask);
 
-    const moreOptionsButton = screen.getByRole('button', { name: '' });
+    const moreOptionsButton = screen.getByLabelText('todo.moreOptions');
     fireEvent.click(moreOptionsButton);
 
-    await waitFor(() => {
-      const deleteButton = screen.getByText('delete');
-      fireEvent.click(deleteButton);
-    });
+    const deleteButton = await screen.findByRole('menuitem', { name: 'common.delete' });
+    fireEvent.click(deleteButton);
 
     expect(mockOnDelete).toHaveBeenCalledWith('1');
   });
 
   it('renders completed task with strikethrough', () => {
     const completedTask = { ...mockTask, completed: true };
-
-    render(
-      <TaskItem
-        task={completedTask}
-        onUpdate={mockOnUpdate}
-        onDelete={mockOnDelete}
-        onToggleComplete={mockOnToggleComplete}
-        onEditDetails={mockOnEditDetails}
-      />
-    );
+    renderTaskItem(completedTask);
 
     const taskTitle = screen.getByText('Test Task');
     expect(taskTitle).toHaveClass('line-through');

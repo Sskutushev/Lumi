@@ -50,10 +50,9 @@ class RealtimeService {
           }
 
           // Вызвать локальный коллбэк
-          if (payload.new?.id) {
-            callback(payload.new as Task, payload.eventType as 'INSERT' | 'UPDATE' | 'DELETE');
-          } else if (payload.old?.id) {
-            callback(payload.old as Task, payload.eventType as 'INSERT' | 'UPDATE' | 'DELETE');
+          const record = (payload.new || payload.old) as any;
+          if (record?.id) {
+            callback(record as Task, payload.eventType as 'INSERT' | 'UPDATE' | 'DELETE');
           }
         }
       )
@@ -91,11 +90,10 @@ class RealtimeService {
               source: 'supabase',
             });
           }
-
-          callback(
-            payload.new?.id || payload.old?.id || '',
-            payload.eventType as 'INSERT' | 'UPDATE' | 'DELETE'
-          );
+          const projectId = (payload.new as any)?.id || (payload.old as any)?.id;
+          if (projectId) {
+            callback(projectId, payload.eventType as 'INSERT' | 'UPDATE' | 'DELETE');
+          }
         }
       )
       .subscribe();
@@ -151,16 +149,24 @@ class RealtimeService {
   }
 
   // Присоединение к presence-каналу для отслеживания онлайн-статуса
-  async joinPresenceChannel(channelName: string, userId: string, userData: any) {
-    const channel = supabase.channel(channelName);
+  joinPresenceChannel(channelName: string, userId: string, userData: any) {
+    const channel = supabase.channel(channelName, {
+      config: {
+        presence: {
+          key: userId,
+        },
+      },
+    });
 
-    await channel.join();
-
-    // Обновляем presence
-    channel.track({
-      user_id: userId,
-      ...userData,
-      online_at: new Date().toISOString(),
+    channel.subscribe(async (status) => {
+      if (status === 'SUBSCRIBED') {
+        // Как только подписка установлена, отслеживаем пользователя
+        await channel.track({
+          user_id: userId,
+          ...userData,
+          online_at: new Date().toISOString(),
+        });
+      }
     });
 
     return channel;

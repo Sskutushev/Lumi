@@ -33,7 +33,7 @@ class PerformanceLogger {
       // Отправка в Sentry если в production
       if (process.env.NODE_ENV === 'production') {
         Sentry.metrics.distribution('app.performance.operation_duration', duration, {
-          tags: { operation: operationName },
+          attributes: { operation: operationName },
         });
       }
 
@@ -70,7 +70,7 @@ class PerformanceLogger {
 
         if (process.env.NODE_ENV === 'production') {
           Sentry.metrics.distribution('app.performance.resource_load_time', resource.duration, {
-            tags,
+            attributes: tags,
           });
         }
       });

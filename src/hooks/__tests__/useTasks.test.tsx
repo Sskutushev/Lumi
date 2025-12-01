@@ -1,11 +1,12 @@
-// src/hooks/__tests__/useTasks.test.ts
+// src/hooks/__tests__/useTasks.test.tsx
 import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { useTasks } from '../queries/useTasks';
 import { tasksAPI } from '../../lib/api/tasks.api';
 
 // Мокаем API
-jest.mock('../../lib/api/tasks.api');
+vi.mock('../../lib/api/tasks.api');
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -21,7 +22,7 @@ const wrapper = ({ children }: { children: React.ReactNode }) => (
 
 describe('useTasks Hook', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should fetch tasks successfully', async () => {
@@ -36,7 +37,7 @@ describe('useTasks Hook', () => {
       },
     ];
 
-    (tasksAPI.getAll as jest.Mock).mockResolvedValue(mockTasks);
+    (tasksAPI.getAll as vi.Mock).mockResolvedValue(mockTasks);
 
     const { result } = renderHook(() => useTasks('user1'), { wrapper });
 
@@ -48,7 +49,7 @@ describe('useTasks Hook', () => {
 
   it('should handle error when fetching tasks', async () => {
     const mockError = new Error('Failed to fetch tasks');
-    (tasksAPI.getAll as jest.Mock).mockRejectedValue(mockError);
+    (tasksAPI.getAll as vi.Mock).mockRejectedValue(mockError);
 
     const { result } = renderHook(() => useTasks('user1'), { wrapper });
 
@@ -58,7 +59,7 @@ describe('useTasks Hook', () => {
   });
 
   it('should not fetch tasks if userId is empty', () => {
-    (tasksAPI.getAll as jest.Mock).mockResolvedValue([]);
+    (tasksAPI.getAll as vi.Mock).mockResolvedValue([]);
 
     const { result } = renderHook(() => useTasks(''), { wrapper });
 

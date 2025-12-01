@@ -1,6 +1,6 @@
 // src/lib/utils/taskFilters.ts
-import { Task, Project } from '../../src/types/api.types';
-import { FilterOptions } from '../../src/components/common/AdvancedFilter';
+import { Task, Project } from '../types/api.types';
+import { FilterOptions } from '../../components/common/AdvancedFilter';
 
 export const filterAndSortTasks = (
   tasks: Task[],

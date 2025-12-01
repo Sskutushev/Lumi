@@ -1,12 +1,13 @@
-// src/hooks/__tests__/useCreateTask.test.ts
+// src/hooks/__tests__/useCreateTask.test.tsx
 import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { useCreateTask } from '../mutations/useCreateTask';
 import { tasksAPI } from '../../lib/api/tasks.api';
-import { act } from 'react-dom/test-utils';
+import { act } from 'react';
 
 // Мокаем API
-jest.mock('../../lib/api/tasks.api');
+vi.mock('../../lib/api/tasks.api');
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -25,7 +26,7 @@ const wrapper = ({ children }: { children: React.ReactNode }) => (
 
 describe('useCreateTask Hook', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should create a task successfully', async () => {
@@ -42,7 +43,7 @@ describe('useCreateTask Hook', () => {
       updated_at: '2023-01-01T00:00:00Z',
     };
 
-    (tasksAPI.create as jest.Mock).mockResolvedValue(mockCreatedTask);
+    (tasksAPI.create as vi.Mock).mockResolvedValue(mockCreatedTask);
 
     const { result } = renderHook(() => useCreateTask(), { wrapper });
 
@@ -66,7 +67,7 @@ describe('useCreateTask Hook', () => {
     };
 
     const mockError = new Error('Failed to create task');
-    (tasksAPI.create as jest.Mock).mockRejectedValue(mockError);
+    (tasksAPI.create as vi.Mock).mockRejectedValue(mockError);
 
     const { result } = renderHook(() => useCreateTask(), { wrapper });
 

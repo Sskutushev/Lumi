@@ -1,6 +1,7 @@
 // src/lib/monitoring/sentryConfig.ts
 import * as Sentry from '@sentry/react';
 import { Integrations } from '@sentry/tracing';
+import { Replay } from '@sentry/replay';
 
 export const initSentry = () => {
   if (process.env.NODE_ENV === 'production') {
@@ -8,7 +9,7 @@ export const initSentry = () => {
       dsn: process.env.VITE_SENTRY_DSN || '', // В реальном проекте нужно использовать реальный DSN
       integrations: [
         new Integrations.BrowserTracing(),
-        new Sentry.Replay({
+        new Replay({
           // Приватность: не записываем чувствительные данные
           maskAllText: false,
           blockAllMedia: false,
@@ -26,7 +27,7 @@ export const initSentry = () => {
       environment: process.env.NODE_ENV || 'development',
 
       // Фильтрация ошибок
-      beforeSend: (event, hint) => {
+      beforeSend(event) {
         // Пример фильтрации определенных типов ошибок
         if (event.message?.includes('ResizeObserver loop limit exceeded')) {
           return null; // Отфильтровать эту ошибку

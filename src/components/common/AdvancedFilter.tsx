@@ -1,11 +1,13 @@
 // src/components/common/AdvancedFilter.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { X, Filter, Calendar, Flag, User, ListFilter, Save, RotateCcw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Task, Project } from '../../types/api.types';
+import { Filter as FilterIcon, Search, X, Flag, Save, RotateCcw } from 'lucide-react';
+import { Project } from '../../types/api.types';
+import { useClickOutside } from '../../hooks/useClickOutside';
 
-interface FilterOptions {
+// Определяем тип для фильтров
+export interface FilterOptions {
   priority: string | null;
   project_id: string | null;
   status: 'all' | 'pending' | 'completed' | 'overdue';
@@ -20,14 +22,12 @@ interface AdvancedFilterProps {
   projects: Project[];
   filters: FilterOptions;
   onFiltersChange: (filters: FilterOptions) => void;
-  onSavedFiltersLoad?: (filters: FilterOptions) => void;
 }
 
 const AdvancedFilter: React.FC<AdvancedFilterProps> = ({
-  projects,
+  projects = [],
   filters,
   onFiltersChange,
-  onSavedFiltersLoad,
 }) => {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
@@ -98,7 +98,7 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({
         className="p-2 rounded-lg hover:bg-bg-tertiary/50 flex items-center gap-2 relative"
         aria-label={t('todo.advancedFilters') || 'Advanced filters'}
       >
-        <Filter className="w-5 h-5 text-text-secondary" />
+        <FilterIcon className="w-5 h-5 text-text-secondary" />
         {filters.priority ||
         filters.project_id ||
         filters.searchQuery ||

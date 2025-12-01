@@ -1,4 +1,4 @@
-import React, { useState, useRef, useMemo, useCallback, useEffect } from 'react';
+import React, { useState, useRef, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Plus,
@@ -6,7 +6,6 @@ import {
   Calendar,
   Flag,
   Search,
-  Filter,
   User,
   LogOut,
   Sun,
@@ -37,9 +36,10 @@ import { useCreateProject } from '../hooks/mutations/useCreateProject';
 import { ErrorHandler } from '../lib/errors/ErrorHandler';
 import { Logger } from '../lib/errors/logger';
 import { useRealtimeTasks } from '../hooks/useRealtimeTasks';
-import AdvancedFilter from '../components/common/AdvancedFilter';
+import AdvancedFilter, { FilterOptions } from '../components/common/AdvancedFilter';
 import { filterAndSortTasks } from '../lib/utils/taskFilters';
 import { profileAPI } from '../lib/api/profile.api';
+import { useProfile } from '../hooks/queries/useProfile';
 import { useQuery } from '@tanstack/react-query';
 
 interface TodoDashboardProps {
@@ -55,17 +55,16 @@ const TodoDashboard: React.FC<TodoDashboardProps> = ({ onSignOut, onProjectSelec
   const [currentView, setCurrentView] = useState<'all' | 'upcoming' | 'important' | 'completed'>(
     'all'
   );
-  const [showFilters, setShowFilters] = useState(false);
 
-  const [advancedFilters, setAdvancedFilters] = useState({
+  const [advancedFilters, setAdvancedFilters] = useState<FilterOptions>({
     priority: null,
     project_id: null,
-    status: 'all' as 'all' | 'pending' | 'completed' | 'overdue',
+    status: 'all',
     dateRange: null,
     assignee: null,
     searchQuery: '',
-    sortBy: 'date' as 'priority' | 'date' | 'name' | 'project',
-    sortOrder: 'desc' as 'asc' | 'desc',
+    sortBy: 'date',
+    sortOrder: 'desc',
   });
 
   const [showProfileSettings, setShowProfileSettings] = useState(false);
@@ -81,11 +80,7 @@ const TodoDashboard: React.FC<TodoDashboardProps> = ({ onSignOut, onProjectSelec
   // Используем React Query хуки для получения данных
   const { data: tasks = [], isLoading: tasksLoading } = useTasks(user?.id || '');
   const { data: projects = [], isLoading: projectsLoading } = useProjects(user?.id || '');
-  const { data: userProfile, isLoading: profileLoading } = useQuery({
-    queryKey: ['profile', user?.id],
-    queryFn: () => profileAPI.getProfile(user?.id || ''),
-    enabled: !!user?.id,
-  });
+  const { data: userProfile, isLoading: profileLoading } = useProfile(user?.id || '');
 
   // Объединяем состояния загрузки
   const loading = user ? tasksLoading || projectsLoading || profileLoading : false;

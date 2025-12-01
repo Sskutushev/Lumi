@@ -110,24 +110,6 @@ export const tasksAPI = {
     }
   },
 
-  // Переключить статус выполнения задачи
-  async toggleComplete(id: string): Promise<Task> {
-    try {
-      const { data, error } = await supabase
-        .from('tasks')
-        .update({ completed: supabase.rpc('not', { bool: 'completed' }) })
-        .eq('id', id)
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data as Task;
-    } catch (error) {
-      Logger.error('Failed to toggle task completion:', error); // Modified
-      throw ErrorHandler.handle(error); // Modified
-    }
-  },
-
   // Получить статистику задач для пользователя
   async getStats(userId: string): Promise<UserStats> {
     try {

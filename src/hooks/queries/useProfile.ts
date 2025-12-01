@@ -50,19 +50,3 @@ export const useUploadAvatar = () => {
     },
   });
 };
-
-// Обновленный мутационный хук для обновления профиля с инвалидацией кэша
-export const useUpdateProfile = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ({ userId, data }: { userId: string; data: UpdateProfileDTO }) =>
-      profileAPI.updateProfile(userId, data),
-    onSuccess: (updatedProfile, variables) => {
-      // Обновляем профиль в кэше
-      queryClient.setQueryData([PROFILE_QUERY_KEY, variables.userId], updatedProfile);
-      // Инвалидируем профиль для обновления
-      queryClient.invalidateQueries({ queryKey: [PROFILE_QUERY_KEY, variables.userId] });
-    },
-  });
-};

@@ -22,7 +22,7 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ isOpen, onClose }) =>
     email: '',
     currentPassword: '',
     newPassword: '',
-    avatar: '',
+    avatar: null as string | null,
   });
   const [loading, setLoading] = useState(true);
   const [storageStats, setStorageStats] = useState<StorageStats | null>(null);

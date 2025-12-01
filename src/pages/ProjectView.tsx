@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react'; // Added useCallback, useMemo
+import React, { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, MoreHorizontal, CheckCircle, Plus, FolderOpen, Calendar } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';

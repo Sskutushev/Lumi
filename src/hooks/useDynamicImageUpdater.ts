@@ -8,7 +8,7 @@ export const useDynamicImageUpdater = () => {
 
   useEffect(() => {
     const updateDynamicImages = () => {
-      const imgElements = document.querySelectorAll(
+      const imgElements = document.querySelectorAll<HTMLImageElement>(
         'img[data-ru-light][data-ru-dark][data-en-light][data-en-dark]'
       );
       const isDark = document.documentElement.classList.contains('dark');
