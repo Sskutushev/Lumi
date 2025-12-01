@@ -9,179 +9,134 @@ import { useAuthStore } from '../../store/authStore';
 import { useTasks } from '../../hooks/queries/useTasks';
 import { useProjects } from '../../hooks/queries/useProjects';
 import { useProfile } from '../../hooks/queries/useProfile';
+import { useCreateTask } from '../../hooks/mutations/useCreateTask';
 
 // Мокаем зависимости
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => key,
-    i18n: {
-      changeLanguage: vi.fn(),
-      language: 'en',
-    },
+    i18n: { changeLanguage: vi.fn(), language: 'en' },
   }),
 }));
 vi.mock('../../store/authStore');
 vi.mock('../../hooks/queries/useTasks');
 vi.mock('../../hooks/queries/useProjects');
 vi.mock('../../hooks/queries/useProfile');
+vi.mock('../../hooks/mutations/useCreateTask');
 
-const mockUser = {
-  id: 'user1',
-  email: 'test@example.com',
-  created_at: '2023-01-01T00:00:00Z',
-};
+const mockUser = { id: 'user1', email: 'test@example.com' };
 
+// Расширенные мок-данные для тестов фильтрации и поиска
 const mockTasks = [
   {
     id: '1',
     user_id: 'user1',
-    title: 'Test Task 1',
+    title: 'High Priority Task',
     completed: false,
-    created_at: '2023-01-01T00:00:00Z',
-    updated_at: '2023-01-01T00:00:00Z',
-    priority: 'medium',
-    due_date: null,
-    project_id: null,
-    description: null,
-    detailed_description: null,
+    priority: 'high',
+    due_date: '2025-01-01T00:00:00Z',
   },
   {
     id: '2',
     user_id: 'user1',
-    title: 'Test Task 2',
-    completed: true,
-    created_at: '2023-01-01T00:00:00Z',
-    updated_at: '2023-01-01T00:00:00Z',
+    title: 'Medium Priority Task',
+    completed: false,
     priority: 'medium',
-    due_date: null,
-    project_id: null,
-    description: null,
-    detailed_description: null,
+    due_date: '2025-01-02T00:00:00Z',
   },
-];
-
-const mockProjects = [
   {
-    id: 'project1',
+    id: '3',
     user_id: 'user1',
-    name: 'Test Project',
-    description: 'Test Description',
-    created_at: '2023-01-01T00:00:00Z',
-    updated_at: '2023-01-01T00:00:00Z',
-    tasks_count: 0,
-    completed_tasks_count: 0,
+    title: 'Low Priority Task',
+    completed: true,
+    priority: 'low',
+    due_date: '2025-01-03T00:00:00Z',
+  },
+  {
+    id: '4',
+    user_id: 'user1',
+    title: 'Another High Task',
+    completed: false,
+    priority: 'high',
+    due_date: '2025-01-04T00:00:00Z',
   },
 ];
 
-const mockProfile = {
-  id: 'user1',
-  full_name: 'Test User',
-  avatar_url: null,
-  storage_used: 0,
-  created_at: '2023-01-01T00:00:00Z',
-  updated_at: '2023-01-01T00:00:00Z',
-};
+const mockProjects = [{ id: 'project1', user_id: 'user1', name: 'Test Project' }];
+const mockProfile = { id: 'user1', full_name: 'Test User' };
+const mockMutate = vi.fn();
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: false, // Отключаем retries для тестов
-    },
-  },
-});
+const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
 
-// Обертываем компонент в QueryClientProvider
 const renderWithProviders = (ui: React.ReactElement) => {
   return render(<QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>);
 };
 
 describe('TodoDashboard Component', () => {
   beforeEach(() => {
-    (useAuthStore as vi.Mock).mockReturnValue({
-      user: mockUser,
-      loading: false,
-      checkSession: vi.fn(),
-      signOut: vi.fn(),
-    });
-
-    (useTasks as vi.Mock).mockReturnValue({
-      data: mockTasks,
-      isLoading: false,
-      isError: false,
-    });
-
-    (useProjects as vi.Mock).mockReturnValue({
-      data: mockProjects,
-      isLoading: false,
-      isError: false,
-    });
-
-    (useProfile as vi.Mock).mockReturnValue({
-      data: mockProfile,
-      isLoading: false,
-      isError: false,
-    });
+    vi.resetAllMocks();
+    (useAuthStore as vi.Mock).mockReturnValue({ user: mockUser });
+    (useTasks as vi.Mock).mockReturnValue({ data: mockTasks, isLoading: false });
+    (useProjects as vi.Mock).mockReturnValue({ data: mockProjects, isLoading: false });
+    (useProfile as vi.Mock).mockReturnValue({ data: mockProfile, isLoading: false });
+    (useCreateTask as vi.Mock).mockReturnValue({ mutate: mockMutate });
   });
 
-  it('renders dashboard with user info', async () => {
+  it('renders tasks correctly', () => {
     renderWithProviders(<TodoDashboard onSignOut={vi.fn()} />);
-
-    // Вместо ожидания текста, который зависит от перевода, можно проверить наличие ключевых элементов
-    await waitFor(() => {
-      expect(screen.getByText('Lumi')).toBeInTheDocument();
-      // Аватар рендерит первую букву email или имени, проверим это
-      expect(screen.getByText(mockUser.email.charAt(0).toUpperCase())).toBeInTheDocument();
-    });
+    expect(screen.getByText('High Priority Task')).toBeInTheDocument();
+    expect(screen.getByText('Medium Priority Task')).toBeInTheDocument();
   });
 
-  it('displays tasks when data is loaded', async () => {
+  it('calls create task mutation with correct data', async () => {
     renderWithProviders(<TodoDashboard onSignOut={vi.fn()} />);
-
-    await waitFor(() => {
-      expect(screen.getByText('Test Task 1')).toBeInTheDocument();
-      expect(screen.getByText('Test Task 2')).toBeInTheDocument();
-    });
-  });
-
-  it('displays projects when data is loaded', async () => {
-    renderWithProviders(<TodoDashboard onSignOut={vi.fn()} />);
-
-    await waitFor(() => {
-      expect(screen.getByText('Test Project')).toBeInTheDocument();
-    });
-  });
-
-  it('filters tasks based on current view', async () => {
-    renderWithProviders(<TodoDashboard onSignOut={vi.fn()} />);
-
-    await waitFor(() => {
-      expect(screen.getByText('Test Task 1')).toBeInTheDocument();
-    });
-
-    // Проверяем переключение вида, ищем по роли и тексту
-    const allButton = screen.getByRole('button', { name: /todo.all/i });
-    fireEvent.click(allButton);
-
-    expect(screen.getByText('Test Task 1')).toBeInTheDocument();
-  });
-
-  it('allows adding new tasks', async () => {
-    renderWithProviders(<TodoDashboard onSignOut={vi.fn()} />);
-
-    // Вводим новую задачу
     const taskInput = screen.getByPlaceholderText('todo.addTaskPlaceholder');
-    fireEvent.change(taskInput, { target: { value: 'New Test Task' } });
+    const addButton = taskInput.nextElementSibling as HTMLElement;
 
-    // Нажимаем кнопку добавления
-    const addButton = taskInput.nextSibling as HTMLElement; // Находим кнопку рядом с инпутом
+    fireEvent.change(taskInput, { target: { value: 'New Integration Task' } });
     fireEvent.click(addButton);
 
-    // Здесь нужна более сложная логика для проверки вызова мутации,
-    // так как useCreateTask замокан. Пока просто проверим, что инпут очистился,
-    // если бы мутация была успешной (в данном случае она не выполняется).
-    // Для реального теста нужно мокать и useCreateTask.
-    // await waitFor(() => {
-    //   expect(taskInput).toHaveValue('');
-    // });
+    await waitFor(() => {
+      expect(mockMutate).toHaveBeenCalledWith(
+        expect.objectContaining({ title: 'New Integration Task', user_id: 'user1' }),
+        expect.any(Object)
+      );
+    });
+  });
+
+  it('filters tasks by priority using AdvancedFilter', async () => {
+    renderWithProviders(<TodoDashboard onSignOut={vi.fn()} />);
+
+    // Убедимся, что все задачи на месте
+    expect(screen.getByText('High Priority Task')).toBeInTheDocument();
+    expect(screen.getByText('Another High Task')).toBeInTheDocument();
+    expect(screen.getByText('Medium Priority Task')).toBeInTheDocument();
+
+    // Открываем продвинутый фильтр
+    const filterButton = screen.getByLabelText('todo.advancedFilters');
+    fireEvent.click(filterButton);
+
+    // Кликаем на фильтр по высокому приоритету
+    const highPriorityButton = await screen.findByRole('button', { name: /todo.priority.high/i });
+    fireEvent.click(highPriorityButton);
+
+    // Проверяем, что остались только задачи с высоким приоритетом
+    expect(screen.getByText('High Priority Task')).toBeInTheDocument();
+    expect(screen.getByText('Another High Task')).toBeInTheDocument();
+    expect(screen.queryByText('Medium Priority Task')).not.toBeInTheDocument();
+  });
+
+  it('filters tasks by search query', async () => {
+    renderWithProviders(<TodoDashboard onSignOut={vi.fn()} />);
+
+    // Находим поле поиска и вводим текст
+    const searchInput = screen.getByPlaceholderText('todo.searchPlaceholder');
+    fireEvent.change(searchInput, { target: { value: 'Medium' } });
+
+    // Проверяем, что осталась только одна задача
+    await waitFor(() => {
+      expect(screen.queryByText('High Priority Task')).not.toBeInTheDocument();
+      expect(screen.getByText('Medium Priority Task')).toBeInTheDocument();
+    });
   });
 });

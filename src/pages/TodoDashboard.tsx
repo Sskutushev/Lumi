@@ -445,6 +445,10 @@ const TodoDashboard: React.FC<TodoDashboardProps> = ({ onSignOut, onProjectSelec
                       type="text"
                       placeholder={t('todo.searchPlaceholder') || 'Search tasks...'}
                       className="pl-10 pr-4 py-2 rounded-xl border border-border bg-bg-tertiary/50 focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20 outline-none transition-all text-text-primary min-w-[180px]"
+                      value={advancedFilters.searchQuery}
+                      onChange={(e) =>
+                        setAdvancedFilters((prev) => ({ ...prev, searchQuery: e.target.value }))
+                      }
                     />
                   </div>
                   <AdvancedFilter
