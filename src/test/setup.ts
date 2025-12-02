@@ -15,7 +15,7 @@ if (typeof window !== 'undefined') {
       this.name = name;
     }
 
-    postMessage(message: any) {
+    postMessage(_message: any) {
       // Do nothing in tests
     }
 
@@ -23,11 +23,19 @@ if (typeof window !== 'undefined') {
       // Do nothing in tests
     }
 
-    addEventListener() {
+    addEventListener(
+      _type: string,
+      _listener: EventListener,
+      _options?: boolean | AddEventListenerOptions
+    ) {
       // Do nothing in tests
     }
 
-    removeEventListener() {
+    removeEventListener(
+      _type: string,
+      _listener: EventListener,
+      _options?: boolean | EventListenerOptions
+    ) {
       // Do nothing in tests
     }
 
