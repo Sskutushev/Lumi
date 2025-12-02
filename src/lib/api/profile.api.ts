@@ -1,12 +1,17 @@
 // API слой для профиля пользователя
 import { supabase } from '../supabase';
+import { MAX_AVATAR_SIZE_BYTES, MAX_STORAGE_LIMIT_BYTES } from '../constants';
 import { UserProfile, UpdateProfileDTO, StorageStats } from '../../types/api.types';
 import { ErrorHandler } from '../errors/ErrorHandler'; // Added import
 import { Logger } from '../errors/logger'; // Added import
+import { abortControllerService } from './abortController';
 
 export const profileAPI = {
   // Создать профиль пользователя
   async createProfile(userId: string): Promise<UserProfile> {
+    const key = `profile-createProfile-${userId}`;
+    const controller = abortControllerService.create(key);
+
     try {
       const { data, error } = await supabase
         .from('users_profile')
@@ -26,11 +31,16 @@ export const profileAPI = {
     } catch (error) {
       Logger.error('Failed to create profile:', error); // Modified
       throw ErrorHandler.handle(error); // Modified
+    } finally {
+      abortControllerService.cleanup(key);
     }
   },
 
   // Получить профиль пользователя с созданием при необходимости
   async getProfile(userId: string): Promise<UserProfile> {
+    const key = `profile-getProfile-${userId}`;
+    const controller = abortControllerService.create(key);
+
     try {
       // Попытка вставить профиль. Если он уже существует, ничего не произойдет благодаря onConflict: 'id'.
       await supabase.from('users_profile').upsert(
@@ -59,11 +69,16 @@ export const profileAPI = {
     } catch (error) {
       Logger.error('Failed to get or create profile:', error); // Modified
       throw ErrorHandler.handle(error); // Modified
+    } finally {
+      abortControllerService.cleanup(key);
     }
   },
 
   // Обновить профиль пользователя
   async updateProfile(userId: string, data: UpdateProfileDTO): Promise<UserProfile> {
+    const key = `profile-updateProfile-${userId}`;
+    const controller = abortControllerService.create(key);
+
     try {
       const { data: updatedData, error } = await supabase
         .from('users_profile')
@@ -93,15 +108,16 @@ export const profileAPI = {
     } catch (error) {
       Logger.error('Failed to update profile:', error); // Modified
       throw ErrorHandler.handle(error); // Modified
+    } finally {
+      abortControllerService.cleanup(key);
     }
   },
 
   // Загрузить аватар
   async uploadAvatar(userId: string, file: File): Promise<UserProfile> {
     try {
-      // Проверяем размер файла (макс. 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        throw new Error('File size exceeds 5MB limit');
+      if (file.size > MAX_AVATAR_SIZE_BYTES) {
+        throw new Error(`File size exceeds ${MAX_AVATAR_SIZE_BYTES / (1024 * 1024)}MB limit`);
       }
 
       // Загружаем файл в Supabase Storage
@@ -135,21 +151,25 @@ export const profileAPI = {
 
   // Получить статистику по использованию хранилища
   async getStorageStats(userId: string): Promise<StorageStats> {
+    const key = `profile-getStorageStats-${userId}`;
+    const controller = abortControllerService.create(key);
+
     try {
       // Используем тот же подход - получаем профиль (создаем если нужно) и возвращаем статистику
       const profile = await this.getProfile(userId);
 
-      const limit = 5 * 1024 * 1024 * 1024; // 5GB в байтах
-      const percentage = (profile.storage_used / limit) * 100;
+      const percentage = (profile.storage_used / MAX_STORAGE_LIMIT_BYTES) * 100;
 
       return {
         used: profile.storage_used,
-        limit,
+        limit: MAX_STORAGE_LIMIT_BYTES,
         percentage,
       };
     } catch (error) {
       Logger.error('Failed to get storage stats:', error); // Modified
       throw ErrorHandler.handle(error); // Modified
+    } finally {
+      abortControllerService.cleanup(key);
     }
   },
 };

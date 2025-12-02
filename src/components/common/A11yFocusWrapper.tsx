@@ -39,7 +39,6 @@ const A11yFocusWrapper: React.FC<A11yFocusWrapperProps> = ({
     };
   }, [enableFocusTrap, returnFocusTo]);
 
-  // Обработка нажатия Escape для закрытия
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && onClose) {

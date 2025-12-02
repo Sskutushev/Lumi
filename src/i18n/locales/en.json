@@ -31,7 +31,19 @@
     "saving": "Saving...",
     "continue": "Continue",
     "clear": "Clear",
-    "create": "Create"
+    "create": "Create",
+    "toggleLanguage": "Toggle Language",
+    "selectMonth": "Select Month",
+    "selectYear": "Select Year",
+    "russian": "Russian",
+    "english": "English",
+    "online": "Online",
+    "offline": "Offline",
+    "installApp": "Install App",
+    "installAppDescription": "Install this application to your home screen for faster access and improved experience.",
+    "installing": "Installing...",
+    "install": "Install",
+    "apply": "Apply"
   },
   "auth": {
     "signUpSuccess": "📧 Email sent! Please check your email to confirm.",
@@ -154,7 +166,20 @@
     "emptyProject": "No tasks in this project",
     "emptyProjectDescription": "Create a new task or add existing ones from all tasks",
     "titleRequired": "Title cannot be empty",
-    "saveError": "Error saving task"
+    "saveError": "Error saving task",
+    "advancedFilters": "Advanced Filters",
+    "status": "Status",
+    "allProjects": "All Projects",
+    "saveFilterPlaceholder": "Save filter as...",
+    "saveFilter": "Save Filter",
+    "savedFilters": "Saved Filters",
+    "ascending": "Ascending",
+    "descending": "Descending",
+    "markAsIncomplete": "Mark as Incomplete",
+    "markAsComplete": "Mark as Complete",
+    "editTaskName": "Edit Task Name",
+    "moreOptions": "More Options",
+    "closeModal": "Close Modal"
   },
   "dashboard": {
     "totalTasks": "Total Tasks",

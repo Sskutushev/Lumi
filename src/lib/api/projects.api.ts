@@ -4,10 +4,14 @@ import { Project, CreateProjectDTO, UpdateProjectDTO, ProjectStats } from '../..
 import { projectInputSchema, validateUserInput, sanitizeInput } from '../security/securityUtils';
 import { ErrorHandler } from '../errors/ErrorHandler'; // Added import
 import { Logger } from '../errors/logger'; // Added import
+import { abortControllerService } from './abortController';
 
 export const projectsAPI = {
   // Получить все проекты пользователя
   async getAll(userId: string): Promise<Project[]> {
+    const key = `projects-getAll-${userId}`;
+    const controller = abortControllerService.create(key);
+
     try {
       const { data, error } = await supabase
         .from('projects')
@@ -20,11 +24,16 @@ export const projectsAPI = {
     } catch (error) {
       Logger.error('Failed to get projects:', error); // Modified
       throw ErrorHandler.handle(error); // Modified
+    } finally {
+      abortControllerService.cleanup(key);
     }
   },
 
   // Получить проект по ID
   async getById(id: string): Promise<Project> {
+    const key = `projects-getById-${id}`;
+    const controller = abortControllerService.create(key);
+
     try {
       const { data, error } = await supabase.from('projects').select('*').eq('id', id).single();
 
@@ -33,11 +42,16 @@ export const projectsAPI = {
     } catch (error) {
       Logger.error('Failed to get project:', error); // Modified
       throw ErrorHandler.handle(error); // Modified
+    } finally {
+      abortControllerService.cleanup(key);
     }
   },
 
   // Создать проект
   async create(project: CreateProjectDTO): Promise<Project> {
+    const key = `projects-create-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const controller = abortControllerService.create(key);
+
     try {
       // Валидируем входные данные
       validateUserInput(project, projectInputSchema);
@@ -60,11 +74,16 @@ export const projectsAPI = {
     } catch (error) {
       Logger.error('Failed to create project:', error); // Modified
       throw ErrorHandler.handle(error); // Modified
+    } finally {
+      abortControllerService.cleanup(key);
     }
   },
 
   // Обновить проект
   async update(id: string, updates: UpdateProjectDTO): Promise<Project> {
+    const key = `projects-update-${id}`;
+    const controller = abortControllerService.create(key);
+
     try {
       // Валидируем входные данные (создаем схему обновления)
       const updateSchema = projectInputSchema.partial(); // Используем частичную схему для обновления
@@ -89,11 +108,16 @@ export const projectsAPI = {
     } catch (error) {
       Logger.error('Failed to update project:', error); // Modified
       throw ErrorHandler.handle(error); // Modified
+    } finally {
+      abortControllerService.cleanup(key);
     }
   },
 
   // Удалить проект
   async delete(id: string): Promise<void> {
+    const key = `projects-delete-${id}`;
+    const controller = abortControllerService.create(key);
+
     try {
       const { error } = await supabase.from('projects').delete().eq('id', id);
 
@@ -101,11 +125,16 @@ export const projectsAPI = {
     } catch (error) {
       Logger.error('Failed to delete project:', error); // Modified
       throw ErrorHandler.handle(error); // Modified
+    } finally {
+      abortControllerService.cleanup(key);
     }
   },
 
   // Получить статистику проекта
   async getStats(projectId: string): Promise<ProjectStats> {
+    const key = `projects-getStats-${projectId}`;
+    const controller = abortControllerService.create(key);
+
     try {
       const { data, error } = await supabase
         .from('projects')
@@ -134,6 +163,8 @@ export const projectsAPI = {
     } catch (error) {
       Logger.error('Failed to get project stats:', error); // Modified
       throw ErrorHandler.handle(error); // Modified
+    } finally {
+      abortControllerService.cleanup(key);
     }
   },
 };

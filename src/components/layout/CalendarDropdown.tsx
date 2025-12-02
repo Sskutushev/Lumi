@@ -165,6 +165,7 @@ const CalendarDropdown: React.FC<CalendarDropdownProps> = ({
                     prevMonth();
                   }}
                   className="p-1 rounded hover:bg-bg-secondary"
+                  aria-label={t('common.selectMonth')}
                 >
                   <ChevronLeft className="w-5 h-5 text-text-secondary" />
                 </button>
@@ -199,6 +200,7 @@ const CalendarDropdown: React.FC<CalendarDropdownProps> = ({
                     nextMonth();
                   }}
                   className="p-1 rounded hover:bg-bg-secondary"
+                  aria-label={t('common.selectMonth')}
                 >
                   <ChevronRight className="w-5 h-5 text-text-secondary" />
                 </button>
@@ -249,6 +251,7 @@ const CalendarDropdown: React.FC<CalendarDropdownProps> = ({
                     handleYearChange(currentDate.getFullYear() - 1);
                   }}
                   className="p-1 rounded hover:bg-bg-secondary"
+                  aria-label={t('common.selectYear')}
                 >
                   <ChevronLeft className="w-5 h-5 text-text-secondary" />
                 </button>
@@ -271,6 +274,7 @@ const CalendarDropdown: React.FC<CalendarDropdownProps> = ({
                     handleYearChange(currentDate.getFullYear() + 1);
                   }}
                   className="p-1 rounded hover:bg-bg-secondary"
+                  aria-label={t('common.selectYear')}
                 >
                   <ChevronRight className="w-5 h-5 text-text-secondary" />
                 </button>
@@ -311,6 +315,7 @@ const CalendarDropdown: React.FC<CalendarDropdownProps> = ({
                     handleYearChange(currentDate.getFullYear() - 12);
                   }}
                   className="p-1 rounded hover:bg-bg-secondary"
+                  aria-label={t('common.selectYear')}
                 >
                   <ChevronLeft className="w-5 h-5 text-text-secondary" />
                 </button>
@@ -326,6 +331,7 @@ const CalendarDropdown: React.FC<CalendarDropdownProps> = ({
                     handleYearChange(currentDate.getFullYear() + 12);
                   }}
                   className="p-1 rounded hover:bg-bg-secondary"
+                  aria-label={t('common.selectYear')}
                 >
                   <ChevronRight className="w-5 h-5 text-text-secondary" />
                 </button>

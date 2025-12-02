@@ -86,7 +86,7 @@ const TodoDashboard: React.FC<TodoDashboardProps> = ({ onSignOut, onProjectSelec
   const loading = user ? tasksLoading || projectsLoading || profileLoading : false;
 
   // Подписываемся на реалтайм обновления задач
-  // useRealtimeTasks(user?.id || ''); // Временно отключаем, чтобы избежать проблем с импортом
+  useRealtimeTasks(user?.id || '');
 
   // Мутации для задач
   const createTaskMutation = useCreateTask();
@@ -323,7 +323,8 @@ const TodoDashboard: React.FC<TodoDashboardProps> = ({ onSignOut, onProjectSelec
                       }}
                       className="w-full text-left px-4 py-2.5 hover:bg-bg-secondary text-text-primary text-sm flex items-center gap-3"
                     >
-                      <Globe className="w-4 h-4" /> {i18n.language === 'en' ? 'Русский' : 'English'}
+                      <Globe className="w-4 h-4" />{' '}
+                      {i18n.language === 'en' ? t('common.russian') : t('common.english')}
                     </button>
                     <hr className="my-2 border-border" />
                     <button

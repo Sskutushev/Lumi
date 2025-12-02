@@ -77,6 +77,7 @@ const Header = ({
             <button
               onClick={toggleLanguage}
               className="p-2 rounded-lg hover:bg-bg-secondary transition-colors flex items-center justify-center"
+              aria-label={t('common.toggleLanguage')}
             >
               {i18n.language === 'en' ? (
                 <img src={rusFlag} alt="Russian" className="w-5 h-5" />
@@ -88,6 +89,7 @@ const Header = ({
             <button
               onClick={onToggleTheme}
               className="p-2 rounded-lg hover:bg-bg-secondary transition-colors"
+              aria-label={currentTheme === 'light' ? t('common.darkTheme') : t('common.lightTheme')}
             >
               {currentTheme === 'light' ? (
                 <Moon className="w-5 h-5 text-text-secondary" />
@@ -200,6 +202,7 @@ const Header = ({
               <button
                 onClick={() => setIsMenuOpen(false)}
                 className="p-2 rounded-lg hover:bg-bg-secondary transition-colors"
+                aria-label={t('common.close')}
               >
                 <X className="w-6 h-6 text-text-secondary" />
               </button>
@@ -236,12 +239,12 @@ const Header = ({
                   {i18n.language === 'en' ? (
                     <>
                       <img src={rusFlag} alt="Russian" className="w-5 h-5" />
-                      Русский
+                      {t('common.russian')}
                     </>
                   ) : (
                     <>
                       <img src={engFlag} alt="English" className="w-5 h-5" />
-                      English
+                      {t('common.english')}
                     </>
                   )}
                 </button>

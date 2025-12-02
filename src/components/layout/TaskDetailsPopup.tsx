@@ -27,10 +27,9 @@ const TaskDetailsPopup: React.FC<TaskDetailsPopupProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    console.log('handleSubmit called'); // Отладочный лог
-    console.log('editedTask:', editedTask); // Отладочный лог
+    console.log('handleSubmit called');
+    console.log('editedTask:', editedTask);
 
-    // Валидация перед сохранением
     if (!editedTask.title.trim()) {
       toast.error(t('todo.titleRequired') || 'Title cannot be empty');
       return;
@@ -38,10 +37,8 @@ const TaskDetailsPopup: React.FC<TaskDetailsPopupProps> = ({
 
     setIsSaving(true);
     try {
-      // Создаем копию задачи для сохранения, чтобы безопасно форматировать даты
       const taskToSave = { ...editedTask };
 
-      // Преобразуем даты в ISO строку, если они существуют
       if (taskToSave.start_date) {
         taskToSave.start_date = new Date(taskToSave.start_date).toISOString();
       }
@@ -49,11 +46,11 @@ const TaskDetailsPopup: React.FC<TaskDetailsPopupProps> = ({
         taskToSave.due_date = new Date(taskToSave.due_date).toISOString();
       }
 
-      console.log('Calling onSave function'); // Отладочный лог
+      console.log('Calling onSave function');
       await onSave(taskToSave);
-      console.log('Task saved successfully'); // Отладочный лог
+      console.log('Task saved successfully');
       toast.success(t('common.save') || 'Task saved successfully!');
-      onClose(); // Закрываем попап после успешного сохранения
+      onClose();
     } catch (error) {
       console.error('Error saving task:', error);
       toast.error(t('todo.saveError') || 'Error saving task');

@@ -4,10 +4,14 @@ import { Task, CreateTaskDTO, UpdateTaskDTO, UserStats } from '../../types/api.t
 import { taskInputSchema, validateUserInput, sanitizeInput } from '../security/securityUtils';
 import { ErrorHandler } from '../errors/ErrorHandler'; // Added import
 import { Logger } from '../errors/logger'; // Added import
+import { abortControllerService } from './abortController';
 
 export const tasksAPI = {
   // Получить все задачи пользователя, опционально фильтруя по проекту
   async getAll(userId: string, projectId?: string): Promise<Task[]> {
+    const key = `tasks-getAll-${userId}${projectId ? `-${projectId}` : ''}`;
+    const controller = abortControllerService.create(key);
+
     try {
       let query = supabase
         .from('tasks')
@@ -26,11 +30,16 @@ export const tasksAPI = {
     } catch (error) {
       Logger.error('Failed to get tasks:', error); // Modified
       throw ErrorHandler.handle(error); // Modified
+    } finally {
+      abortControllerService.cleanup(key);
     }
   },
 
   // Получить задачу по ID
   async getById(id: string): Promise<Task> {
+    const key = `tasks-getById-${id}`;
+    const controller = abortControllerService.create(key);
+
     try {
       const { data, error } = await supabase.from('tasks').select('*').eq('id', id).single();
 
@@ -39,11 +48,16 @@ export const tasksAPI = {
     } catch (error) {
       Logger.error('Failed to get task:', error); // Modified
       throw ErrorHandler.handle(error); // Modified
+    } finally {
+      abortControllerService.cleanup(key);
     }
   },
 
   // Создать задачу
   async create(task: CreateTaskDTO): Promise<Task> {
+    const key = `tasks-create-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const controller = abortControllerService.create(key);
+
     try {
       // Валидируем входные данные
       validateUserInput(task, taskInputSchema);
@@ -66,11 +80,16 @@ export const tasksAPI = {
     } catch (error) {
       Logger.error('Failed to create task:', error); // Modified
       throw ErrorHandler.handle(error); // Modified
+    } finally {
+      abortControllerService.cleanup(key);
     }
   },
 
   // Обновить задачу
   async update(id: string, updates: UpdateTaskDTO): Promise<Task> {
+    const key = `tasks-update-${id}`;
+    const controller = abortControllerService.create(key);
+
     try {
       // Валидируем входные данные (создаем схему обновления)
       const updateSchema = taskInputSchema.partial(); // Используем частичную схему для обновления
@@ -95,11 +114,16 @@ export const tasksAPI = {
     } catch (error) {
       Logger.error('Failed to update task:', error); // Modified
       throw ErrorHandler.handle(error); // Modified
+    } finally {
+      abortControllerService.cleanup(key);
     }
   },
 
   // Удалить задачу
   async delete(id: string): Promise<void> {
+    const key = `tasks-delete-${id}`;
+    const controller = abortControllerService.create(key);
+
     try {
       const { error } = await supabase.from('tasks').delete().eq('id', id);
 
@@ -107,6 +131,8 @@ export const tasksAPI = {
     } catch (error) {
       Logger.error('Failed to delete task:', error); // Modified
       throw ErrorHandler.handle(error); // Modified
+    } finally {
+      abortControllerService.cleanup(key);
     }
   },
 

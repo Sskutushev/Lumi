@@ -15,12 +15,10 @@ const HeroSection = () => {
   const imageRef = useRef<HTMLImageElement>(null);
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
 
-  // Определяем текущую тему
   useEffect(() => {
     const current = document.documentElement.classList.contains('light') ? 'light' : 'dark';
     setTheme(current);
 
-    // Предзагружаем изображения для обеих тем
     preloadThemeImages('light');
     preloadThemeImages('dark');
   }, []);
@@ -43,12 +41,11 @@ const HeroSection = () => {
         setIsLoading(false);
       })
       .catch(() => {
-        setCurrentImage(isDark ? enDark : enLight); // резервный вариант
+        setCurrentImage(isDark ? enDark : enLight); // fallback
         setIsLoading(false);
       });
   }, [i18n.language, theme]);
 
-  // Наблюдаем за изменениями темы на документе
   useEffect(() => {
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
@@ -57,7 +54,6 @@ const HeroSection = () => {
           const newTheme = hasLight ? 'light' : 'dark';
 
           if (newTheme !== theme) {
-            // Быстрое переключение изображения
             const isDark = newTheme === 'dark';
             let imagePath = '';
 
@@ -67,14 +63,14 @@ const HeroSection = () => {
               imagePath = isDark ? enDark : enLight;
             }
 
-            // Кэшируем новое изображение и переключаем
+            // Cache the new image and switch
             cacheImage(imagePath)
               .then(() => {
                 setCurrentImage(imagePath);
                 setTheme(newTheme);
               })
               .catch(() => {
-                setCurrentImage(isDark ? enDark : enLight); // резервный вариант
+                setCurrentImage(isDark ? enDark : enLight); // fallback
                 setTheme(newTheme);
               });
           }

@@ -8,6 +8,7 @@ import { tasksAPI } from '../../lib/api/tasks.api';
 import { supabase } from '../../lib/supabase';
 import { StorageStats, UserStats } from '../../types/api.types';
 import { useQueryClient } from '@tanstack/react-query';
+import { MAX_AVATAR_SIZE_BYTES, STORAGE_WARNING_THRESHOLD } from '../../lib/constants';
 
 interface ProfileSettingsProps {
   isOpen: boolean;
@@ -35,7 +36,6 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ isOpen, onClose }) =>
 
     setLoading(true);
     try {
-      // Загружаем данные профиля, статистику хранилища и задач в параллель
       const [profile, storageStatsData, stats] = await Promise.all([
         profileAPI.getProfile(user.id),
         profileAPI.getStorageStats(user.id),
@@ -55,7 +55,6 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ isOpen, onClose }) =>
       setUserStats(stats);
     } catch (error) {
       console.error('Error loading profile data:', error);
-      // Показываем уведомление пользователю
       toast.error(t('profile.loadError') || 'Failed to load profile data');
     } finally {
       setLoading(false);
@@ -78,9 +77,11 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ isOpen, onClose }) =>
 
     const file = e.target.files[0];
 
-    // Проверяем размер файла (макс. 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error(t('profile.avatarTooLarge') || 'Avatar must be less than 5MB');
+    if (file.size > MAX_AVATAR_SIZE_BYTES) {
+      toast.error(
+        t('profile.avatarTooLarge') ||
+          `Avatar must be less than ${MAX_AVATAR_SIZE_BYTES / (1024 * 1024)}MB`
+      );
       return;
     }
 
@@ -93,8 +94,7 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ isOpen, onClose }) =>
     try {
       const updatedProfile = await profileAPI.uploadAvatar(user.id, file);
 
-      // Обновляем и локальное состояние, и кэш React Query
-      setUserData((prev) => ({ ...prev, avatar: updatedProfile.avatar_url }));
+      setUserData((prev) => ({ ...prev, avatar: updatedProfile.avatar_url || null }));
       queryClient.setQueryData(['profile', user.id], updatedProfile);
 
       toast.success(t('profile.updateSuccess') || 'Avatar updated successfully!');
@@ -114,9 +114,8 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ isOpen, onClose }) =>
     }
 
     setIsUpdating(true);
-    console.log('Updating profile for user:', user.id); // Отладочный лог
+    console.log('Updating profile for user:', user.id);
     try {
-      // Создаем объект для обновления, добавляя поля только если они действительны
       const updateData: { full_name?: string; avatar_url?: string } = {};
       if (userData.name) {
         updateData.full_name = userData.name;
@@ -125,9 +124,8 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ isOpen, onClose }) =>
         updateData.avatar_url = userData.avatar;
       }
 
-      console.log('Data to send:', updateData); // ЛОГ 1: Что мы отправляем
+      console.log('Data to send:', updateData);
 
-      // Проверяем, есть ли что обновлять
       if (Object.keys(updateData).length === 0 && !userData.newPassword) {
         toast.info('No changes to save.');
         onClose();
@@ -136,13 +134,11 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ isOpen, onClose }) =>
 
       if (Object.keys(updateData).length > 0) {
         const updatedProfile = await profileAPI.updateProfile(user.id, updateData);
-        console.log('API response:', updatedProfile); // ЛОГ 2: Что мы получили в ответ
+        console.log('API response:', updatedProfile);
 
-        // Вручную обновляем кэш, так как есть проблемы с получением свежих данных
         if (updatedProfile) {
           queryClient.setQueryData(['profile', user.id], updatedProfile);
         } else {
-          // Если по какой-то причине ответ пуст, делаем классическую инвалидацию
           queryClient.invalidateQueries({ queryKey: ['profile', user.id] });
         }
       }
@@ -166,7 +162,7 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ isOpen, onClose }) =>
       onClose();
     } catch (error: any) {
       console.error('Error updating profile:', error);
-      console.error('Error details:', error.message, error.code, error.status); // Дополнительная информация
+      console.error('Error details:', error.message, error.code, error.status);
       toast.error(t('profile.updateError') || 'Error updating profile: ' + error.message);
     } finally {
       setIsUpdating(false);
@@ -315,7 +311,9 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ isOpen, onClose }) =>
                       <div className="w-full bg-bg-tertiary rounded-full h-2">
                         <div
                           className={`h-2 rounded-full ${
-                            storageStats.percentage > 90 ? 'bg-error' : 'bg-accent-primary'
+                            storageStats.percentage > STORAGE_WARNING_THRESHOLD
+                              ? 'bg-error'
+                              : 'bg-accent-primary'
                           }`}
                           style={{ width: `${Math.min(100, storageStats.percentage)}%` }}
                         ></div>

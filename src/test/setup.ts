@@ -1,7 +1,7 @@
 import { cleanup } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { afterEach, vi } from 'vitest';
-import { supabaseMock } from './supabaseMock';
+import { supabaseMock } from '../__mocks__/supabase';
 
 // Глобально мокаем модуль, который экспортирует клиент Supabase
 vi.mock('../src/lib/supabase', () => ({

@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { visualizer } from 'rollup-plugin-visualizer';
+import { VitePWA } from 'vite-plugin-pwa';
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
@@ -9,6 +10,40 @@ export default defineConfig({
       filename: './dist/stats.html',
       open: false, // Не открывать автоматически
       template: 'treemap', // Тип визуализация: treemap, sunburst, network
+    }),
+    VitePWA({
+      registerType: 'autoUpdate',
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        // Стратегия кэширования для API вызовов
+        runtimeCaching: [
+          {
+            urlPattern: /^https:\/\/.*\/.*$/,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'api-cache',
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 300, // 5 минут
+              },
+              cacheableResponse: {
+                statuses: [0, 200],
+              },
+            },
+          },
+        ],
+      },
+      manifest: {
+        name: 'Lumi Todo',
+        short_name: 'Lumi',
+        description: 'Productivity application with advanced task management',
+        theme_color: '#818cf8',
+        background_color: '#0f172a',
+        display: 'standalone',
+        icon: 'src/assets/images/logo.png',
+        start_url: '/',
+        orientation: 'portrait',
+      },
     }),
   ],
   resolve: {

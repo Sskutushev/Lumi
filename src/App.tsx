@@ -67,15 +67,10 @@ function App() {
     const fetchProfile = async () => {
       if (user) {
         try {
-          // Задержка для уверенности, что пользователь полностью создан
-          await new Promise((resolve) => setTimeout(resolve, 500));
-
           const profile = await profileAPI.getProfile(user.id);
           setUserProfile(profile);
         } catch (error) {
           console.error('Failed to fetch user profile:', error);
-          // Не останавливаем приложение из-за ошибки получения профиля
-          // Пользователь может продолжать использовать приложение
         }
       }
     };

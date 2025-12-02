@@ -124,6 +124,7 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({
               <button
                 onClick={() => setIsOpen(false)}
                 className="text-text-secondary hover:text-text-primary"
+                aria-label={t('common.close') || 'Close'}
               >
                 <X className="w-4 h-4" />
               </button>
