@@ -13,10 +13,7 @@ export const queryBuilderMock = {
   // Терминальные методы - они не возвращают 'this'
   single: vi.fn().mockResolvedValue({ data: null, error: null }), // Возвращаем промис с данными
   // 'then' для await-запросов, не заканчивающихся на .single()
-  then: vi.fn(function (onFulfilled, onRejected) {
-    // Возвращаем промис, чтобы избежать проблем с цепочками
-    return Promise.resolve({ data: null, error: null }).then(onFulfilled, onRejected);
-  }),
+  then: vi.fn().mockResolvedValue({ data: null, error: null }),
 };
 
 export const storageBuilderMock = {
