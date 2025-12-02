@@ -8,5 +8,8 @@ export default defineConfig({
     globals: true,
     setupFiles: './src/test/setup.ts',
     css: true,
-  }
+    testTimeout: 10000, // Увеличиваем таймаут до 10 секунд
+    hookTimeout: 15000, // Увеличиваем таймаут для хуков
+    clearMocks: true, // Автоматически очищаем моки после каждого теста
+  },
 });

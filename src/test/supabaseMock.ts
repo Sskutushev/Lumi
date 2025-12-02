@@ -11,14 +11,17 @@ export const queryBuilderMock = {
   eq: vi.fn().mockReturnThis(),
   order: vi.fn().mockReturnThis(),
   // Терминальные методы - они не возвращают 'this'
-  single: vi.fn(),
+  single: vi.fn().mockResolvedValue({ data: null, error: null }), // Возвращаем промис с данными
   // 'then' для await-запросов, не заканчивающихся на .single()
-  then: vi.fn(),
+  then: vi.fn(function (onFulfilled, onRejected) {
+    // Возвращаем промис, чтобы избежать проблем с цепочками
+    return Promise.resolve({ data: null, error: null }).then(onFulfilled, onRejected);
+  }),
 };
 
 export const storageBuilderMock = {
-  upload: vi.fn(),
-  getPublicUrl: vi.fn(),
+  upload: vi.fn().mockResolvedValue({ error: null }),
+  getPublicUrl: vi.fn().mockReturnValue({ data: { publicUrl: 'http://mock.url/file.png' } }),
 };
 
 // Главный мок-объект, который будет подставляться вместо реального supabase
@@ -27,5 +30,5 @@ export const supabaseMock = {
   storage: {
     from: vi.fn(() => storageBuilderMock),
   },
-  rpc: vi.fn(),
+  rpc: vi.fn().mockReturnThis(),
 };
