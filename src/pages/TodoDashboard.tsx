@@ -17,7 +17,6 @@ import {
   List,
   AlertCircle,
   CheckCircle,
-  Filter,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
@@ -69,13 +68,10 @@ const TodoDashboard: React.FC<TodoDashboardProps> = ({ onSignOut, onProjectSelec
   const [showProfileSettings, setShowProfileSettings] = useState(false);
   const [showProjectCreation, setShowProjectCreation] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-  const [showFilters, setShowFilters] = useState(false);
 
   const userMenuRef = useRef<HTMLDivElement>(null);
-  const filterMenuRef = useRef<HTMLDivElement>(null);
 
   useClickOutside(userMenuRef, () => setIsUserMenuOpen(false));
-  useClickOutside(filterMenuRef, () => setShowFilters(false));
 
   // Используем React Query хуки для получения данных
   const { data: tasks = [], isLoading: tasksLoading } = useTasks(user?.id || '');
