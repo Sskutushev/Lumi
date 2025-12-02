@@ -251,7 +251,6 @@ const MemoizedTaskItem = React.memo(
     onToggleComplete: () => void;
     onEditDetails: () => void;
   }) => {
-    const { t } = useTranslation();
     const isOverdue = task.due_date && new Date(task.due_date) < new Date() && !task.completed;
 
     return (

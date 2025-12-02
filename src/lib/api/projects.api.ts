@@ -10,7 +10,7 @@ export const projectsAPI = {
   // Получить все проекты пользователя
   async getAll(userId: string): Promise<Project[]> {
     const key = `projects-getAll-${userId}`;
-    const controller = abortControllerService.create(key);
+    abortControllerService.create(key);
 
     try {
       const { data, error } = await supabase
@@ -32,7 +32,7 @@ export const projectsAPI = {
   // Получить проект по ID
   async getById(id: string): Promise<Project> {
     const key = `projects-getById-${id}`;
-    const controller = abortControllerService.create(key);
+    abortControllerService.create(key);
 
     try {
       const { data, error } = await supabase.from('projects').select('*').eq('id', id).single();
@@ -50,7 +50,7 @@ export const projectsAPI = {
   // Создать проект
   async create(project: CreateProjectDTO): Promise<Project> {
     const key = `projects-create-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    const controller = abortControllerService.create(key);
+    abortControllerService.create(key);
 
     try {
       // Валидируем входные данные
@@ -82,7 +82,7 @@ export const projectsAPI = {
   // Обновить проект
   async update(id: string, updates: UpdateProjectDTO): Promise<Project> {
     const key = `projects-update-${id}`;
-    const controller = abortControllerService.create(key);
+    abortControllerService.create(key);
 
     try {
       // Валидируем входные данные (создаем схему обновления)
@@ -116,7 +116,7 @@ export const projectsAPI = {
   // Удалить проект
   async delete(id: string): Promise<void> {
     const key = `projects-delete-${id}`;
-    const controller = abortControllerService.create(key);
+    abortControllerService.create(key);
 
     try {
       const { error } = await supabase.from('projects').delete().eq('id', id);
@@ -133,7 +133,7 @@ export const projectsAPI = {
   // Получить статистику проекта
   async getStats(projectId: string): Promise<ProjectStats> {
     const key = `projects-getStats-${projectId}`;
-    const controller = abortControllerService.create(key);
+    abortControllerService.create(key);
 
     try {
       const { data, error } = await supabase

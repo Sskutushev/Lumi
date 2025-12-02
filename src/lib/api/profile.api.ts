@@ -10,7 +10,7 @@ export const profileAPI = {
   // Создать профиль пользователя
   async createProfile(userId: string): Promise<UserProfile> {
     const key = `profile-createProfile-${userId}`;
-    const controller = abortControllerService.create(key);
+    abortControllerService.create(key);
 
     try {
       const { data, error } = await supabase
@@ -39,7 +39,7 @@ export const profileAPI = {
   // Получить профиль пользователя с созданием при необходимости
   async getProfile(userId: string): Promise<UserProfile> {
     const key = `profile-getProfile-${userId}`;
-    const controller = abortControllerService.create(key);
+    abortControllerService.create(key);
 
     try {
       // Попытка вставить профиль. Если он уже существует, ничего не произойдет благодаря onConflict: 'id'.
@@ -77,7 +77,7 @@ export const profileAPI = {
   // Обновить профиль пользователя
   async updateProfile(userId: string, data: UpdateProfileDTO): Promise<UserProfile> {
     const key = `profile-updateProfile-${userId}`;
-    const controller = abortControllerService.create(key);
+    abortControllerService.create(key);
 
     try {
       const { data: updatedData, error } = await supabase
@@ -152,7 +152,7 @@ export const profileAPI = {
   // Получить статистику по использованию хранилища
   async getStorageStats(userId: string): Promise<StorageStats> {
     const key = `profile-getStorageStats-${userId}`;
-    const controller = abortControllerService.create(key);
+    abortControllerService.create(key);
 
     try {
       // Используем тот же подход - получаем профиль (создаем если нужно) и возвращаем статистику

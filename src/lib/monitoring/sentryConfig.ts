@@ -1,6 +1,5 @@
 // src/lib/monitoring/sentryConfig.ts
 import * as Sentry from '@sentry/react';
-import { Integrations } from '@sentry/tracing';
 import { Replay } from '@sentry/replay';
 
 export const initSentry = () => {
@@ -8,7 +7,7 @@ export const initSentry = () => {
     Sentry.init({
       dsn: process.env.VITE_SENTRY_DSN || '', // В реальном проекте нужно использовать реальный DSN
       integrations: [
-        new Integrations.BrowserTracing(),
+        // new BrowserTracing(), // Временно отключено из-за несовместимости типов
         new Replay({
           // Приватность: не записываем чувствительные данные
           maskAllText: false,

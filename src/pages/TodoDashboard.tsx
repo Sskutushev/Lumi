@@ -17,6 +17,7 @@ import {
   List,
   AlertCircle,
   CheckCircle,
+  Filter,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
@@ -38,9 +39,7 @@ import { Logger } from '../lib/errors/logger';
 import { useRealtimeTasks } from '../hooks/useRealtimeTasks';
 import AdvancedFilter, { FilterOptions } from '../components/common/AdvancedFilter';
 import { filterAndSortTasks } from '../lib/utils/taskFilters';
-import { profileAPI } from '../lib/api/profile.api';
 import { useProfile } from '../hooks/queries/useProfile';
-import { useQuery } from '@tanstack/react-query';
 
 interface TodoDashboardProps {
   onSignOut: () => void;
@@ -453,11 +452,20 @@ const TodoDashboard: React.FC<TodoDashboardProps> = ({ onSignOut, onProjectSelec
                       }
                     />
                   </div>
-                  <AdvancedFilter
-                    projects={projects}
-                    filters={advancedFilters}
-                    onFiltersChange={setAdvancedFilters}
-                  />
+                  <button
+                    onClick={() => setShowFilters(!showFilters)}
+                    className="px-3 py-2 rounded-lg bg-bg-tertiary text-text-secondary text-sm flex items-center gap-2"
+                  >
+                    <Filter className="w-4 h-4" />
+                    {t('todo.advancedFilters') || 'Advanced Filters'}
+                  </button>
+                  {showFilters && (
+                    <AdvancedFilter
+                      projects={projects}
+                      filters={advancedFilters}
+                      onFiltersChange={setAdvancedFilters}
+                    />
+                  )}
                 </div>
               </div>
 

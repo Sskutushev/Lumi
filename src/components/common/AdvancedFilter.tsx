@@ -1,10 +1,9 @@
 // src/components/common/AdvancedFilter.tsx
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Filter as FilterIcon, Search, X, Flag, Save, RotateCcw } from 'lucide-react';
+import { Filter as FilterIcon, X, Flag, Save, RotateCcw } from 'lucide-react';
 import { Project } from '../../types/api.types';
-import { useClickOutside } from '../../hooks/useClickOutside';
 
 // Определяем тип для фильтров
 export interface FilterOptions {
