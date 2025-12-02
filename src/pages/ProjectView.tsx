@@ -21,7 +21,8 @@ const ProjectView: React.FC<ProjectViewProps> = ({ project, onBack }) => {
   const { user } = useAuthStore();
 
   // --- РЕФАКТОРИНГ: Используем хуки React Query ---
-  const { data: projectTasks = [], isLoading: tasksLoading } = useTasks(user?.id, project.id);
+  const { data: allTasks = [], isLoading: tasksLoading } = useTasks(user?.id || '');
+  const projectTasks = allTasks.filter((task) => task.project_id === project.id);
   const { data: projectStats, isLoading: statsLoading } = useQuery<ProjectStats>({
     queryKey: ['projectStats', project.id],
     queryFn: () => projectsAPI.getStats(project.id),
@@ -44,6 +45,8 @@ const ProjectView: React.FC<ProjectViewProps> = ({ project, onBack }) => {
         user_id: user.id,
         project_id: project.id,
         title: newTaskTitle.trim(),
+        completed: false,
+        priority: 'medium',
       },
       {
         onSuccess: () => {

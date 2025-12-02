@@ -70,6 +70,7 @@ const TodoDashboard: React.FC<TodoDashboardProps> = ({ onSignOut, onProjectSelec
   const [showProfileSettings, setShowProfileSettings] = useState(false);
   const [showProjectCreation, setShowProjectCreation] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
 
   const userMenuRef = useRef<HTMLDivElement>(null);
   const filterMenuRef = useRef<HTMLDivElement>(null);

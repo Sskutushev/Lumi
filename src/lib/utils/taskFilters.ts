@@ -1,5 +1,5 @@
 // src/lib/utils/taskFilters.ts
-import { Task, Project } from '../types/api.types';
+import { Task, Project } from '../../types/api.types';
 import { FilterOptions } from '../../components/common/AdvancedFilter';
 
 export const filterAndSortTasks = (

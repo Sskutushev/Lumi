@@ -40,7 +40,18 @@ export default defineConfig({
         theme_color: '#818cf8',
         background_color: '#0f172a',
         display: 'standalone',
-        icon: 'src/assets/images/logo.png',
+        icons: [
+          {
+            src: 'src/assets/images/logo.png',
+            sizes: '192x192',
+            type: 'image/png',
+          },
+          {
+            src: 'src/assets/images/logo.png',
+            sizes: '512x512',
+            type: 'image/png',
+          },
+        ],
         start_url: '/',
         orientation: 'portrait',
       },
