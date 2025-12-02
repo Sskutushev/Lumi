@@ -93,6 +93,8 @@ describe('ProjectView Component', () => {
           user_id: mockUser.id,
           project_id: mockProject.id,
           title: 'A brand new task',
+          completed: false,
+          priority: 'medium',
         },
         expect.any(Object)
       );

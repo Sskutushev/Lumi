@@ -452,20 +452,11 @@ const TodoDashboard: React.FC<TodoDashboardProps> = ({ onSignOut, onProjectSelec
                       }
                     />
                   </div>
-                  <button
-                    onClick={() => setShowFilters(!showFilters)}
-                    className="px-3 py-2 rounded-lg bg-bg-tertiary text-text-secondary text-sm flex items-center gap-2"
-                  >
-                    <Filter className="w-4 h-4" />
-                    {t('todo.advancedFilters') || 'Advanced Filters'}
-                  </button>
-                  {showFilters && (
-                    <AdvancedFilter
-                      projects={projects}
-                      filters={advancedFilters}
-                      onFiltersChange={setAdvancedFilters}
-                    />
-                  )}
+                  <AdvancedFilter
+                    projects={projects}
+                    filters={advancedFilters}
+                    onFiltersChange={setAdvancedFilters}
+                  />
                 </div>
               </div>
 
