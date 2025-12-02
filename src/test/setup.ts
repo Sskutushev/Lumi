@@ -3,6 +3,55 @@ import '@testing-library/jest-dom';
 import { afterEach, vi } from 'vitest';
 import { supabaseMock } from '../__mocks__/supabase';
 
+// Мокаем BroadcastChannel для тестов
+if (typeof window !== 'undefined') {
+  // Create a mock BroadcastChannel for tests
+  class MockBroadcastChannel {
+    name: string;
+    onmessage: ((event: MessageEvent) => void) | null = null;
+    onmessageerror: ((event: MessageEvent) => void) | null = null;
+
+    constructor(name: string) {
+      this.name = name;
+    }
+
+    postMessage(message: any) {
+      // Do nothing in tests
+    }
+
+    close() {
+      // Do nothing in tests
+    }
+
+    addEventListener() {
+      // Do nothing in tests
+    }
+
+    removeEventListener() {
+      // Do nothing in tests
+    }
+
+    start() {
+      // Do nothing in tests
+    }
+
+    stop() {
+      // Do nothing in tests
+    }
+  }
+
+  Object.defineProperty(window, 'BroadcastChannel', {
+    writable: true,
+    value: MockBroadcastChannel,
+  });
+
+  // Мокаем navigator.onLine
+  Object.defineProperty(navigator, 'onLine', {
+    writable: true,
+    value: true,
+  });
+}
+
 // Глобально мокаем модуль, который экспортирует клиент Supabase
 vi.mock('../src/lib/supabase', () => ({
   supabase: supabaseMock,
