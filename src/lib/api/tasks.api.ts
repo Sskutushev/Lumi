@@ -39,6 +39,7 @@ export const tasksAPI = {
       }
       return []; // Return empty array on abort
     } finally {
+      controller.abort();
       abortControllerService.cleanup(`tasks-getAll-${userId}-${projectId || 'all'}`);
     }
   },
@@ -67,6 +68,7 @@ export const tasksAPI = {
       }
       throw error;
     } finally {
+      controller.abort();
       abortControllerService.cleanup(`tasks-getById-${id}`);
     }
   },
@@ -103,6 +105,7 @@ export const tasksAPI = {
       }
       throw error;
     } finally {
+      controller.abort();
       abortControllerService.cleanup(`tasks-create`);
     }
   },
@@ -160,6 +163,7 @@ export const tasksAPI = {
       }
       throw error;
     } finally {
+      controller.abort();
       abortControllerService.cleanup(`tasks-update-${id}`);
     }
   },
@@ -185,6 +189,7 @@ export const tasksAPI = {
         throw ErrorHandler.handle(error);
       }
     } finally {
+      controller.abort();
       abortControllerService.cleanup(`tasks-delete-${id}`);
     }
   },
@@ -195,7 +200,6 @@ export const tasksAPI = {
    * @returns A promise that resolves to an object with user statistics.
    */
   async getStats(userId: string): Promise<UserStats> {
-    const controller = abortControllerService.create(`tasks-getStats-${userId}`);
     try {
       const allTasks = await this.getAll(userId);
 

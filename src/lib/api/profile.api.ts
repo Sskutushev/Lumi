@@ -17,16 +17,7 @@ export const profileAPI = {
     try {
       const { data, error } = await supabase
         .from('users_profile')
-        .insert([
-          {
-            id: userId,
-            full_name: '',
-            avatar_url: null,
-            storage_used: 0,
-          },
-        ])
-        .select()
-        .abortSignal(_controller.signal)
+        .abortSignal(controller.signal)
         .single();
 
       if (error) throw error;
@@ -92,6 +83,7 @@ export const profileAPI = {
         throw ErrorHandler.handle(error);
       }
     } finally {
+      _controller.abort();
       abortControllerService.cleanup(`profile-get-${userId}`);
     }
   },
@@ -140,6 +132,7 @@ export const profileAPI = {
         throw ErrorHandler.handle(error);
       }
     } finally {
+      _controller.abort();
       abortControllerService.cleanup(`profile-update-${userId}`);
     }
   },
@@ -188,6 +181,7 @@ export const profileAPI = {
         );
       }
     } finally {
+      _controller.abort();
       abortControllerService.cleanup(`profile-uploadAvatar-${userId}`);
     }
   },
@@ -218,6 +212,7 @@ export const profileAPI = {
         throw ErrorHandler.handle(error);
       }
     } finally {
+      controller.abort();
       abortControllerService.cleanup(`profile-getStats-${userId}`);
     }
   },

@@ -111,30 +111,30 @@ const TodoDashboard: React.FC<TodoDashboardProps> = ({ onSignOut, onProjectSelec
 
   // Combine currentView with advancedFilters
   const combinedFilters = useMemo(() => {
-    // Check the Sidebar component - 'important' tab is actually for overdue tasks
+    let newFilters: FilterOptions = { ...advancedFilters };
+
     if (currentView === 'completed') {
-      return { ...advancedFilters, status: 'completed' };
+      newFilters.status = 'completed';
     } else if (currentView === 'important') {
-      // This is for overdue tasks, but 'overdue' is not part of FilterOptions status type
-      // So we'll use the default filters as the filtering will be handled differently
-      return { ...advancedFilters };
+      // For 'important' view (overdue), we filter by pending tasks first
+      // and then apply overdue logic in filteredTasks useMemo.
+      newFilters.status = 'pending'; // Filter only pending tasks
     } else if (currentView === 'upcoming') {
       // For upcoming tasks (due within 3 days), we need to set date range
       const today = new Date();
       const threeDaysFromNow = new Date();
       threeDaysFromNow.setDate(today.getDate() + 3);
 
-      return {
-        ...advancedFilters,
-        status: 'pending', // Only show non-completed tasks for upcoming
-        dateRange: {
-          start: today.toISOString().split('T')[0],
-          end: threeDaysFromNow.toISOString().split('T')[0],
-        },
+      newFilters.status = 'pending'; // Only show non-completed tasks for upcoming
+      newFilters.dateRange = {
+        start: today.toISOString().split('T')[0],
+        end: threeDaysFromNow.toISOString().split('T')[0],
       };
     } else {
-      return advancedFilters; // For 'all' view, use filters as they are
+      newFilters.status = 'all'; // Default for 'all' view
     }
+
+    return newFilters;
   }, [currentView, advancedFilters]);
 
   const filteredTasks = useMemo(() => {
@@ -222,7 +222,6 @@ const TodoDashboard: React.FC<TodoDashboardProps> = ({ onSignOut, onProjectSelec
             />
             <TasksList
               filteredTasks={filteredTasks}
-              projects={projects}
               handleUpdateTask={handleUpdateTask}
               handleDeleteTask={handleDeleteTask}
               toggleComplete={toggleComplete}

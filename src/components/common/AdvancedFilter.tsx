@@ -94,7 +94,7 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="p-2 rounded-lg border-1.5 border-gray-400 bg-transparent hover:bg-bg-secondary focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20 focus:outline-none flex items-center gap-2 relative"
+        className="p-2 rounded-lg bg-transparent hover:bg-bg-secondary focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20 focus:outline-none flex items-center gap-2 relative [border:1.5px_solid_#A1A1AA!important]"
         aria-label={t('todo.advancedFilters') || 'Advanced filters'}
       >
         <FilterIcon className="w-5 h-5 text-text-secondary" />

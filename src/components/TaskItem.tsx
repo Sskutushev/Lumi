@@ -80,7 +80,7 @@ const TaskItem = React.memo(
           <button
             onClick={handleToggleComplete}
             onKeyDown={handleKeyDown}
-            className={`flex-shrink-0 w-6 h-6 rounded-lg flex items-center justify-center mt-0.5 ${task.completed ? 'bg-gradient-animated' : 'border-1.5 border-gray-400 bg-transparent'}`}
+            className={`flex-shrink-0 w-6 h-6 rounded-lg flex items-center justify-center mt-0.5 ${task.completed ? 'bg-gradient-animated' : 'bg-transparent [border:1.5px_solid_#A1A1AA!important]'}`}
             aria-label={task.completed ? t('todo.markAsIncomplete') : t('todo.markAsComplete')}
             aria-checked={task.completed}
             role="checkbox"
