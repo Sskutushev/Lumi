@@ -130,22 +130,6 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({
             </div>
 
             <div className="px-4 space-y-4 max-h-96 overflow-y-auto">
-              {/* Search */}
-              <div>
-                <label className="text-xs font-semibold text-text-tertiary mb-1 block">
-                  {t('common.search') || 'Search'}
-                </label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={filters.searchQuery}
-                    onChange={(e) => handleFilterChange('searchQuery', e.target.value)}
-                    placeholder={t('todo.searchPlaceholder') || 'Search tasks...'}
-                    className="w-full px-3 py-2 rounded-lg border-1.5 border-gray-400 bg-bg-tertiary/50 focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20 outline-none transition-all text-text-primary text-sm"
-                  />
-                </div>
-              </div>
-
               {/* Status Filter */}
               <div>
                 <label className="text-xs font-semibold text-text-tertiary mb-1 block">
@@ -198,35 +182,25 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({
 
               {/* Project Filter */}
               <div>
-                <label className="text-xs font-semibold text-text-tertiary mb-1 block">
+                <label
+                  htmlFor="project-select"
+                  className="text-xs font-semibold text-text-tertiary mb-1 block"
+                >
                   {t('todo.project') || 'Project'}
                 </label>
-                <div className="space-y-1 max-h-32 overflow-y-auto">
-                  <button
-                    onClick={() => handleFilterChange('project_id', null)}
-                    className={`w-full text-left px-3 py-1.5 rounded-lg text-sm border-1.5 border-gray-400 ${
-                      !filters.project_id
-                        ? 'bg-accent-primary/10 text-accent-primary font-medium'
-                        : 'hover:bg-bg-secondary'
-                    }`}
-                  >
-                    {t('todo.allProjects') || 'All Projects'}
-                  </button>
+                <select
+                  id="project-select"
+                  value={filters.project_id || ''}
+                  onChange={(e) => handleFilterChange('project_id', e.target.value || null)}
+                  className="w-full px-3 py-2 rounded-lg border-1.5 border-gray-400 bg-bg-tertiary/50 focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20 outline-none transition-all text-text-primary text-sm"
+                >
+                  <option value="">{t('todo.allProjects') || 'All Projects'}</option>
                   {projects.map((project) => (
-                    <button
-                      key={project.id}
-                      onClick={() => handleFilterChange('project_id', project.id)}
-                      className={`w-full text-left px-3 py-1.5 rounded-lg text-sm truncate border-1.5 border-gray-400 ${
-                        filters.project_id === project.id
-                          ? 'bg-accent-primary/10 text-accent-primary font-medium'
-                          : 'hover:bg-bg-secondary'
-                      }`}
-                    >
-                      {' '}
+                    <option key={project.id} value={project.id}>
                       {project.name}
-                    </button>
+                    </option>
                   ))}
-                </div>
+                </select>
               </div>
 
               {/* Sort Options */}
@@ -257,7 +231,7 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({
                 <div className="mt-2 flex gap-2">
                   <button
                     onClick={() => handleFilterChange('sortOrder', 'asc')}
-                    className={`px-3 py-1.5 rounded-lg text-xs border-1.5 border-gray-400 ${
+                    className={`flex-1 px-3 py-1.5 rounded-lg text-xs border-1.5 border-gray-400 ${
                       filters.sortOrder === 'asc'
                         ? 'bg-accent-primary text-white'
                         : 'bg-bg-secondary text-text-secondary hover:bg-bg-tertiary'
@@ -267,7 +241,7 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({
                   </button>
                   <button
                     onClick={() => handleFilterChange('sortOrder', 'desc')}
-                    className={`px-3 py-1.5 rounded-lg text-xs border-1.5 border-gray-400 ${
+                    className={`flex-1 px-3 py-1.5 rounded-lg text-xs border-1.5 border-gray-400 ${
                       filters.sortOrder === 'desc'
                         ? 'bg-accent-primary text-white'
                         : 'bg-bg-secondary text-text-secondary hover:bg-bg-tertiary'

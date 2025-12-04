@@ -231,7 +231,7 @@ const AuthModal = ({ onClose }: AuthModalProps) => {
           {/* OAuth Buttons */}
           <div className="space-y-3 mb-6">
             <button
-              className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl border border-border hover:bg-bg-secondary transition-colors"
+              className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl border-1.5 border-gray-400 hover:bg-bg-secondary transition-colors"
               onClick={() => handleOAuthSignIn('google')}
               aria-label={t('common.signInWithGoogle')}
             >
@@ -242,7 +242,7 @@ const AuthModal = ({ onClose }: AuthModalProps) => {
             </button>
 
             <button
-              className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl border border-border hover:bg-bg-secondary transition-colors"
+              className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl border-1.5 border-gray-400 hover:bg-bg-secondary transition-colors"
               onClick={() => handleOAuthSignIn('github')}
               aria-label={t('common.signInWithGithub')}
             >
