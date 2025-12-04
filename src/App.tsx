@@ -78,8 +78,9 @@ const MainLayout = () => {
         } catch (error) {
           // Check if the error or its originalError property is an AbortError
           const isAbortError =
-            (error as any).name === 'AbortError' ||
-            ((error as any).originalError && (error as any).originalError.name === 'AbortError');
+            (error as any).message?.includes('AbortError') ||
+            ((error as any).originalError &&
+              (error as any).originalError.message?.includes('AbortError'));
 
           if (isMounted && !isAbortError) {
             console.error('Failed to fetch user profile:', error);
