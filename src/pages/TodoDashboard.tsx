@@ -226,11 +226,10 @@ const TodoDashboard: React.FC<TodoDashboardProps> = ({ onSignOut, onProjectSelec
               handleDeleteTask={handleDeleteTask}
               toggleComplete={toggleComplete}
               setSelectedTask={setSelectedTask}
-              currentView={currentView}
               addTaskFocus={() =>
                 (document.querySelector('input[placeholder*="Add"]') as HTMLElement)?.focus()
               }
-            />
+            />{' '}
           </div>
         </main>
       </div>

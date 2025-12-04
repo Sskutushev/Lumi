@@ -17,7 +17,18 @@ export const profileAPI = {
     try {
       const { data, error } = await supabase
         .from('users_profile')
-        .abortSignal(controller.signal)
+        .insert(
+          [
+            {
+              id: userId,
+              full_name: '',
+              avatar_url: null,
+              storage_used: 0,
+            },
+          ],
+          { signal: controller.signal }
+        )
+        .select()
         .single();
 
       if (error) throw error;
@@ -67,9 +78,10 @@ export const profileAPI = {
 
       const { data, error } = await supabase
         .from('users_profile')
-        .select('id, full_name, avatar_url, storage_used, created_at, updated_at')
+        .select('id, full_name, avatar_url, storage_used, created_at, updated_at', {
+          signal: _controller.signal,
+        })
         .eq('id', userId)
-        .abortSignal(_controller.signal)
         .single();
 
       if (error) throw error;
@@ -99,10 +111,9 @@ export const profileAPI = {
     try {
       const { data: updatedData, error } = await supabase
         .from('users_profile')
-        .update(data)
+        .update(data, { signal: _controller.signal })
         .eq('id', userId)
         .select()
-        .abortSignal(_controller.signal)
         .single();
 
       if (error) {
@@ -110,9 +121,8 @@ export const profileAPI = {
           // Profile not found, try to insert
           const { data: newData, error: newError } = await supabase
             .from('users_profile')
-            .insert([{ ...data, id: userId }])
+            .insert([{ ...data, id: userId }], { signal: _controller.signal })
             .select()
-            .abortSignal(_controller.signal)
             .single();
 
           if (newError) throw ErrorHandler.handle(newError);
@@ -144,7 +154,6 @@ export const profileAPI = {
    * @returns A promise that resolves to the updated user profile.
    */
   async uploadAvatar(userId: string, file: File): Promise<UserProfile> {
-    const _controller = abortControllerService.create(`profile-uploadAvatar-${userId}`);
     try {
       if (file.size > MAX_AVATAR_SIZE_BYTES) {
         throw new Error(`File size exceeds ${MAX_AVATAR_SIZE_BYTES / 1024 / 1024}MB limit`);
@@ -180,9 +189,6 @@ export const profileAPI = {
           error instanceof Error ? error.message : 'Failed to upload avatar'
         );
       }
-    } finally {
-      _controller.abort();
-      abortControllerService.cleanup(`profile-uploadAvatar-${userId}`);
     }
   },
 

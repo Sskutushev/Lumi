@@ -20,7 +20,7 @@ export const tasksAPI = {
     try {
       let query = supabase
         .from('tasks')
-        .select('*')
+        .select('*', { signal: controller.signal })
         .eq('user_id', userId)
         .order('created_at', { ascending: false });
 
@@ -28,7 +28,7 @@ export const tasksAPI = {
         query = query.eq('project_id', projectId);
       }
 
-      const { data, error } = await query.abortSignal(controller.signal);
+      const { data, error } = await query;
 
       if (error) throw error;
       return data as Task[];
@@ -54,9 +54,8 @@ export const tasksAPI = {
     try {
       const { data, error } = await supabase
         .from('tasks')
-        .select('*')
+        .select('*', { signal: controller.signal })
         .eq('id', id)
-        .abortSignal(controller.signal)
         .single();
 
       if (error) throw error;
@@ -91,9 +90,8 @@ export const tasksAPI = {
 
       const { data, error } = await supabase
         .from('tasks')
-        .insert([sanitizedTask])
+        .insert([sanitizedTask], { signal: controller.signal })
         .select()
-        .abortSignal(controller.signal)
         .single();
 
       if (error) throw error;
@@ -148,10 +146,9 @@ export const tasksAPI = {
 
       const { data, error } = await supabase
         .from('tasks')
-        .update(sanitizedUpdates)
+        .update(sanitizedUpdates, { signal: controller.signal })
         .eq('id', id)
         .select()
-        .abortSignal(controller.signal)
         .single();
 
       if (error) throw error;
@@ -178,9 +175,8 @@ export const tasksAPI = {
     try {
       const { error } = await supabase
         .from('tasks')
-        .delete()
-        .eq('id', id)
-        .abortSignal(controller.signal);
+        .delete({ signal: controller.signal })
+        .eq('id', id);
 
       if (error) throw error;
     } catch (error) {
