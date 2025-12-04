@@ -43,8 +43,16 @@ const TasksList: React.FC<TasksListProps> = React.memo(
           icon={<CheckCircle className="w-8 h-8 text-text-tertiary" />}
           title={t('todo.noTasksTitle')}
           description={t('todo.noTasksDescription')}
-          actionText={t('todo.createFirstTask')}
-          onAction={addTaskFocus}
+          action={
+            addTaskFocus ? (
+              <button
+                onClick={addTaskFocus}
+                className="px-4 py-2 rounded-lg bg-accent-gradient-1 text-white font-medium hover:shadow-lg transition-shadow"
+              >
+                {t('todo.createFirstTask')}
+              </button>
+            ) : undefined
+          }
         />
       );
     }

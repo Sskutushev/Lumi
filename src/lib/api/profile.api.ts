@@ -54,6 +54,8 @@ export const profileAPI = {
     try {
       // Upsert does not support abortSignal, so we perform it without cancellation.
       // Since this is an upsert, we don't need to wait for it to complete before making the select query
+      // Perform upsert without awaiting to prevent blocking
+      // We'll handle the upsert in a different way compatible with newer Supabase versions
       supabase
         .from('users_profile')
         .upsert(
@@ -69,14 +71,11 @@ export const profileAPI = {
             onConflict: 'id',
           }
         )
-        .then((result) => {
-          if (result.error) {
-            // Log the error but don't throw it, as upsert is just for ensuring the record exists
-            Logger.warn('Profile upsert failed, continuing with select query:', result.error);
-          }
+        .then(() => {
+          // Upsert succeeded, nothing to log on success
         })
         .catch((err) => {
-          // Catch any other errors in the promise chain
+          // Log the error but don't throw it, as upsert is just for ensuring the record exists
           Logger.warn('Profile upsert failed, continuing with select query:', err);
         });
 

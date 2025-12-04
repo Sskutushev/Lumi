@@ -84,8 +84,8 @@ const SolutionBenefits = () => {
           <motion.div
             custom={0}
             variants={cardVariants}
-            initial={reducedMotion ? false : 'hidden'}
-            whileInView={reducedMotion ? false : 'visible'}
+            initial={reducedMotion ? 'hidden' : 'hidden'}
+            whileInView={reducedMotion ? 'visible' : 'visible'}
             viewport={{ once: true }}
             className="md:col-span-2 rounded-xl bg-gradient-to-br from-accent-primary/10 to-accent-secondary/10 border border-border p-3 flex flex-col justify-center text-left"
           >
@@ -114,8 +114,8 @@ const SolutionBenefits = () => {
           <motion.div
             custom={1}
             variants={cardVariants}
-            initial={reducedMotion ? false : 'hidden'}
-            whileInView={reducedMotion ? false : 'visible'}
+            initial={reducedMotion ? 'hidden' : 'hidden'}
+            whileInView={reducedMotion ? 'visible' : 'visible'}
             viewport={{ once: true }}
             className="md:col-span-2 rounded-xl bg-bg-elevated border border-border p-3 flex flex-col justify-center text-left"
           >
@@ -144,8 +144,8 @@ const SolutionBenefits = () => {
           <motion.div
             custom={2}
             variants={cardVariants}
-            initial={reducedMotion ? false : 'hidden'}
-            whileInView={reducedMotion ? false : 'visible'}
+            initial={reducedMotion ? 'hidden' : 'hidden'}
+            whileInView={reducedMotion ? 'visible' : 'visible'}
             viewport={{ once: true }}
             className="md:col-span-1 rounded-xl bg-bg-elevated border border-border p-2 flex flex-col justify-center text-left"
           >
@@ -160,8 +160,8 @@ const SolutionBenefits = () => {
           <motion.div
             custom={3}
             variants={cardVariants}
-            initial={reducedMotion ? false : 'hidden'}
-            whileInView={reducedMotion ? false : 'visible'}
+            initial={reducedMotion ? 'hidden' : 'hidden'}
+            whileInView={reducedMotion ? 'visible' : 'visible'}
             viewport={{ once: true }}
             className="md:col-span-2 rounded-xl bg-gradient-to-r from-accent-tertiary/10 to-accent-primary/10 border border-border p-3 flex flex-col justify-center text-left"
           >

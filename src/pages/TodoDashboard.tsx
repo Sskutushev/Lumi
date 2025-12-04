@@ -115,7 +115,7 @@ const TodoDashboard: React.FC<TodoDashboardProps> = ({ onSignOut, onProjectSelec
       case 'completed':
         return 'completed';
       case 'important': // This should show overdue tasks
-        return 'overdue';
+        return 'pending'; // Overdue tasks are pending tasks past their due date
       case 'all':
       default:
         return 'all';
@@ -128,10 +128,9 @@ const TodoDashboard: React.FC<TodoDashboardProps> = ({ onSignOut, onProjectSelec
     if (currentView === 'completed') {
       return { ...advancedFilters, status: 'completed' };
     } else if (currentView === 'important') {
-      // This is for overdue tasks
-      // We need to filter for overdue tasks manually since taskFilters.ts only has 'overdue' status
-      // that checks for !completed AND due_date < today. In this case, we want just the overdue status
-      return { ...advancedFilters, status: 'overdue' };
+      // This is for overdue tasks, but 'overdue' is not part of FilterOptions status type
+      // So we'll use the default filters as the filtering will be handled differently
+      return { ...advancedFilters };
     } else if (currentView === 'upcoming') {
       // For upcoming tasks (due within 3 days), we need to set date range
       const today = new Date();
@@ -153,8 +152,18 @@ const TodoDashboard: React.FC<TodoDashboardProps> = ({ onSignOut, onProjectSelec
 
   const filteredTasks = useMemo(() => {
     // Ensure tasks and projects are arrays before filtering
-    return filterAndSortTasks(tasks || [], projects || [], combinedFilters);
-  }, [tasks, projects, combinedFilters]);
+    let result = filterAndSortTasks(tasks || [], projects || [], combinedFilters);
+
+    // Special handling for 'important' view - show overdue tasks
+    // Overdue tasks are incomplete tasks with due date in the past
+    if (currentView === 'important') {
+      result = result.filter((task) => {
+        return !task.completed && task.due_date && new Date(task.due_date) < new Date();
+      });
+    }
+
+    return result;
+  }, [tasks, projects, combinedFilters, currentView]);
 
   if (tasksLoading || projectsLoading || profileLoading) {
     return (

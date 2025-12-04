@@ -208,6 +208,8 @@ const ProjectView: React.FC<ProjectViewProps> = ({ project, onBack }) => {
                   <TaskItem
                     key={task.id || `task-${index}`} // Use task id or fallback to index-based key
                     task={task}
+                    onUpdate={updateTask}
+                    onDelete={handleDeleteTask}
                     onToggleComplete={() => toggleTaskCompletion(task)}
                     onEditDetails={() => setSelectedTask(task)}
                   />

@@ -75,7 +75,7 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ isOpen, onClose }) =>
 
       const [profile, storageStatsData, stats] = results;
 
-      if (isMountedRef.current) {
+      if (isMountedRef.current && profile && typeof profile === 'object' && !profile.__aborted) {
         setUserData((prev) => ({
           ...prev,
           name: profile.full_name || '',

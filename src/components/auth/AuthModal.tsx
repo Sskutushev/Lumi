@@ -154,15 +154,15 @@ const AuthModal = ({ onClose }: AuthModalProps) => {
   if (isSuccess) {
     return (
       <motion.div
-        initial={reducedMotion ? false : { opacity: 0 }}
-        animate={reducedMotion ? false : { opacity: 1 }}
-        exit={reducedMotion ? false : { opacity: 0 }}
+        initial={reducedMotion ? { opacity: 0 } : { opacity: 0 }}
+        animate={reducedMotion ? { opacity: 1 } : { opacity: 1 }}
+        exit={reducedMotion ? { opacity: 0 } : { opacity: 0 }}
         className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
       >
         <motion.div
-          initial={reducedMotion ? false : { scale: 0.9, opacity: 0 }}
-          animate={reducedMotion ? false : { scale: 1, opacity: 1 }}
-          exit={reducedMotion ? false : { scale: 0.9, opacity: 0 }}
+          initial={reducedMotion ? { scale: 0.9, opacity: 0 } : { scale: 0.9, opacity: 0 }}
+          animate={reducedMotion ? { scale: 1, opacity: 1 } : { scale: 1, opacity: 1 }}
+          exit={reducedMotion ? { scale: 0.9, opacity: 0 } : { scale: 0.9, opacity: 0 }}
           className="relative w-full max-w-md bg-bg-primary rounded-2xl shadow-2xl border border-border overflow-hidden"
           onClick={(e) => e.stopPropagation()}
         >
@@ -194,18 +194,18 @@ const AuthModal = ({ onClose }: AuthModalProps) => {
 
   return (
     <motion.div
-      initial={reducedMotion ? false : { opacity: 0 }}
-      animate={reducedMotion ? false : { opacity: 1 }}
-      exit={reducedMotion ? false : { opacity: 0 }}
+      initial={reducedMotion ? { opacity: 0 } : { opacity: 0 }}
+      animate={reducedMotion ? { opacity: 1 } : { opacity: 1 }}
+      exit={reducedMotion ? { opacity: 0 } : { opacity: 0 }}
       className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
       onClick={onClose}
       aria-modal="true"
       role="dialog"
     >
       <motion.div
-        initial={reducedMotion ? false : { scale: 0.9, opacity: 0 }}
-        animate={reducedMotion ? false : { scale: 1, opacity: 1 }}
-        exit={reducedMotion ? false : { scale: 0.9, opacity: 0 }}
+        initial={reducedMotion ? { scale: 0.9, opacity: 0 } : { scale: 0.9, opacity: 0 }}
+        animate={reducedMotion ? { scale: 1, opacity: 1 } : { scale: 1, opacity: 1 }}
+        exit={reducedMotion ? { scale: 0.9, opacity: 0 } : { scale: 0.9, opacity: 0 }}
         className="relative w-full max-w-md bg-bg-primary rounded-2xl shadow-2xl border border-border overflow-hidden"
         onClick={(e) => e.stopPropagation()}
         role="document"

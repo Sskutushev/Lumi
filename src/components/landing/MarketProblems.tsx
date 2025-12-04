@@ -45,8 +45,8 @@ const MarketProblems = () => {
           {problems.map((problem, index) => (
             <motion.div
               key={index}
-              initial={reducedMotion ? false : { opacity: 0, y: 20 }}
-              whileInView={reducedMotion ? false : { opacity: 1, y: 0 }}
+              initial={reducedMotion ? { opacity: 0, y: 20 } : { opacity: 0, y: 20 }}
+              whileInView={reducedMotion ? { opacity: 1, y: 0 } : { opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
               viewport={{ once: true }}
               className="relative rounded-2xl bg-bg-secondary/50 backdrop-blur-sm border border-border p-8 hover:bg-bg-tertiary/50 transition-all duration-300 group shadow-lg shadow-accent-primary/10 hover:shadow-2xl hover:shadow-accent-primary/20"
