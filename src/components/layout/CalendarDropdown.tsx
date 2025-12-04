@@ -148,6 +148,7 @@ const CalendarDropdown: React.FC<CalendarDropdownProps> = ({
           type="button"
           onClick={() => setIsOpen(!isOpen)}
           className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-text-secondary"
+          aria-label={t('common.openCalendar', 'Open calendar')}
         >
           <CalendarIcon className="w-5 h-5" />
         </button>
@@ -165,7 +166,7 @@ const CalendarDropdown: React.FC<CalendarDropdownProps> = ({
                     prevMonth();
                   }}
                   className="p-1 rounded hover:bg-bg-secondary"
-                  aria-label={t('common.selectMonth')}
+                  aria-label={t('common.previousMonth', 'Previous month')}
                 >
                   <ChevronLeft className="w-5 h-5 text-text-secondary" />
                 </button>
@@ -178,6 +179,7 @@ const CalendarDropdown: React.FC<CalendarDropdownProps> = ({
                       setView('months');
                     }}
                     className="font-medium text-text-primary hover:underline"
+                    aria-label={t('common.selectMonth', 'Select month')}
                   >
                     {months[currentDate.getMonth()]}
                   </button>
@@ -188,6 +190,7 @@ const CalendarDropdown: React.FC<CalendarDropdownProps> = ({
                       setView('years');
                     }}
                     className="font-medium text-text-primary hover:underline"
+                    aria-label={t('common.selectYear', 'Select year')}
                   >
                     {currentDate.getFullYear()}
                   </button>
@@ -200,7 +203,7 @@ const CalendarDropdown: React.FC<CalendarDropdownProps> = ({
                     nextMonth();
                   }}
                   className="p-1 rounded hover:bg-bg-secondary"
-                  aria-label={t('common.selectMonth')}
+                  aria-label={t('common.nextMonth', 'Next month')}
                 >
                   <ChevronRight className="w-5 h-5 text-text-secondary" />
                 </button>
@@ -251,7 +254,7 @@ const CalendarDropdown: React.FC<CalendarDropdownProps> = ({
                     handleYearChange(currentDate.getFullYear() - 1);
                   }}
                   className="p-1 rounded hover:bg-bg-secondary"
-                  aria-label={t('common.selectYear')}
+                  aria-label={t('common.previousYear', 'Previous year')}
                 >
                   <ChevronLeft className="w-5 h-5 text-text-secondary" />
                 </button>
@@ -263,6 +266,7 @@ const CalendarDropdown: React.FC<CalendarDropdownProps> = ({
                     setView('years');
                   }}
                   className="font-medium text-text-primary hover:underline"
+                  aria-label={t('common.selectYear', 'Select year')}
                 >
                   {currentDate.getFullYear()}
                 </button>
@@ -274,7 +278,7 @@ const CalendarDropdown: React.FC<CalendarDropdownProps> = ({
                     handleYearChange(currentDate.getFullYear() + 1);
                   }}
                   className="p-1 rounded hover:bg-bg-secondary"
-                  aria-label={t('common.selectYear')}
+                  aria-label={t('common.nextYear', 'Next year')}
                 >
                   <ChevronRight className="w-5 h-5 text-text-secondary" />
                 </button>
@@ -315,7 +319,7 @@ const CalendarDropdown: React.FC<CalendarDropdownProps> = ({
                     handleYearChange(currentDate.getFullYear() - 12);
                   }}
                   className="p-1 rounded hover:bg-bg-secondary"
-                  aria-label={t('common.selectYear')}
+                  aria-label={t('common.previousYearRange', 'Previous year range')}
                 >
                   <ChevronLeft className="w-5 h-5 text-text-secondary" />
                 </button>
@@ -331,7 +335,7 @@ const CalendarDropdown: React.FC<CalendarDropdownProps> = ({
                     handleYearChange(currentDate.getFullYear() + 12);
                   }}
                   className="p-1 rounded hover:bg-bg-secondary"
-                  aria-label={t('common.selectYear')}
+                  aria-label={t('common.nextYearRange', 'Next year range')}
                 >
                   <ChevronRight className="w-5 h-5 text-text-secondary" />
                 </button>

@@ -1,7 +1,7 @@
 // src/lib/monitoring/performanceLogger.ts
 import { Sentry } from './sentryConfig';
 
-// Утилита для измерения производительности
+// Utility for measuring performance
 class PerformanceLogger {
   private static instance: PerformanceLogger;
   private marks: Map<string, number> = new Map();
@@ -16,12 +16,12 @@ class PerformanceLogger {
     return PerformanceLogger.instance;
   }
 
-  // Установка метки времени
+  // Set a timestamp
   setMark(name: string) {
     this.marks.set(name, performance.now());
   }
 
-  // Измерение времени между метками
+  // Measure the time between marks
   measure(startMark: string, endMark: string, operationName: string) {
     const startTime = this.marks.get(startMark);
     const endTime = this.marks.get(endMark);
@@ -30,7 +30,7 @@ class PerformanceLogger {
       const duration = endTime - startTime;
       this.measures.set(operationName, duration);
 
-      // Отправка в Sentry если в production
+      // Send to Sentry in production
       if (process.env.NODE_ENV === 'production') {
         Sentry.metrics.distribution('app.performance.operation_duration', duration, {
           attributes: { operation: operationName },
@@ -42,7 +42,7 @@ class PerformanceLogger {
     return null;
   }
 
-  // Логирование времени выполнения функции
+  // Log the execution time of a function
   async measureFunction<T>(name: string, fn: () => Promise<T>): Promise<T> {
     this.setMark(`${name}_start`);
     try {
@@ -57,7 +57,7 @@ class PerformanceLogger {
     }
   }
 
-  // Логирование времени загрузки ресурсов
+  // Log resource loading times
   logResourceTiming() {
     if (performance.getEntriesByType('resource').length > 0) {
       const resources = performance.getEntriesByType('resource') as PerformanceResourceTiming[];
@@ -77,9 +77,9 @@ class PerformanceLogger {
     }
   }
 
-  // Логирование метрик производительности страницы
+  // Log page performance metrics
   logPagePerformance() {
-    // Ожидание загрузки всех ресурсов
+    // Wait for all resources to load
     window.addEventListener('load', () => {
       setTimeout(() => {
         // First Contentful Paint
@@ -105,12 +105,12 @@ class PerformanceLogger {
     });
   }
 
-  // Получить все измерения
+  // Get all measurements
   getMeasures() {
     return new Map(this.measures);
   }
 
-  // Сбросить все измерения
+  // Clear all measurements
   clear() {
     this.marks.clear();
     this.measures.clear();

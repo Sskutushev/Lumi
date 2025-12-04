@@ -25,27 +25,27 @@ class AnalyticsService {
     this.isInitialized = true;
     this.userId = userId || null;
 
-    // Запуск логирования производительности
+    // Start performance logging
     performanceLogger.logPagePerformance();
   }
 
-  // Отправка события
+  // Track a custom event
   trackEvent(event: AnalyticsEvent) {
     if (!this.isInitialized) {
       console.warn('Analytics not initialized');
       return;
     }
 
-    // Логируем в консоль в dev режиме
+    // Log to console in dev mode
     if (process.env.NODE_ENV !== 'production') {
       console.log('Analytics event:', event);
     }
 
-    // Здесь можно добавить интеграцию с Google Analytics, Yandex Metrika и т.д.
+    // Integration with Google Analytics, Yandex Metrika, etc. can be added here
     this.sendToExternalServices(event);
   }
 
-  // Отправка данных о пользовательском действии
+  // Track a user action
   trackUserAction(action: string, properties?: Record<string, any>) {
     this.trackEvent({
       name: 'user_action',
@@ -58,7 +58,7 @@ class AnalyticsService {
     });
   }
 
-  // Отправка данных о просмотре страницы
+  // Track a page view
   trackPageView(path: string, properties?: Record<string, any>) {
     this.trackEvent({
       name: 'page_view',
@@ -71,7 +71,7 @@ class AnalyticsService {
     });
   }
 
-  // Отправка данных об ошибке
+  // Track an error
   trackError(error: Error, context?: Record<string, any>) {
     this.trackEvent({
       name: 'error',
@@ -85,7 +85,7 @@ class AnalyticsService {
     });
   }
 
-  // Отправка данных о выполнении операции
+  // Track a performance measurement
   trackPerformance(measureName: string, duration: number, properties?: Record<string, any>) {
     this.trackEvent({
       name: 'performance',
@@ -100,27 +100,27 @@ class AnalyticsService {
   }
 
   private sendToExternalServices(event: AnalyticsEvent) {
-    // В реальном приложении здесь будет отправка в Google Analytics, Yandex Metrika и т.д.
-    // Пример интеграции с существующей метрикой:
+    // In a real application, this is where you would send data to Google Analytics, Yandex Metrika, etc.
+    // Example integration with an existing metric service:
     if (typeof window !== 'undefined' && (window as any).ym && process.env.VITE_YM_COUNTER_ID) {
-      // Отправка в Яндекс.Метрику
+      // Send to Yandex.Metrika
       (window as any).ym(process.env.VITE_YM_COUNTER_ID, 'reachGoal', event.name, event.properties);
     }
 
-    // Также можно добавить другие сервисы аналитики
+    // Other analytics services can be added here
   }
 
-  // Получить ID пользователя
+  // Get user ID
   getUserId(): string | null {
     return this.userId;
   }
 
-  // Установить ID пользователя
+  // Set user ID
   setUserId(userId: string) {
     this.userId = userId;
   }
 
-  // Сбросить данные пользователя
+  // Reset user data
   resetUser() {
     this.userId = null;
   }

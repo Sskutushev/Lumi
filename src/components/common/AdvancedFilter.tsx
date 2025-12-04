@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Filter as FilterIcon, X, Flag, Save, RotateCcw } from 'lucide-react';
 import { Project } from '../../types/api.types';
 
-// Определяем тип для фильтров
+// Defines the type for the filter options
 export interface FilterOptions {
   priority: string | null;
   project_id: string | null;
@@ -35,7 +35,7 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({
   >([]);
   const [newFilterName, setNewFilterName] = useState('');
 
-  // Загружаем сохраненные фильтры из localStorage
+  // Load saved filters from localStorage
   useEffect(() => {
     const saved = localStorage.getItem('lumi_saved_filters');
     if (saved) {
@@ -94,7 +94,7 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="p-2 rounded-lg hover:bg-bg-tertiary/50 flex items-center gap-2 relative"
+        className="p-2 rounded-lg border border-border bg-transparent hover:bg-bg-secondary focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20 focus:outline-none flex items-center gap-2 relative"
         aria-label={t('todo.advancedFilters') || 'Advanced filters'}
       >
         <FilterIcon className="w-5 h-5 text-text-secondary" />

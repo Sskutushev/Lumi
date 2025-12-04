@@ -9,7 +9,7 @@ export const filterAndSortTasks = (
 ): Task[] => {
   let filteredTasks = [...tasks];
 
-  // Применяем фильтр поиска
+  // Apply search filter
   if (filters.searchQuery) {
     const query = filters.searchQuery.toLowerCase();
     filteredTasks = filteredTasks.filter(
@@ -19,17 +19,17 @@ export const filterAndSortTasks = (
     );
   }
 
-  // Применяем фильтр приоритета
+  // Apply priority filter
   if (filters.priority) {
     filteredTasks = filteredTasks.filter((task) => task.priority === filters.priority);
   }
 
-  // Применяем фильтр проекта
+  // Apply project filter
   if (filters.project_id) {
     filteredTasks = filteredTasks.filter((task) => task.project_id === filters.project_id);
   }
 
-  // Применяем фильтр статуса
+  // Apply status filter
   filteredTasks = filteredTasks.filter((task) => {
     switch (filters.status) {
       case 'completed':
@@ -43,7 +43,7 @@ export const filterAndSortTasks = (
     }
   });
 
-  // Применяем фильтр по диапазону дат
+  // Apply date range filter
   if (filters.dateRange) {
     filteredTasks = filteredTasks.filter((task) => {
       if (!task.due_date) return false;
@@ -59,19 +59,19 @@ export const filterAndSortTasks = (
     });
   }
 
-  // Применяем фильтр по исполнителю
+  // Apply assignee filter
   if (filters.assignee) {
-    // В текущей реализации все задачи принадлежат пользователю, но можно расширить
+    // In current implementation all tasks belong to the user, but can be extended
     filteredTasks = filteredTasks.filter((task) => task.user_id === filters.assignee);
   }
 
-  // Сортируем задачи
+  // Sort tasks
   filteredTasks.sort((a, b) => {
     let comparison = 0;
 
     switch (filters.sortBy) {
       case 'priority':
-        // Сопоставляем приоритеты с числовыми значениями для сортировки
+        // Match priorities with numeric values for sorting
         const priorityOrder: Record<string, number> = { high: 3, medium: 2, low: 1 };
         comparison =
           (priorityOrder[b.priority || 'low'] || 0) - (priorityOrder[a.priority || 'low'] || 0);
@@ -91,14 +91,14 @@ export const filterAndSortTasks = (
         comparison = a.title.localeCompare(b.title);
         break;
       case 'project':
-        // Сортировка по имени проекта
+        // Sort by project name
         const projectA = projects.find((p) => p.id === a.project_id);
         const projectB = projects.find((p) => p.id === b.project_id);
         comparison = (projectA?.name || '').localeCompare(projectB?.name || '');
         break;
     }
 
-    // Применяем порядок сортировки
+    // Apply sort order
     return filters.sortOrder === 'asc' ? comparison : -comparison;
   });
 

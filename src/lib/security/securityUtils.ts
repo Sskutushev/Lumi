@@ -2,7 +2,7 @@
 import DOMPurify from 'dompurify';
 import { z } from 'zod';
 
-// Валидационные схемы для безопасности
+// Security validation schemas
 export const userInputSchema = z.object({
   email: z.string().email('Invalid email format'),
   password: z
@@ -32,81 +32,21 @@ export const projectInputSchema = z.object({
   description: z.string().max(500, 'Description must be less than 500 characters').optional(),
 });
 
-// Утилиты для очистки пользовательского ввода
+// Utilities for sanitizing user input
 export const sanitizeInput = (input: string): string => {
-  // Use DOMPurify to sanitize input, with fallback to regex if DOMPurify is not available
+  // Use DOMPurify to sanitize input. If DOMPurify is not available, return an empty string for safety.
   if (typeof DOMPurify !== 'undefined' && DOMPurify.sanitize) {
-    // Handle javascript: protocols specifically by replacing them with empty string
-    let processedInput = input.replace(/javascript:/gi, '');
-
-    // If the input was just a javascript protocol (like 'javascript:alert(1)'), it becomes 'alert(1)'.
-    // But the test expects it to be completely empty. So if the original input started with javascript:
-    if (input.trim().toLowerCase().startsWith('javascript:')) {
-      // If after removing 'javascript:' the result is just what followed it, return empty string
-      const originalWithoutProtocol = input.trim().substring(11).trim(); // 11 = length of 'javascript:'
-      if (
-        processedInput === originalWithoutProtocol &&
-        !processedInput.includes('<') &&
-        !processedInput.includes('>')
-      ) {
-        // This means it was just 'javascript:...' without HTML tags, so return empty
-        processedInput = '';
-      }
-    }
-
-    if (processedInput === '') {
-      return '';
-    }
-
-    // Remove script and iframe tags completely before sanitizing
-    processedInput = processedInput.replace(
-      /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
-      ''
-    );
-    processedInput = processedInput.replace(
-      /<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi,
-      ''
-    );
-
-    // Remove event handlers but keep the tags themselves
-    processedInput = processedInput.replace(/\s+on\w+="[^"]*"/gi, '');
-    processedInput = processedInput.replace(/\s+on\w+='[^']*'/gi, '');
-    processedInput = processedInput.replace(/\s+on\w+=[^\\s>]+/gi, '');
-
-    // Remove null characters
-    processedInput = processedInput.replace(/\x00/g, '');
-
-    // Use DOMPurify to remove any remaining dangerous content, allowing tags but removing attributes
-    const sanitized = DOMPurify.sanitize(processedInput, {
-      FORBID_TAGS: [
-        'script',
-        'iframe',
-        'object',
-        'embed',
-        'form',
-        'input',
-        'button',
-        'select',
-        'option',
-        'textarea',
-      ],
-      ALLOWED_ATTR: [], // Remove all attributes to prevent XSS via event handlers
+    const sanitized = DOMPurify.sanitize(input, {
+      ALLOWED_TAGS: [],
+      ALLOWED_ATTR: [],
     });
-
-    return sanitized.toString().trim();
-  } else {
-    // Fallback: basic regex sanitization
-    return input
-      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '') // Удаление скриптов
-      .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '') // Удаление iframe
-      .replace(/javascript:/gi, '') // Удаление javascript: ссылок
-      .replace(/on\w+="[^"]*"/gi, '') // Удаление обработчиков событий
-      .replace(/\x00/g, '') // Remove null characters
-      .trim();
+    return sanitized.trim();
   }
+  // Fallback: if DOMPurify is not available for some reason, return empty string.
+  return '';
 };
 
-// Утилита для валидации пользовательского ввода
+// Utility for validating user input
 export const validateUserInput = (data: any, schema: z.ZodSchema) => {
   try {
     return schema.parse(data);
@@ -122,9 +62,9 @@ export const validateUserInput = (data: any, schema: z.ZodSchema) => {
   }
 };
 
-// Утилита для проверки токена
+// Utility for token validation
 export const validateToken = (token: string): boolean => {
-  // Проверяем, является ли токен валидным JWT
+  // Check if the token is a valid JWT
   if (!token || typeof token !== 'string') {
     return false;
   }
@@ -135,16 +75,16 @@ export const validateToken = (token: string): boolean => {
   }
 
   try {
-    // Декодируем payload (вторую часть JWT)
+    // Decode the payload (second part of JWT)
     const payload = JSON.parse(atob(parts[1]));
 
-    // Проверяем срок действия
+    // Check expiration
     const now = Math.floor(Date.now() / 1000);
     if (payload.exp && payload.exp < now) {
       return false;
     }
 
-    // Проверяем, есть ли необходимые поля
+    // Check for required fields
     if (!payload.sub || !payload.iat) {
       return false;
     }
@@ -156,7 +96,7 @@ export const validateToken = (token: string): boolean => {
   }
 };
 
-// Утилита для проверки URL
+// Utility to check URL validity
 export const isValidUrl = (urlString: string): boolean => {
   try {
     const url = new URL(urlString);
@@ -166,7 +106,7 @@ export const isValidUrl = (urlString: string): boolean => {
   }
 };
 
-// Утилита для хеширования чувствительных данных (клиентская часть)
+// Utility for client-side hashing of sensitive data
 export const hashSensitiveData = async (data: string): Promise<string> => {
   const encoder = new TextEncoder();
   const dataBuffer = encoder.encode(data);
@@ -175,17 +115,17 @@ export const hashSensitiveData = async (data: string): Promise<string> => {
   return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
 };
 
-// Утилита для проверки CSRF токена
+// Utility for CSRF token validation
 export const validateCSRFToken = (token: string, expectedToken: string): boolean => {
-  // В реальном приложении токен должен совпадать с серверным
+  // In a real application, the token should match the one on the server
   return token === expectedToken;
 };
 
-// Утилита для безопасного хранения данных в localStorage
+// Utility for secure localStorage access
 export const secureLocalStorage = {
   setItem: (key: string, value: string) => {
     try {
-      // В реальном приложении можно зашифровать данные перед сохранением
+      // In a real application, data could be encrypted before saving
       localStorage.setItem(key, value);
     } catch (e) {
       console.error('Failed to set item in localStorage:', e);
@@ -210,13 +150,13 @@ export const secureLocalStorage = {
   },
 };
 
-// Утилита для проверки размера файлов
+// Utility to validate file size
 export const validateFileSize = (file: File, maxSizeInMB: number): boolean => {
   const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
   return file.size <= maxSizeInBytes;
 };
 
-// Утилита для проверки типа файла
+// Utility to validate file type
 export const validateFileType = (file: File, allowedTypes: string[]): boolean => {
   return allowedTypes.some(
     (type) => file.type === type || file.name.toLowerCase().endsWith(type.replace('image/', '.'))

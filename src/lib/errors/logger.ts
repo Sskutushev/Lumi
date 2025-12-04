@@ -10,14 +10,26 @@ export class Logger {
       console.log(logMessage);
     }
 
-    // В продакшене можно отправлять логи в соответствующий сервис
+    // In production, logs can be sent to an external service
     if (process.env.NODE_ENV === 'production') {
-      // Пример: отправка логов в Sentry или другой сервис
+      // Example: send logs to Sentry or another service
       // logToExternalService(level, message, meta);
     }
   }
 
   static error(message: string, error?: any): void {
+    // Don't log AbortError if it's expected (for example, during component unmount)
+    if (error) {
+      // Check if this is an AbortError in various forms
+      const isAbortError =
+        (error as any).name === 'AbortError' ||
+        (typeof error === 'object' && error.message && error.message.includes('AbortError')) ||
+        (typeof error === 'string' && error.includes('AbortError'));
+
+      if (isAbortError) {
+        return; // Skip logging AbortError
+      }
+    }
     Logger.log('error', message, error);
   }
 

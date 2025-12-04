@@ -53,22 +53,22 @@ interface ErrorFallbackProps {
 }
 
 const DefaultErrorFallback: React.FC<ErrorFallbackProps> = ({ appError, resetError }) => {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const lang = i18n.language || 'en';
 
-  // Получаем пользовательское сообщение об ошибке в зависимости от типа ошибки
+  // Get user-facing error message based on error type
   const getErrorMessage = () => {
-    if (!appError) return 'Произошла непредвиденная ошибка. Пожалуйста, попробуйте еще раз.';
+    if (!appError) return t('errors.unexpected');
 
-    // Используем специфичное сообщение для типа ошибки
+    // Use specific message for the error type
     const message = errorMessages[appError.type]?.[lang];
     if (message) return message;
 
-    // Возвращаем оригинальное сообщение, если нет перевода
-    return appError.message || 'Произошла непредвиденная ошибка.';
+    // Fallback to original message if no translation is available
+    return appError.message || t('errors.unexpected');
   };
 
-  // Показываем техническую информацию об ошибке только в dev mode
+  // Show technical details only in dev mode
   const shouldShowDetails = process.env.NODE_ENV !== 'production' && appError?.originalError;
 
   return (
@@ -79,24 +79,24 @@ const DefaultErrorFallback: React.FC<ErrorFallbackProps> = ({ appError, resetErr
         </div>
 
         <div className="space-y-2">
-          <h2 className="text-xl font-bold text-text-primary">Что-то пошло не так</h2>
+          <h2 className="text-xl font-bold text-text-primary">{t('errors.somethingWentWrong')}</h2>
           <p className="text-text-secondary">{getErrorMessage()}</p>
 
           {shouldShowDetails && (
             <details className="text-left text-xs text-text-tertiary mt-4 p-3 bg-bg-secondary rounded-lg">
-              <summary className="cursor-pointer">Технические детали</summary>
+              <summary className="cursor-pointer">{t('errors.technicalDetails')}</summary>
               <div className="mt-2">
                 <p>
-                  <strong>Тип ошибки:</strong> {appError?.type}
+                  <strong>{t('errors.errorType')}:</strong> {appError?.type}
                 </p>
                 <p>
-                  <strong>Статус:</strong> {appError?.status}
+                  <strong>{t('errors.status')}:</strong> {appError?.status}
                 </p>
                 <p>
-                  <strong>URL:</strong> {appError?.url}
+                  <strong>{t('errors.url')}:</strong> {appError?.url}
                 </p>
                 <p>
-                  <strong>Оригинальная ошибка:</strong> {String(appError?.originalError)}
+                  <strong>{t('errors.originalError')}:</strong> {String(appError?.originalError)}
                 </p>
               </div>
             </details>
@@ -109,7 +109,7 @@ const DefaultErrorFallback: React.FC<ErrorFallbackProps> = ({ appError, resetErr
             className="px-4 py-2 rounded-lg bg-accent-gradient-1 text-white font-medium hover:shadow-lg transition-all flex items-center gap-2 mx-auto"
           >
             <RotateCcw className="w-4 h-4" />
-            Попробовать снова
+            {t('errors.tryAgain')}
           </button>
         </div>
       </div>

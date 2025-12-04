@@ -44,6 +44,15 @@
     "installing": "Установка...",
     "install": "Установить",
     "apply": "Применить",
+    "openUserMenu": "Открыть меню пользователя",
+    "openNavigationMenu": "Открыть меню навигации",
+    "openCalendar": "Открыть календарь",
+    "previousMonth": "Предыдущий месяц",
+    "nextMonth": "Следующий месяц",
+    "previousYear": "Предыдущий год",
+    "nextYear": "Следующий год",
+    "previousYearRange": "Предыдущий диапазон лет",
+    "nextYearRange": "Следующий диапазон лет",
     "months": {
       "january": "Январь",
       "february": "Февраль",
@@ -263,5 +272,15 @@
   "footer": {
     "rights": "© 2025 Lumi. Все права защищены.",
     "contact": "Контакты"
+  },
+  "errors": {
+    "unexpected": "Произошла непредвиденная ошибка. Пожалуйста, попробуйте еще раз.",
+    "somethingWentWrong": "Что-то пошло не так",
+    "technicalDetails": "Технические детали",
+    "errorType": "Тип ошибки",
+    "status": "Статус",
+    "url": "URL",
+    "originalError": "Оригинальная ошибка",
+    "tryAgain": "Попробовать снова"
   }
 }

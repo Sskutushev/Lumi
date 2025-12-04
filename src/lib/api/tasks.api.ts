@@ -1,17 +1,22 @@
-// API слой для задач
+// API layer for tasks
 import { supabase } from '../supabase';
 import { Task, CreateTaskDTO, UpdateTaskDTO, UserStats } from '../../types/api.types';
 import { taskInputSchema, validateUserInput, sanitizeInput } from '../security/securityUtils';
-import { ErrorHandler } from '../errors/ErrorHandler'; // Added import
-import { Logger } from '../errors/logger'; // Added import
+import { ErrorHandler } from '../errors/ErrorHandler';
+import { Logger } from '../errors/logger';
 import { abortControllerService } from './abortController';
 
 export const tasksAPI = {
-  // Получить все задачи пользователя, опционально фильтруя по проекту
+  /**
+   * Fetches all tasks for a specific user, optionally filtered by project.
+   * @param userId - The ID of the user whose tasks are to be fetched.
+   * @param projectId - Optional ID of the project to filter tasks by.
+   * @returns A promise that resolves to an array of tasks.
+   */
   async getAll(userId: string, projectId?: string): Promise<Task[]> {
-    const key = `tasks-getAll-${userId}${projectId ? `-${projectId}` : ''}`;
-    abortControllerService.create(key);
-
+    const controller = abortControllerService.create(
+      `tasks-getAll-${userId}-${projectId || 'all'}`
+    );
     try {
       let query = supabase
         .from('tasks')
@@ -23,46 +28,59 @@ export const tasksAPI = {
         query = query.eq('project_id', projectId);
       }
 
-      const { data, error } = await query;
+      const { data, error } = await query.abortSignal(controller.signal);
 
       if (error) throw error;
       return data as Task[];
     } catch (error) {
-      Logger.error('Failed to get tasks:', error); // Modified
-      throw ErrorHandler.handle(error); // Modified
+      if ((error as any).name !== 'AbortError') {
+        Logger.error('Failed to get tasks:', error);
+        throw ErrorHandler.handle(error);
+      }
+      return []; // Return empty array on abort
     } finally {
-      abortControllerService.cleanup(key);
+      abortControllerService.cleanup(`tasks-getAll-${userId}-${projectId || 'all'}`);
     }
   },
 
-  // Получить задачу по ID
+  /**
+   * Fetches a single task by its ID.
+   * @param id - The ID of the task to fetch.
+   * @returns A promise that resolves to the task object.
+   */
   async getById(id: string): Promise<Task> {
-    const key = `tasks-getById-${id}`;
-    abortControllerService.create(key);
-
+    const controller = abortControllerService.create(`tasks-getById-${id}`);
     try {
-      const { data, error } = await supabase.from('tasks').select('*').eq('id', id).single();
+      const { data, error } = await supabase
+        .from('tasks')
+        .select('*')
+        .eq('id', id)
+        .abortSignal(controller.signal)
+        .single();
 
       if (error) throw error;
       return data as Task;
     } catch (error) {
-      Logger.error('Failed to get task:', error); // Modified
-      throw ErrorHandler.handle(error); // Modified
+      if ((error as any).name !== 'AbortError') {
+        Logger.error('Failed to get task:', error);
+        throw ErrorHandler.handle(error);
+      }
+      throw error;
     } finally {
-      abortControllerService.cleanup(key);
+      abortControllerService.cleanup(`tasks-getById-${id}`);
     }
   },
 
-  // Создать задачу
+  /**
+   * Creates a new task.
+   * @param task - The task data for creation.
+   * @returns A promise that resolves to the newly created task.
+   */
   async create(task: CreateTaskDTO): Promise<Task> {
-    const key = `tasks-create-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    abortControllerService.create(key);
-
+    const controller = abortControllerService.create(`tasks-create`);
     try {
-      // Валидируем входные данные
       validateUserInput(task, taskInputSchema);
 
-      // Санитизируем заголовок и описание
       const sanitizedTask = {
         ...task,
         title: sanitizeInput(task.title),
@@ -73,93 +91,127 @@ export const tasksAPI = {
         .from('tasks')
         .insert([sanitizedTask])
         .select()
+        .abortSignal(controller.signal)
         .single();
 
       if (error) throw error;
       return data as Task;
     } catch (error) {
-      Logger.error('Failed to create task:', error); // Modified
-      throw ErrorHandler.handle(error); // Modified
+      if ((error as any).name !== 'AbortError') {
+        Logger.error('Failed to create task:', error);
+        throw ErrorHandler.handle(error);
+      }
+      throw error;
     } finally {
-      abortControllerService.cleanup(key);
+      abortControllerService.cleanup(`tasks-create`);
     }
   },
 
-  // Обновить задачу
+  /**
+   * Updates an existing task.
+   * @param id - The ID of the task to update.
+   * @param updates - An object containing the fields to update.
+   * @returns A promise that resolves to the updated task.
+   */
   async update(id: string, updates: UpdateTaskDTO): Promise<Task> {
-    const key = `tasks-update-${id}`;
-    abortControllerService.create(key);
-
+    const controller = abortControllerService.create(`tasks-update-${id}`);
     try {
-      // Валидируем входные данные (создаем схему обновления)
-      const updateSchema = taskInputSchema.partial(); // Используем частичную схему для обновления
+      const updateSchema = taskInputSchema.partial();
       validateUserInput(updates, updateSchema);
 
-      // Санитизируем заголовок и описание, если они присутствуют
-      const sanitizedUpdates = {
-        ...updates,
-        title: updates.title ? sanitizeInput(updates.title) : undefined,
-        description: updates.description ? sanitizeInput(updates.description) : undefined,
-      };
+      // Filter out null values that should be optional, only keep defined values
+      const filteredUpdates: Partial<UpdateTaskDTO> = {};
+      if (updates.title !== undefined && updates.title !== null) {
+        filteredUpdates.title = sanitizeInput(updates.title);
+      }
+      if (updates.description !== undefined && updates.description !== null) {
+        filteredUpdates.description = sanitizeInput(updates.description);
+      }
+      if (updates.priority !== undefined && updates.priority !== null) {
+        filteredUpdates.priority = updates.priority;
+      }
+      if (updates.due_date !== undefined && updates.due_date !== null) {
+        filteredUpdates.due_date = updates.due_date;
+      }
+      if (updates.project_id !== undefined) {
+        // project_id can be null
+        filteredUpdates.project_id = updates.project_id;
+      }
+      if (updates.completed !== undefined && updates.completed !== null) {
+        filteredUpdates.completed = updates.completed;
+      }
+
+      const sanitizedUpdates = filteredUpdates;
 
       const { data, error } = await supabase
         .from('tasks')
         .update(sanitizedUpdates)
         .eq('id', id)
         .select()
+        .abortSignal(controller.signal)
         .single();
 
       if (error) throw error;
       return data as Task;
     } catch (error) {
-      Logger.error('Failed to update task:', error); // Modified
-      throw ErrorHandler.handle(error); // Modified
+      if ((error as any).name !== 'AbortError') {
+        Logger.error('Failed to update task:', error);
+        throw ErrorHandler.handle(error);
+      }
+      throw error;
     } finally {
-      abortControllerService.cleanup(key);
+      abortControllerService.cleanup(`tasks-update-${id}`);
     }
   },
 
-  // Удалить задачу
+  /**
+   * Deletes a task by its ID.
+   * @param id - The ID of the task to delete.
+   * @returns A promise that resolves when the operation is complete.
+   */
   async delete(id: string): Promise<void> {
-    const key = `tasks-delete-${id}`;
-    abortControllerService.create(key);
-
+    const controller = abortControllerService.create(`tasks-delete-${id}`);
     try {
-      const { error } = await supabase.from('tasks').delete().eq('id', id);
+      const { error } = await supabase
+        .from('tasks')
+        .delete()
+        .eq('id', id)
+        .abortSignal(controller.signal);
 
       if (error) throw error;
     } catch (error) {
-      Logger.error('Failed to delete task:', error); // Modified
-      throw ErrorHandler.handle(error); // Modified
+      if ((error as any).name !== 'AbortError') {
+        Logger.error('Failed to delete task:', error);
+        throw ErrorHandler.handle(error);
+      }
     } finally {
-      abortControllerService.cleanup(key);
+      abortControllerService.cleanup(`tasks-delete-${id}`);
     }
   },
 
-  // Получить статистику задач для пользователя
+  /**
+   * Fetches task statistics for a specific user.
+   * @param userId - The ID of the user.
+   * @returns A promise that resolves to an object with user statistics.
+   */
   async getStats(userId: string): Promise<UserStats> {
+    const controller = abortControllerService.create(`tasks-getStats-${userId}`);
     try {
-      // Получаем все задачи пользователя
       const allTasks = await this.getAll(userId);
 
-      // Подсчитываем общее количество задач
       const total = allTasks.length;
-
-      // Подсчитываем завершенные задачи
       const completed = allTasks.filter((task) => task.completed).length;
 
-      // Подсчитываем просроченные задачи (незавершенные с датой в прошлом)
       const today = new Date();
-      const overdue = allTasks.filter((task) => {
-        return !task.completed && task.due_date && new Date(task.due_date) < today;
-      }).length;
+      const overdue = allTasks.filter(
+        (task) => !task.completed && task.due_date && new Date(task.due_date) < today
+      ).length;
 
-      // Подсчитываем задачи на этой неделе
       const oneWeekAgo = new Date();
       oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-      const tasksThisWeek = allTasks.filter((task) => {
-        return new Date(task.created_at) >= oneWeekAgo;
-      }).length;
+      const tasksThisWeek = allTasks.filter(
+        (task) => new Date(task.created_at) >= oneWeekAgo
+      ).length;
 
       return {
         total_tasks: total,
@@ -168,8 +220,13 @@ export const tasksAPI = {
         tasks_this_week: tasksThisWeek,
       };
     } catch (error) {
-      Logger.error('Failed to get task stats:', error); // Modified
-      throw ErrorHandler.handle(error); // Modified
+      if ((error as any).name !== 'AbortError') {
+        Logger.error('Failed to get task stats:', error);
+        throw ErrorHandler.handle(error);
+      }
+      throw error;
+    } finally {
+      abortControllerService.cleanup(`tasks-getStats-${userId}`);
     }
   },
 };

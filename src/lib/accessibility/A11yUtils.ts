@@ -1,7 +1,7 @@
 // src/lib/accessibility/A11yUtils.ts
 import { RefObject } from 'react';
 
-// Утилиты для улучшения доступности
+// Utilities for improving accessibility
 export const focusFirstElement = (containerRef: RefObject<HTMLElement>) => {
   if (containerRef.current) {
     const focusableElements = containerRef.current.querySelectorAll(
@@ -39,10 +39,10 @@ export const focusTrap = (containerRef: RefObject<HTMLElement>, returnFocusTo?: 
 
   document.addEventListener('keydown', handleKeyDown);
 
-  // Фокус на первый элемент при активации
+  // Focus the first element on activation
   firstElement.focus();
 
-  // Возвращаем фокус на предыдущий элемент при очистке
+  // Return focus to the previous element on cleanup
   return () => {
     document.removeEventListener('keydown', handleKeyDown);
     if (returnFocusTo) {
@@ -65,30 +65,30 @@ export const announceToScreenReader = (message: string) => {
   }, 1000);
 };
 
-// Утилита для скрытия элемента от скринридера
+// Utility to hide an element from screen readers
 export const hideFromScreenReader = (element: HTMLElement) => {
   element.setAttribute('aria-hidden', 'true');
 };
 
-// Утилита для показа элемента скринридеру
+// Utility to show an element to screen readers
 export const showToScreenReader = (element: HTMLElement) => {
   element.removeAttribute('aria-hidden');
 };
 
-// Утилита для улучшения контрастности
+// Utility to check color contrast
 export const ensureColorContrast = (color: string, backgroundColor: string): boolean => {
-  // Простая проверка контрастности (упрощенный алгоритм)
-  // В реальном проекте можно использовать библиотеку a11y для точной проверки
+  // Simple contrast check (simplified algorithm)
+  // For a real project, a library like 'a11y-color-contrast' would be better
   const colorBrightness = getBrightness(color);
   const bgBrightness = getBrightness(backgroundColor);
   const contrastRatio = Math.abs(colorBrightness - bgBrightness) / 255;
 
-  // Минимальный контраст для обычного текста (3:1)
+  // Minimum contrast for normal text (3:1)
   return contrastRatio >= 0.3;
 };
 
 const getBrightness = (color: string): number => {
-  // Упрощенный расчет яркости
+  // Simplified brightness calculation
   if (color.startsWith('#')) {
     const hex = color.replace('#', '');
     const r = parseInt(hex.substr(0, 2), 16);
@@ -96,5 +96,5 @@ const getBrightness = (color: string): number => {
     const b = parseInt(hex.substr(4, 2), 16);
     return (r * 299 + g * 587 + b * 114) / 1000;
   }
-  return 128; // значение по умолчанию
+  return 128; // Default value
 };

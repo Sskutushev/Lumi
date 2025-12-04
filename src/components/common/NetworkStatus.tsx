@@ -11,7 +11,7 @@ const NetworkStatus: React.FC = () => {
   const [showInstallPrompt, setShowInstallPrompt] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
 
-  // Проверяем статус сети
+  // Check network status
   useEffect(() => {
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
@@ -19,7 +19,7 @@ const NetworkStatus: React.FC = () => {
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
 
-    // Проверяем, можно ли установить PWA
+    // Check if PWA can be installed
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e);
@@ -55,7 +55,7 @@ const NetworkStatus: React.FC = () => {
 
   return (
     <div className="fixed top-4 right-4 z-50 flex flex-col items-end gap-2">
-      {/* Статус сети */}
+      {/* Network Status */}
       <motion.div
         initial={{ opacity: 0, x: 100 }}
         animate={{ opacity: 1, x: 0 }}
@@ -71,7 +71,7 @@ const NetworkStatus: React.FC = () => {
         </span>
       </motion.div>
 
-      {/* Уведомление об установке PWA */}
+      {/* PWA Install Prompt */}
       <AnimatePresence>
         {showInstallPrompt && (
           <motion.div

@@ -1,17 +1,19 @@
-// API слой для профиля пользователя
+// API layer for user profile
 import { supabase } from '../supabase';
-import { MAX_AVATAR_SIZE_BYTES, MAX_STORAGE_LIMIT_BYTES } from '../constants';
 import { UserProfile, UpdateProfileDTO, StorageStats } from '../../types/api.types';
-import { ErrorHandler } from '../errors/ErrorHandler'; // Added import
-import { Logger } from '../errors/logger'; // Added import
+import { ErrorHandler } from '../errors/ErrorHandler';
+import { Logger } from '../errors/logger';
+import { MAX_AVATAR_SIZE_BYTES, MAX_STORAGE_LIMIT_BYTES } from '../constants';
 import { abortControllerService } from './abortController';
 
 export const profileAPI = {
-  // Создать профиль пользователя
+  /**
+   * Creates a new user profile.
+   * @param userId - The ID of the user for whom to create a profile.
+   * @returns A promise that resolves to the newly created user profile.
+   */
   async createProfile(userId: string): Promise<UserProfile> {
-    const key = `profile-createProfile-${userId}`;
-    abortControllerService.create(key);
-
+    const controller = abortControllerService.create(`profile-create-${userId}`);
     try {
       const { data, error } = await supabase
         .from('users_profile')
@@ -24,106 +26,146 @@ export const profileAPI = {
           },
         ])
         .select()
+        .abortSignal(controller.signal)
         .single();
 
       if (error) throw error;
       return data as UserProfile;
     } catch (error) {
-      Logger.error('Failed to create profile:', error); // Modified
-      throw ErrorHandler.handle(error); // Modified
+      if ((error as any).name === 'AbortError') {
+        // For AbortError, we still want to throw it but skip logging since it's expected during cancellation
+        throw error;
+      } else {
+        Logger.error('Failed to create profile:', error);
+        throw ErrorHandler.handle(error);
+      }
     } finally {
-      abortControllerService.cleanup(key);
+      abortControllerService.cleanup(`profile-create-${userId}`);
     }
   },
 
-  // Получить профиль пользователя с созданием при необходимости
+  /**
+   * Fetches a user profile. If the profile does not exist, it is created first.
+   * @param userId - The ID of the user.
+   * @returns A promise that resolves to the user profile.
+   */
   async getProfile(userId: string): Promise<UserProfile> {
-    const key = `profile-getProfile-${userId}`;
-    abortControllerService.create(key);
-
+    const controller = abortControllerService.create(`profile-get-${userId}`);
     try {
-      // Попытка вставить профиль. Если он уже существует, ничего не произойдет благодаря onConflict: 'id'.
-      await supabase.from('users_profile').upsert(
-        [
+      // Upsert does not support abortSignal, so we perform it without cancellation.
+      // Since this is an upsert, we don't need to wait for it to complete before making the select query
+      supabase
+        .from('users_profile')
+        .upsert(
+          [
+            {
+              id: userId,
+              full_name: '',
+              // Don't include avatar_url to avoid overwriting existing avatar - only set defaults
+              storage_used: 0,
+            },
+          ],
           {
-            id: userId,
-            full_name: '',
-            avatar_url: null,
-            storage_used: 0,
-          },
-        ],
-        {
-          onConflict: 'id',
-        }
-      );
+            onConflict: 'id',
+          }
+        )
+        .then((result) => {
+          if (result.error) {
+            // Log the error but don't throw it, as upsert is just for ensuring the record exists
+            Logger.warn('Profile upsert failed, continuing with select query:', result.error);
+          }
+        })
+        .catch((err) => {
+          // Catch any other errors in the promise chain
+          Logger.warn('Profile upsert failed, continuing with select query:', err);
+        });
 
-      // Теперь получаем профиль, который либо был только что создан, либо уже существовал.
       const { data, error } = await supabase
         .from('users_profile')
         .select('id, full_name, avatar_url, storage_used, created_at, updated_at')
         .eq('id', userId)
+        .abortSignal(controller.signal)
         .single();
 
       if (error) throw error;
       return data as UserProfile;
     } catch (error) {
-      Logger.error('Failed to get or create profile:', error); // Modified
-      throw ErrorHandler.handle(error); // Modified
+      if ((error as any).name === 'AbortError') {
+        // For AbortError, we still want to throw it but skip logging since it's expected during cancellation
+        throw error;
+      } else {
+        Logger.error('Failed to get or create profile:', error);
+        throw ErrorHandler.handle(error);
+      }
     } finally {
-      abortControllerService.cleanup(key);
+      abortControllerService.cleanup(`profile-get-${userId}`);
     }
   },
 
-  // Обновить профиль пользователя
+  /**
+   * Updates an existing user profile.
+   * @param userId - The ID of the user to update.
+   * @param data - An object with the profile fields to update.
+   * @returns A promise that resolves to the updated user profile.
+   */
   async updateProfile(userId: string, data: UpdateProfileDTO): Promise<UserProfile> {
-    const key = `profile-updateProfile-${userId}`;
-    abortControllerService.create(key);
-
+    const controller = abortControllerService.create(`profile-update-${userId}`);
     try {
       const { data: updatedData, error } = await supabase
         .from('users_profile')
         .update(data)
         .eq('id', userId)
         .select()
+        .abortSignal(controller.signal)
         .single();
 
       if (error) {
         if (error.code === 'PGRST116') {
-          // Record not found
-          // Профиль не существует, создаем его с обновленными данными
+          // Profile not found, try to insert
           const { data: newData, error: newError } = await supabase
             .from('users_profile')
             .insert([{ ...data, id: userId }])
             .select()
+            .abortSignal(controller.signal)
             .single();
 
-          if (newError) throw ErrorHandler.handle(newError); // Modified
+          if (newError) throw ErrorHandler.handle(newError);
           return newData as UserProfile;
         } else {
-          throw ErrorHandler.handle(error); // Modified
+          throw ErrorHandler.handle(error);
         }
       }
 
       return updatedData as UserProfile;
     } catch (error) {
-      Logger.error('Failed to update profile:', error); // Modified
-      throw ErrorHandler.handle(error); // Modified
+      if ((error as any).name === 'AbortError') {
+        // For AbortError, we still want to throw it but skip logging since it's expected during cancellation
+        throw error;
+      } else {
+        Logger.error('Failed to update profile:', error);
+        throw ErrorHandler.handle(error);
+      }
     } finally {
-      abortControllerService.cleanup(key);
+      abortControllerService.cleanup(`profile-update-${userId}`);
     }
   },
 
-  // Загрузить аватар
+  /**
+   * Uploads a new avatar for the user and updates the profile.
+   * @param userId - The ID of the user.
+   * @param file - The avatar file to upload.
+   * @returns A promise that resolves to the updated user profile.
+   */
   async uploadAvatar(userId: string, file: File): Promise<UserProfile> {
+    const controller = abortControllerService.create(`profile-uploadAvatar-${userId}`);
     try {
       if (file.size > MAX_AVATAR_SIZE_BYTES) {
-        throw new Error(`File size exceeds ${MAX_AVATAR_SIZE_BYTES / (1024 * 1024)}MB limit`);
+        throw new Error(`File size exceeds ${MAX_AVATAR_SIZE_BYTES / 1024 / 1024}MB limit`);
       }
 
-      // Загружаем файл в Supabase Storage
       const fileExt = file.name.split('.').pop();
       const fileName = `${userId}/${Date.now()}.${fileExt}`;
-      const bucketName = 'avatars'; // Убедитесь, что бакет 'avatars' существует в Supabase Storage
+      const bucketName = 'avatars';
 
       const { error: uploadError } = await supabase.storage
         .from(bucketName)
@@ -134,28 +176,36 @@ export const profileAPI = {
 
       if (uploadError) throw uploadError;
 
-      // Получаем публичный URL файла
       const {
         data: { publicUrl },
       } = supabase.storage.from(bucketName).getPublicUrl(fileName);
 
-      // Обновляем URL аватара в профиле (профиль будет создан если не существует)
       const updatedProfile = await this.updateProfile(userId, { avatar_url: publicUrl });
 
       return updatedProfile;
     } catch (error) {
-      Logger.error('Failed to upload avatar:', error); // Modified
-      throw ErrorHandler.handle(error instanceof Error ? error.message : 'Failed to upload avatar'); // Modified
+      if ((error as any).name === 'AbortError') {
+        // For AbortError, we still want to throw it but skip logging since it's expected during cancellation
+        throw error;
+      } else {
+        Logger.error('Failed to upload avatar:', error);
+        throw ErrorHandler.handle(
+          error instanceof Error ? error.message : 'Failed to upload avatar'
+        );
+      }
+    } finally {
+      abortControllerService.cleanup(`profile-uploadAvatar-${userId}`);
     }
   },
 
-  // Получить статистику по использованию хранилища
+  /**
+   * Fetches storage usage statistics for a user.
+   * @param userId - The ID of the user.
+   * @returns A promise that resolves to an object with storage statistics.
+   */
   async getStorageStats(userId: string): Promise<StorageStats> {
-    const key = `profile-getStorageStats-${userId}`;
-    abortControllerService.create(key);
-
+    const controller = abortControllerService.create(`profile-getStats-${userId}`);
     try {
-      // Используем тот же подход - получаем профиль (создаем если нужно) и возвращаем статистику
       const profile = await this.getProfile(userId);
 
       const percentage = (profile.storage_used / MAX_STORAGE_LIMIT_BYTES) * 100;
@@ -166,15 +216,25 @@ export const profileAPI = {
         percentage,
       };
     } catch (error) {
-      Logger.error('Failed to get storage stats:', error); // Modified
-      throw ErrorHandler.handle(error); // Modified
+      if ((error as any).name === 'AbortError') {
+        // For AbortError, we still want to throw it but skip logging since it's expected during cancellation
+        throw error;
+      } else {
+        Logger.error('Failed to get storage stats:', error);
+        throw ErrorHandler.handle(error);
+      }
     } finally {
-      abortControllerService.cleanup(key);
+      abortControllerService.cleanup(`profile-getStats-${userId}`);
     }
   },
 };
 
-// Вспомогательная функция для форматирования байтов
+/**
+ * Formats a number of bytes into a human-readable string.
+ * @param bytes - The number of bytes.
+ * @param decimals - The number of decimal places to use.
+ * @returns A formatted string (e.g., "1.23 MB").
+ */
 export const formatBytes = (bytes: number, decimals = 2): string => {
   if (bytes === 0) return '0 Bytes';
 

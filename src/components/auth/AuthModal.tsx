@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { X, Github, Loader2, CheckCircle, Eye, EyeOff } from 'lucide-react';
 import { motion } from 'framer-motion';
+import useReducedMotion from '../../hooks/useReducedMotion';
 import { toast } from 'sonner';
 import { supabase } from '../../lib/supabase';
 
@@ -33,6 +34,7 @@ interface AuthModalProps {
 
 const AuthModal = ({ onClose }: AuthModalProps) => {
   const { t } = useTranslation();
+  const reducedMotion = useReducedMotion();
   const [isSignIn, setIsSignIn] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -51,13 +53,11 @@ const AuthModal = ({ onClose }: AuthModalProps) => {
     try {
       let response;
       if (isSignIn) {
-        // Sign in with email and password
         response = await supabase.auth.signInWithPassword({
           email,
           password,
         });
       } else {
-        // Sign up with email and password
         response = await supabase.auth.signUp({
           email,
           password,
@@ -69,9 +69,7 @@ const AuthModal = ({ onClose }: AuthModalProps) => {
       if (!isSignIn && response.data.session === null) {
         // User needs to confirm email
         setIsSuccess(true);
-        setSuccessMessage(
-          t('auth.signUpSuccess') || '📧 Письмо отправлено! Проверьте почту для подтверждения.'
-        );
+        setSuccessMessage(t('auth.signUpSuccess'));
       } else {
         // Close modal after successful auth
         onClose();
@@ -84,7 +82,7 @@ const AuthModal = ({ onClose }: AuthModalProps) => {
         error,
       });
 
-      // Более информативное сообщение об ошибке
+      // More informative error message
       let errorMessage = error.message || 'Authentication failed';
 
       if (error.code === '23505') {
@@ -94,7 +92,7 @@ const AuthModal = ({ onClose }: AuthModalProps) => {
         error.message?.includes('database') ||
         error.message?.includes('saving new user')
       ) {
-        // Пользователь может продолжать использование, даже если профиль не был создан сразу
+        // User can continue even if profile creation fails initially
         if (error.message.includes('saving new user')) {
           errorMessage =
             'Registration was successful, but there was an issue with profile creation. Please try logging in again shortly.';
@@ -104,7 +102,7 @@ const AuthModal = ({ onClose }: AuthModalProps) => {
       } else if (error.status === 500) {
         errorMessage = 'Server error occurred. Please try again later.';
       } else if (error.code === 'unexpected_failure') {
-        // В случае ошибки создания профиля, пользователь все равно может войти после подтверждения
+        // In case of profile creation error, user can still log in after confirmation
         errorMessage =
           'Registration successful! Please check your email to confirm your account before logging in.';
       }
@@ -129,7 +127,7 @@ const AuthModal = ({ onClose }: AuthModalProps) => {
 
       if (error) throw error;
 
-      toast.success(t('auth.passwordResetSuccess') || 'Password reset link sent to your email');
+      toast.success(t('auth.passwordResetSuccess'));
     } catch (error: any) {
       console.error('Error resetting password:', error.message);
       toast.error(error.message || 'Failed to send password reset email');
@@ -156,15 +154,15 @@ const AuthModal = ({ onClose }: AuthModalProps) => {
   if (isSuccess) {
     return (
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
+        initial={reducedMotion ? false : { opacity: 0 }}
+        animate={reducedMotion ? false : { opacity: 1 }}
+        exit={reducedMotion ? false : { opacity: 0 }}
         className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
       >
         <motion.div
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.9, opacity: 0 }}
+          initial={reducedMotion ? false : { scale: 0.9, opacity: 0 }}
+          animate={reducedMotion ? false : { scale: 1, opacity: 1 }}
+          exit={reducedMotion ? false : { scale: 0.9, opacity: 0 }}
           className="relative w-full max-w-md bg-bg-primary rounded-2xl shadow-2xl border border-border overflow-hidden"
           onClick={(e) => e.stopPropagation()}
         >
@@ -175,9 +173,7 @@ const AuthModal = ({ onClose }: AuthModalProps) => {
               </div>
             </div>
 
-            <h3 className="text-xl font-bold text-text-primary mb-2">
-              {t('common.success') || 'Success'}
-            </h3>
+            <h3 className="text-xl font-bold text-text-primary mb-2">{t('common.success')}</h3>
 
             <p className="text-text-secondary mb-6">{successMessage}</p>
 
@@ -188,7 +184,7 @@ const AuthModal = ({ onClose }: AuthModalProps) => {
               }}
               className="w-full px-4 py-3 rounded-xl bg-accent-gradient-1 text-white font-semibold shadow-lg hover:shadow-xl transition-all"
             >
-              {t('common.continue') || 'Continue'}
+              {t('common.continue')}
             </button>
           </div>
         </motion.div>
@@ -198,18 +194,18 @@ const AuthModal = ({ onClose }: AuthModalProps) => {
 
   return (
     <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
+      initial={reducedMotion ? false : { opacity: 0 }}
+      animate={reducedMotion ? false : { opacity: 1 }}
+      exit={reducedMotion ? false : { opacity: 0 }}
       className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
       onClick={onClose}
       aria-modal="true"
       role="dialog"
     >
       <motion.div
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.9, opacity: 0 }}
+        initial={reducedMotion ? false : { scale: 0.9, opacity: 0 }}
+        animate={reducedMotion ? false : { scale: 1, opacity: 1 }}
+        exit={reducedMotion ? false : { scale: 0.9, opacity: 0 }}
         className="relative w-full max-w-md bg-bg-primary rounded-2xl shadow-2xl border border-border overflow-hidden"
         onClick={(e) => e.stopPropagation()}
         role="document"

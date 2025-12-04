@@ -4,15 +4,19 @@ import { tasksAPI } from '../../lib/api/tasks.api';
 
 const TASKS_QUERY_KEY = 'tasks';
 
+/**
+ * Custom hook to delete a task.
+ * @returns A TanStack Mutation object for deleting a task.
+ */
 export const useDeleteTask = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (taskId: string) => tasksAPI.delete(taskId),
     onSuccess: (_, taskId) => {
-      // Удаляем задачу из кэша
+      // Remove the task from the cache
       queryClient.removeQueries({ queryKey: [TASKS_QUERY_KEY, taskId] });
-      // Инвалидируем все задачи для обновления списка
+      // Invalidate all tasks to refetch the list
       queryClient.invalidateQueries({ queryKey: [TASKS_QUERY_KEY] });
     },
   });

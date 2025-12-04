@@ -1,7 +1,7 @@
 // src/lib/utils/imageOptimizer.ts
 import { useEffect, useState } from 'react';
 
-// Утилита для предзагрузки изображений для текущей темы
+// Preloads images for the current theme to avoid flickering
 export const preloadThemeImages = (theme: 'light' | 'dark') => {
   const imageMap: Record<string, Record<string, string>> = {
     ru: {
@@ -23,7 +23,7 @@ export const preloadThemeImages = (theme: 'light' | 'dark') => {
   });
 };
 
-// Кастомный хук для обработки изображений с учетом темы
+// Custom hook to handle theme-based images
 export const useThemedImage = (baseName: string) => {
   const [theme] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -32,14 +32,14 @@ export const useThemedImage = (baseName: string) => {
     return 'dark';
   });
 
-  // Определяем путь к изображению в зависимости от темы
+  // Determines the image path based on the current theme
   const getImagePath = () => {
     if (baseName.includes('light') || baseName.includes('dark')) {
-      // Если имя файла уже содержит тему, возвращаем как есть
+      // If the filename already contains the theme, return as is
       return baseName;
     }
 
-    // Для специфичных изображений темы
+    // For specific theme images
     if (baseName.includes('ru')) {
       return theme === 'light'
         ? '/src/assets/images/ru_light.jpg'
@@ -56,7 +56,7 @@ export const useThemedImage = (baseName: string) => {
   return getImagePath();
 };
 
-// Утилита для кэширования изображений
+// Utility to cache an image
 export const cacheImage = (src: string): Promise<HTMLImageElement> => {
   return new Promise((resolve, reject) => {
     const image = new Image();
@@ -66,7 +66,7 @@ export const cacheImage = (src: string): Promise<HTMLImageElement> => {
   });
 };
 
-// Утилита для ленивой загрузки изображений с поддержкой темы
+// Utility for lazy loading images with theme support
 export const useLazyImage = (src: string, fallback?: string) => {
   const [imageSrc, setImageSrc] = useState(src);
   const [isLoading, setIsLoading] = useState(true);
@@ -94,9 +94,9 @@ export const useLazyImage = (src: string, fallback?: string) => {
   return { imageSrc, isLoading, hasError };
 };
 
-// Утилита для переключения изображений при смене темы
+// Utility to switch images when the theme changes
 export const switchThemeImages = (newTheme: 'light' | 'dark') => {
-  // Обновляем изображения на странице при смене темы
+  // Update images on the page when the theme changes
   const images = document.querySelectorAll('img[data-theme-src]');
   images.forEach((img) => {
     const themeSrc = img.getAttribute(`data-${newTheme}-src`);
@@ -108,7 +108,7 @@ export const switchThemeImages = (newTheme: 'light' | 'dark') => {
     }
   });
 
-  // Обновляем также фоны с изображениями
+  // Also update background images
   const elementsWithBg = document.querySelectorAll('[data-theme-bg]');
   elementsWithBg.forEach((el) => {
     const themeBg = el.getAttribute(`data-${newTheme}-bg`);
@@ -118,7 +118,7 @@ export const switchThemeImages = (newTheme: 'light' | 'dark') => {
   });
 };
 
-// Утилита для получения правильного изображения в зависимости от темы
+// Utility to get the correct image URL based on language and theme
 export const getThemedImageUrl = (language: string, theme: 'light' | 'dark'): string => {
   const imageMap: Record<string, Record<string, string>> = {
     ru: {

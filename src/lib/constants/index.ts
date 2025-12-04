@@ -1,4 +1,10 @@
-export const MAX_AVATAR_SIZE_BYTES = 5 * 1024 * 1024; // 5MB
-export const MAX_STORAGE_LIMIT_BYTES = 5 * 1024 * 1024 * 1024; // 5GB
-export const PROFILE_CREATION_DELAY_MS = 500; // 500ms delay
-export const STORAGE_WARNING_THRESHOLD = 90; // 90% storage threshold
+// src/lib/constants/index.ts
+
+// 5 MB in bytes
+export const MAX_AVATAR_SIZE_BYTES = 5 * 1024 * 1024; // 5_242_880
+
+// 5 GB in bytes
+export const MAX_STORAGE_LIMIT_BYTES = 5 * 1024 * 1024 * 1024; // 5_368_709_120
+
+// Threshold for storage usage warning (in percent)
+export const STORAGE_WARNING_THRESHOLD = 90;

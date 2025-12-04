@@ -1,5 +1,5 @@
 // src/pages/ProjectView.tsx
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, lazy, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, MoreHorizontal, CheckCircle, Plus, FolderOpen, Calendar } from 'lucide-react';
@@ -10,6 +10,9 @@ import { useTasks } from '../hooks/queries/useTasks';
 import { useCreateTask } from '../hooks/mutations/useCreateTask';
 import { useUpdateTask } from '../hooks/mutations/useUpdateTask';
 import TaskDetailsPopup from '../components/layout/TaskDetailsPopup';
+import EmptyState from '../components/common/EmptyState';
+import SkeletonLoader from '../components/common/SkeletonLoader';
+import TaskItem from '../components/TaskItem';
 
 interface ProjectViewProps {
   project: Project;
@@ -20,7 +23,6 @@ const ProjectView: React.FC<ProjectViewProps> = ({ project, onBack }) => {
   const { t } = useTranslation();
   const { user } = useAuthStore();
 
-  // --- РЕФАКТОРИНГ: Используем хуки React Query ---
   const { data: allTasks = [], isLoading: tasksLoading } = useTasks(user?.id || '');
   const projectTasks = allTasks.filter((task) => task.project_id === project.id);
   const { data: projectStats, isLoading: statsLoading } = useQuery<ProjectStats>({
@@ -72,40 +74,6 @@ const ProjectView: React.FC<ProjectViewProps> = ({ project, onBack }) => {
       updateTaskMutation.mutate({ id, data: updates });
     },
     [updateTaskMutation]
-  );
-
-  // Компонент пустого состояния
-  const EmptyState = () => (
-    <div className="text-center py-12">
-      <div className="w-16 h-16 rounded-full bg-bg-secondary flex items-center justify-center mx-auto mb-4">
-        <FolderOpen className="w-8 h-8 text-text-tertiary" />
-      </div>
-      <h3 className="text-lg font-medium text-text-primary mb-1">{t('todo.emptyProject')}</h3>
-      <p className="text-text-secondary mb-4">{t('todo.emptyProjectDescription')}</p>
-      <div className="flex gap-3 justify-center">
-        <button
-          onClick={() => setShowTaskCreation(true)}
-          className="px-4 py-2 rounded-lg bg-accent-gradient-1 text-white font-medium"
-        >
-          {t('todo.createFirstTask')}
-        </button>
-        <button
-          onClick={onBack}
-          className="px-4 py-2 rounded-lg border border-border text-text-primary"
-        >
-          {t('common.back')}
-        </button>
-      </div>
-    </div>
-  );
-
-  // Компонент загрузки
-  const SkeletonLoader = ({ count = 5 }) => (
-    <div className="space-y-3">
-      {[...Array(count)].map((_, i) => (
-        <div key={i} className="h-16 bg-bg-secondary animate-pulse rounded-xl" />
-      ))}
-    </div>
   );
 
   if (loading) {
@@ -211,16 +179,40 @@ const ProjectView: React.FC<ProjectViewProps> = ({ project, onBack }) => {
 
           <div className="space-y-3">
             {projectTasks.length === 0 ? (
-              <EmptyState />
+              <EmptyState
+                icon={<FolderOpen className="w-8 h-8 text-text-tertiary" />}
+                title={t('todo.emptyProject')}
+                description={t('todo.emptyProjectDescription')}
+                actions={[
+                  <button
+                    key="create"
+                    onClick={() => setShowTaskCreation(true)}
+                    className="px-4 py-2 rounded-lg bg-accent-gradient-1 text-white font-medium"
+                  >
+                    {t('todo.createFirstTask')}
+                  </button>,
+                  <button
+                    key="back"
+                    onClick={onBack}
+                    className="px-4 py-2 rounded-lg border border-border text-text-primary"
+                  >
+                    {t('common.back')}
+                  </button>,
+                ]}
+              />
             ) : (
-              projectTasks.map((task) => (
-                <MemoizedTaskItem
-                  key={task.id}
-                  task={task}
-                  onToggleComplete={() => toggleTaskCompletion(task)}
-                  onEditDetails={() => setSelectedTask(task)}
-                />
-              ))
+              <div className="max-h-[600px] overflow-y-auto space-y-2.5">
+                {' '}
+                {/* 10px space between items (2.5 * 4px = 10px) */}
+                {projectTasks.map((task, index) => (
+                  <TaskItem
+                    key={task.id || `task-${index}`} // Use task id or fallback to index-based key
+                    task={task}
+                    onToggleComplete={() => toggleTaskCompletion(task)}
+                    onEditDetails={() => setSelectedTask(task)}
+                  />
+                ))}
+              </div>
             )}
           </div>
         </div>
@@ -240,62 +232,5 @@ const ProjectView: React.FC<ProjectViewProps> = ({ project, onBack }) => {
     </div>
   );
 };
-
-const MemoizedTaskItem = React.memo(
-  ({
-    task,
-    onToggleComplete,
-    onEditDetails,
-  }: {
-    task: Task;
-    onToggleComplete: () => void;
-    onEditDetails: () => void;
-  }) => {
-    const isOverdue = task.due_date && new Date(task.due_date) < new Date() && !task.completed;
-
-    return (
-      <div
-        className={`flex items-center gap-4 p-4 rounded-xl border cursor-pointer ${task.completed ? 'border-border bg-bg-tertiary/30 opacity-60' : 'border-border hover:border-border-hover hover:shadow-sm'} ${isOverdue ? 'glow-error' : ''}`}
-        onClick={onEditDetails}
-      >
-        <button
-          onClick={(e) => {
-            e.stopPropagation(); // Prevent opening popup when completing task
-            onToggleComplete();
-          }}
-          role="checkbox"
-          aria-checked={task.completed}
-          className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center flex-shrink-0 ${
-            task.completed
-              ? 'bg-accent-gradient-1 border-transparent'
-              : 'border-border hover:border-accent-primary'
-          }`}
-        >
-          {task.completed && <CheckCircle className="w-4 h-4 text-white" />}
-        </button>
-        <p
-          className={`flex-1 font-medium ${task.completed ? 'line-through text-text-tertiary' : 'text-text-primary'}`}
-        >
-          {task.title}
-        </p>
-        {task.due_date && (
-          <div className="flex items-center gap-1 text-xs text-text-secondary">
-            <Calendar className="w-3.5 h-3.5" />
-            <span>{new Date(task.due_date).toLocaleDateString()}</span>
-          </div>
-        )}
-        <button
-          className="p-1.5 rounded-md hover:bg-bg-tertiary/50"
-          onClick={(e) => {
-            e.stopPropagation();
-            onEditDetails();
-          }}
-        >
-          <MoreHorizontal className="w-5 h-5 text-text-secondary" />
-        </button>
-      </div>
-    );
-  }
-);
 
 export default ProjectView;

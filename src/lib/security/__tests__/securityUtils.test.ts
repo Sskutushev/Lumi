@@ -1,53 +1,68 @@
 import { sanitizeInput } from '../securityUtils';
+import { describe, it, expect } from 'vitest';
 
 describe('securityUtils', () => {
-  describe('sanitizeInput', () => {
-    test('should remove script tags', () => {
-      const input = '<script>alert("xss")</script>';
-      const result = sanitizeInput(input);
-      expect(result).toBe('');
+  describe('sanitizeInput with DOMPurify', () => {
+    it('should remove script tags and their content', () => {
+      const input = 'Hello <script>alert("xss")</script> World';
+      expect(sanitizeInput(input)).toBe('Hello  World');
     });
 
-    test('should remove iframe tags', () => {
-      const input = '<iframe src="malicious.com"></iframe>';
-      const result = sanitizeInput(input);
-      expect(result).toBe('');
+    it('should remove iframe tags', () => {
+      const input = 'This is an <iframe src="malicious.com"></iframe>';
+      expect(sanitizeInput(input)).toBe('This is an');
     });
 
-    test('should remove javascript protocol', () => {
-      const input = 'javascript:alert(1)';
-      const result = sanitizeInput(input);
-      expect(result).toBe('');
+    it('should strip javascript protocol from links', () => {
+      const input = '<a href="javascript:alert(1)">Click Me</a>';
+      expect(sanitizeInput(input)).toBe('Click Me');
     });
 
-    test('should remove event handlers', () => {
+    it('should remove event handlers like onclick', () => {
       const input = '<div onclick="alert(1)">Click me</div>';
-      const result = sanitizeInput(input);
-      expect(result).toBe('<div>Click me</div>');
+      expect(sanitizeInput(input)).toBe('Click me');
     });
 
-    test('should handle basic text safely', () => {
-      const input = 'Hello, world!';
-      const result = sanitizeInput(input);
-      expect(result).toBe('Hello, world!');
+    it('should handle plain text without changes', () => {
+      const input = 'Hello, this is a clean world!';
+      expect(sanitizeInput(input)).toBe('Hello, this is a clean world!');
     });
 
-    test('should remove multiple types of malicious content', () => {
-      const input = '<script>alert(1)</script><iframe></iframe><div onclick="xss()">test</div>';
-      const result = sanitizeInput(input);
-      expect(result).toBe('<div>test</div>');
+    it('should remove a mix of malicious tags', () => {
+      const input =
+        '<p>Test</p><script>alert(1)</script><iframe></iframe><b onmouseover="xss()">test</b>';
+      expect(sanitizeInput(input)).toBe('Test test');
     });
 
-    test('should handle empty string', () => {
+    it('should handle an empty string', () => {
       const input = '';
-      const result = sanitizeInput(input);
-      expect(result).toBe('');
+      expect(sanitizeInput(input)).toBe('');
     });
 
-    test('should handle null characters', () => {
+    it('should handle a string with only whitespace', () => {
+      const input = '   ';
+      expect(sanitizeInput(input)).toBe('');
+    });
+
+    it('should remove null characters', () => {
       const input = 'test\x00script';
-      const result = sanitizeInput(input);
-      expect(result).toBe('testscript');
+      // DOMPurify removes null characters by default
+      expect(sanitizeInput(input)).toBe('testscript');
+    });
+
+    it('should keep text content from within tags', () => {
+      const input = '<b>Bold text</b> and <i>italic text</i>';
+      expect(sanitizeInput(input)).toBe('Bold text and italic text');
+    });
+
+    it('should handle nested malicious tags', () => {
+      const input = '<div onclick="xss()"><p><script>alert("nested")</script></p></div>';
+      expect(sanitizeInput(input)).toBe('');
+    });
+
+    it('should prevent XSS via image onload attribute', () => {
+      const input = '<img src="x" onerror="alert(1)">';
+      expect(sanitizeInput(input)).toBe('');
     });
   });
 });

@@ -31,41 +31,110 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ isOpen, onClose }) =>
   const [isUpdating, setIsUpdating] = useState(false);
   const queryClient = useQueryClient();
 
+  // Use a ref to track component mount status
+  const isMountedRef = React.useRef(true);
+
   const loadProfileData = useCallback(async () => {
-    if (!user) return;
+    if (!user || !isMountedRef.current) return;
 
     setLoading(true);
     try {
-      const [profile, storageStatsData, stats] = await Promise.all([
-        profileAPI.getProfile(user.id),
-        profileAPI.getStorageStats(user.id),
-        tasksAPI.getStats(user.id),
+      // Execute API calls with individual error handling to prevent AbortError propagation
+      const profilePromise = profileAPI.getProfile(user.id);
+      const storageStatsPromise = profileAPI.getStorageStats(user.id);
+      const statsPromise = tasksAPI.getStats(user.id);
+
+      // Wait for all promises with specific AbortError handling
+      const results = await Promise.all([
+        profilePromise.catch((err) => {
+          if ((err as any).name === 'AbortError') {
+            // Return a special indicator for aborted requests
+            return { __aborted: true, error: err };
+          }
+          throw err; // Re-throw other errors
+        }),
+        storageStatsPromise.catch((err) => {
+          if ((err as any).name === 'AbortError') {
+            return { __aborted: true, error: err };
+          }
+          throw err;
+        }),
+        statsPromise.catch((err) => {
+          if ((err as any).name === 'AbortError') {
+            return { __aborted: true, error: err };
+          }
+          throw err;
+        }),
       ]);
 
-      setUserData((prev) => ({
-        ...prev,
-        name: profile.full_name || '',
-        email: user.email || '',
-        currentPassword: '',
-        newPassword: '',
-        avatar: profile.avatar_url || '',
-      }));
+      // Check if any of the operations were aborted
+      const abortedResult = results.find((result: any) => result && result.__aborted);
+      if (abortedResult) {
+        return; // Exit early if any operation was aborted
+      }
 
-      setStorageStats(storageStatsData);
-      setUserStats(stats);
+      const [profile, storageStatsData, stats] = results;
+
+      if (isMountedRef.current) {
+        setUserData((prev) => ({
+          ...prev,
+          name: profile.full_name || '',
+          email: user.email || '',
+          currentPassword: '',
+          newPassword: '',
+          avatar: profile.avatar_url || '',
+        }));
+
+        setStorageStats(storageStatsData);
+        setUserStats(stats);
+      }
     } catch (error) {
-      console.error('Error loading profile data:', error);
-      toast.error(t('profile.loadError') || 'Failed to load profile data');
+      // Only show error if component is still mounted and it's not an AbortError
+      if (isMountedRef.current) {
+        // Check if this is an AbortError or a wrapped AbortError to avoid displaying it
+        const isAbortError =
+          (error as any).name === 'AbortError' || // Direct AbortError
+          (error && typeof error === 'object' && (error as any).__aborted) || // Our custom aborted indicator
+          (error &&
+            typeof error === 'object' &&
+            (error as any).message &&
+            (error as any).message.includes('AbortError')); // Wrapped AbortError
+
+        if (!isAbortError) {
+          console.error('Error loading profile data:', error);
+          toast.error(t('profile.loadError') || 'Failed to load profile data');
+        }
+      }
     } finally {
-      setLoading(false);
+      if (isMountedRef.current) {
+        setLoading(false);
+      }
     }
   }, [user, t]);
 
+  // Update the ref when component mounts/unmounts
+  React.useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
   useEffect(() => {
     if (isOpen) {
-      loadProfileData();
+      loadProfileData().catch((error) => {
+        // Catch any unhandled errors in loadProfileData, especially AbortError
+        if ((error as any).name === 'AbortError') {
+          // Silently handle AbortError - no need to log or show it
+          return;
+        }
+        // For other errors, only log if component is still mounted
+        if (isMountedRef.current) {
+          console.error('Error in useEffect loadProfileData:', error);
+        }
+      });
     }
-  }, [isOpen, loadProfileData]);
+  }, [isOpen, loadProfileData, isMountedRef]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -73,7 +142,7 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ isOpen, onClose }) =>
   };
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!user || !e.target.files || !e.target.files[0]) return;
+    if (!user || !e.target.files || !e.target.files[0] || !isMountedRef.current) return;
 
     const file = e.target.files[0];
 
@@ -85,7 +154,6 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ isOpen, onClose }) =>
       return;
     }
 
-    // Проверяем тип файла
     if (!file.type.startsWith('image/')) {
       toast.error(t('profile.avatarInvalidType') || 'Please select an image file');
       return;
@@ -94,22 +162,30 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ isOpen, onClose }) =>
     try {
       const updatedProfile = await profileAPI.uploadAvatar(user.id, file);
 
-      setUserData((prev) => ({ ...prev, avatar: updatedProfile.avatar_url || null }));
-      queryClient.setQueryData(['profile', user.id], updatedProfile);
+      if (isMountedRef.current) {
+        setUserData((prev) => ({ ...prev, avatar: updatedProfile.avatar_url || null }));
+        queryClient.setQueryData(['profile', user.id], updatedProfile);
+        // Also invalidate all profile queries to ensure fresh data everywhere
+        queryClient.invalidateQueries({ queryKey: ['profile'] });
 
-      toast.success(t('profile.updateSuccess') || 'Avatar updated successfully!');
+        toast.success(t('profile.updateSuccess') || 'Avatar updated successfully!');
+      }
     } catch (error: any) {
-      console.error('Error uploading avatar:', error);
-      toast.error(
-        t('profile.avatarUploadError') ||
-          `Failed to upload avatar: ${error instanceof Error ? error.message : 'Unknown error'}`
-      );
+      if (isMountedRef.current) {
+        console.error('Error uploading avatar:', error);
+        toast.error(
+          t('profile.avatarUploadError') ||
+            `Failed to upload avatar: ${error instanceof Error ? error.message : 'Unknown error'}`
+        );
+      }
     }
   };
 
   const updateProfile = async () => {
-    if (!user) {
-      toast.error('No user logged in');
+    if (!user || !isMountedRef.current) {
+      if (isMountedRef.current) {
+        toast.error('No user logged in');
+      }
       return;
     }
 
@@ -127,8 +203,12 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ isOpen, onClose }) =>
       console.log('Data to send:', updateData);
 
       if (Object.keys(updateData).length === 0 && !userData.newPassword) {
-        toast.info('No changes to save.');
-        onClose();
+        if (isMountedRef.current) {
+          toast.info('No changes to save.');
+        }
+        if (isMountedRef.current) {
+          onClose();
+        }
         return;
       }
 
@@ -136,14 +216,16 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ isOpen, onClose }) =>
         const updatedProfile = await profileAPI.updateProfile(user.id, updateData);
         console.log('API response:', updatedProfile);
 
-        if (updatedProfile) {
+        if (isMountedRef.current && updatedProfile) {
           queryClient.setQueryData(['profile', user.id], updatedProfile);
-        } else {
+          // Also invalidate all profile queries to ensure fresh data everywhere
+          queryClient.invalidateQueries({ queryKey: ['profile'] });
+        } else if (isMountedRef.current) {
           queryClient.invalidateQueries({ queryKey: ['profile', user.id] });
+          queryClient.invalidateQueries({ queryKey: ['profile'] });
         }
       }
 
-      // Если меняется пароль, обновляем его
       if (userData.newPassword && userData.newPassword.length >= 6) {
         const { error } = await supabase.auth.updateUser({
           password: userData.newPassword,
@@ -158,14 +240,20 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ isOpen, onClose }) =>
         throw new Error('Password must be at least 6 characters long');
       }
 
-      toast.success(t('profile.updateSuccess') || 'Profile updated successfully!');
-      onClose();
+      if (isMountedRef.current) {
+        toast.success(t('profile.updateSuccess') || 'Profile updated successfully!');
+        onClose();
+      }
     } catch (error: any) {
-      console.error('Error updating profile:', error);
-      console.error('Error details:', error.message, error.code, error.status);
-      toast.error(t('profile.updateError') || 'Error updating profile: ' + error.message);
+      if (isMountedRef.current) {
+        console.error('Error updating profile:', error);
+        console.error('Error details:', error.message, error.code, error.status);
+        toast.error(t('profile.updateError') || 'Error updating profile: ' + error.message);
+      }
     } finally {
-      setIsUpdating(false);
+      if (isMountedRef.current) {
+        setIsUpdating(false);
+      }
     }
   };
 
@@ -183,6 +271,7 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ isOpen, onClose }) =>
             onClick={onClose}
             disabled={isUpdating}
             className="p-2 rounded-lg hover:bg-bg-secondary transition-colors disabled:opacity-50"
+            aria-label={t('common.close') || 'Close'}
           >
             <X className="w-5 h-5 text-text-secondary" />
           </button>
@@ -205,6 +294,7 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ isOpen, onClose }) =>
                       <img
                         src={userData.avatar}
                         alt="Avatar"
+                        loading="lazy"
                         className="w-24 h-24 rounded-full object-cover border-2 border-border"
                       />
                     ) : (

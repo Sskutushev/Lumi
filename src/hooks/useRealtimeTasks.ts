@@ -12,7 +12,7 @@ export const useRealtimeTasks = (userId: string) => {
     if (!userId) return;
 
     const channel = realtimeService.subscribeToTasks(userId, () => {
-      // При получении обновления - инвалидируем кэш задач
+      // Invalidate the tasks cache on receiving an update
       queryClient.invalidateQueries({ queryKey: [TASKS_QUERY_KEY, userId] });
     });
 

@@ -43,7 +43,16 @@
     "installAppDescription": "Install this application to your home screen for faster access and improved experience.",
     "installing": "Installing...",
     "install": "Install",
-    "apply": "Apply"
+    "apply": "Apply",
+    "openUserMenu": "Open user menu",
+    "openNavigationMenu": "Open navigation menu",
+    "openCalendar": "Open calendar",
+    "previousMonth": "Previous month",
+    "nextMonth": "Next month",
+    "previousYear": "Previous year",
+    "nextYear": "Next year",
+    "previousYearRange": "Previous year range",
+    "nextYearRange": "Next year range"
   },
   "auth": {
     "signUpSuccess": "📧 Email sent! Please check your email to confirm.",
@@ -238,5 +247,15 @@
   "footer": {
     "rights": "© 2025 Lumi. All rights reserved.",
     "contact": "Contact"
+  },
+  "errors": {
+    "unexpected": "An unexpected error occurred. Please try again.",
+    "somethingWentWrong": "Something went wrong",
+    "technicalDetails": "Technical Details",
+    "errorType": "Error Type",
+    "status": "Status",
+    "url": "URL",
+    "originalError": "Original Error",
+    "tryAgain": "Try Again"
   }
 }

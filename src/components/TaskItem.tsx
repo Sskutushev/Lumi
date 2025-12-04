@@ -52,10 +52,8 @@ const TaskItem = React.memo(
       setShowMoreOptions((prev) => !prev);
     }, []);
 
-    // Улучшения доступности
     const taskItemRef = useRef<HTMLDivElement>(null);
 
-    // Обработка клавиатурных событий для доступности
     const handleKeyDown = useCallback(
       (e: React.KeyboardEvent) => {
         if (e.key === 'Enter' || e.key === ' ') {
@@ -70,112 +68,118 @@ const TaskItem = React.memo(
       <div
         ref={taskItemRef}
         className={twMerge(
-          'flex items-start gap-3 p-4 rounded-xl border transition-all',
-          task.completed && 'border-border bg-bg-tertiary/30 opacity-60',
-          !task.completed && 'border-border hover:border-border-hover hover:shadow-sm',
+          'flex flex-col sm:flex-row sm:items-center gap-3 p-3 sm:p-4 rounded-xl border transition-all bg-transparent focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20 focus:outline-none',
+          task.completed
+            ? 'border-border opacity-60'
+            : 'border-border hover:border-border-hover hover:shadow-sm',
           isOverdue && 'glow-error'
         )}
         role="listitem"
       >
-        <button
-          onClick={handleToggleComplete}
-          onKeyDown={handleKeyDown}
-          className={`flex-shrink-0 w-6 h-6 rounded-lg border-2 flex items-center justify-center mt-0.5 ${task.completed ? 'bg-accent-gradient-1 border-transparent' : 'border-border hover:border-accent-primary'}`}
-          aria-label={task.completed ? t('todo.markAsIncomplete') : t('todo.markAsComplete')}
-          aria-checked={task.completed}
-          role="checkbox"
-        >
-          {task.completed && <Check className="w-4 h-4 text-white" />}
-        </button>
-        <div className="flex-1 min-w-0">
-          {isEditing ? (
-            <input
-              type="text"
-              value={editingTitle}
-              onChange={(e) => setEditingTitle(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSave()}
-              onBlur={handleSave}
-              className="w-full bg-transparent border-b border-accent-primary focus:outline-none"
-              autoFocus
-              aria-label={t('todo.editTaskName')}
-            />
-          ) : (
-            <p
-              className={`cursor-pointer font-medium ${task.completed ? 'line-through text-text-tertiary' : 'text-text-primary'}`}
-              onClick={() => setIsEditing(true)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  setIsEditing(true);
-                } else if (e.key === ' ') {
-                  e.preventDefault();
-                  onEditDetails(task);
-                }
-              }}
-              tabIndex={0}
-              aria-label={`${task.title} ${task.completed ? t('todo.completed') : t('todo.pending')}`}
-            >
-              {task.title}
-            </p>
-          )}
-          <div className="flex flex-wrap items-center gap-2 mt-2 text-xs">
-            {task.due_date && (
-              <div
-                className="flex items-center gap-1 px-2 py-1 rounded-md bg-bg-tertiary/50 text-text-secondary"
-                aria-label={`${t('todo.dueDate')}: ${task.due_date}`}
+        <div className="flex items-start gap-3 flex-1 w-full">
+          <button
+            onClick={handleToggleComplete}
+            onKeyDown={handleKeyDown}
+            className={`flex-shrink-0 w-6 h-6 rounded-lg flex items-center justify-center mt-0.5 ${task.completed ? 'bg-gradient-animated' : 'border border-border bg-transparent'}`}
+            aria-label={task.completed ? t('todo.markAsIncomplete') : t('todo.markAsComplete')}
+            aria-checked={task.completed}
+            role="checkbox"
+          >
+            {task.completed && <Check className="w-4 h-4 text-white" />}
+          </button>
+          <div className="flex-1 min-w-0">
+            {isEditing ? (
+              <input
+                type="text"
+                value={editingTitle}
+                onChange={(e) => setEditingTitle(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSave()}
+                onBlur={handleSave}
+                className="w-full px-2 py-1 rounded border border-border bg-transparent focus:outline-none focus:border-accent-primary"
+                autoFocus
+                aria-label={t('todo.editTaskName')}
+              />
+            ) : (
+              <p
+                className={`cursor-pointer font-medium px-2 py-1 rounded border border-border ${task.completed ? 'line-through text-text-tertiary' : 'text-text-primary'}`}
+                onClick={() => onEditDetails(task)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    onEditDetails(task);
+                  } else if (e.key === ' ') {
+                    e.preventDefault();
+                    onEditDetails(task);
+                  }
+                }}
+                tabIndex={0}
+                aria-label={`${task.title} ${task.completed ? t('todo.completed') : t('todo.pending')}`}
               >
-                <Calendar className="w-3 h-3" aria-hidden="true" />
-                <span>{task.due_date}</span>
-              </div>
+                {task.title}
+              </p>
             )}
-            {task.priority && (
+            <div className="flex flex-col sm:flex-row sm:items-center flex-wrap gap-2 mt-1 text-xs">
+              {task.due_date && (
+                <div
+                  className="flex items-center gap-1 px-2 py-1 rounded-md border border-border bg-transparent text-text-secondary min-w-min"
+                  aria-label={`${t('todo.dueDate')}: ${task.due_date}`}
+                >
+                  <Calendar className="w-3 h-3" aria-hidden="true" />
+                  <span className="truncate max-w-[100px] sm:max-w-none">{task.due_date}</span>
+                </div>
+              )}
+              {task.priority && (
+                <div
+                  className={twMerge(
+                    'px-2 py-1 rounded-md flex items-center gap-1 border border-border bg-transparent',
+                    task.priority === 'high' && 'text-error',
+                    task.priority === 'medium' && 'text-warning',
+                    task.priority === 'low' && 'text-success'
+                  )}
+                  aria-label={`${t('todo.priority.label')}: ${t(`todo.priority.${task.priority}`)}`}
+                >
+                  <Flag className="w-3 h-3" aria-hidden="true" />
+                  <span className="capitalize">{t(`todo.priority.${task.priority}`)}</span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center justify-end pt-2 sm:pt-0 w-full sm:w-auto">
+          <div className="relative">
+            <button
+              onClick={toggleMoreOptions}
+              className="p-1.5 rounded-md border border-border bg-transparent hover:border-border"
+              aria-label={t('todo.moreOptions')}
+              aria-expanded={showMoreOptions}
+              aria-haspopup="true"
+            >
+              <MoreHorizontal className="w-4 h-4 text-text-secondary" aria-hidden="true" />
+            </button>
+            {showMoreOptions && (
               <div
-                className={twMerge(
-                  'px-2 py-1 rounded-md flex items-center gap-1',
-                  task.priority === 'high' && 'bg-error/10 text-error border-error',
-                  task.priority === 'medium' && 'bg-warning/10 text-warning border-warning',
-                  task.priority === 'low' && 'bg-success/10 text-success border-success'
-                )}
-                aria-label={`${t('todo.priority.label')}: ${t(`todo.priority.${task.priority}`)}`}
+                className="absolute right-0 mt-1 w-40 bg-transparent rounded-lg shadow-lg border border-border py-1 z-10"
+                role="menu"
               >
-                <Flag className="w-3 h-3" aria-hidden="true" />
-                <span className="capitalize">{t(`todo.priority.${task.priority}`)}</span>
+                <button
+                  onClick={handleEditDetails}
+                  className="w-full text-left px-3 py-1.5 text-xs flex items-center gap-2 text-text-secondary border border-border hover:border-border"
+                  role="menuitem"
+                >
+                  <Edit className="w-4 h-4" aria-hidden="true" />
+                  {t('common.edit')}
+                </button>
+                <button
+                  onClick={handleDelete}
+                  className="w-full text-left px-3 py-1.5 text-xs flex items-center gap-2 text-error border border-border hover:border-border"
+                  role="menuitem"
+                >
+                  <Trash2 className="w-4 h-4" aria-hidden="true" />
+                  {t('common.delete')}
+                </button>
               </div>
             )}
           </div>
-        </div>
-        <div className="relative">
-          <button
-            onClick={toggleMoreOptions}
-            className="p-1.5 rounded-md hover:bg-bg-tertiary/50"
-            aria-label={t('todo.moreOptions')}
-            aria-expanded={showMoreOptions}
-            aria-haspopup="true"
-          >
-            <MoreHorizontal className="w-4 h-4 text-text-secondary" aria-hidden="true" />
-          </button>
-          {showMoreOptions && (
-            <div
-              className="absolute right-0 mt-1 w-40 bg-bg-primary rounded-lg shadow-lg border border-border py-1 z-10"
-              role="menu"
-            >
-              <button
-                onClick={handleEditDetails}
-                className="w-full text-left px-3 py-1.5 text-xs flex items-center gap-2 text-text-secondary hover:bg-bg-secondary"
-                role="menuitem"
-              >
-                <Edit className="w-4 h-4" aria-hidden="true" />
-                {t('common.edit')}
-              </button>
-              <button
-                onClick={handleDelete}
-                className="w-full text-left px-3 py-1.5 text-xs flex items-center gap-2 text-error hover:bg-error/10"
-                role="menuitem"
-              >
-                <Trash2 className="w-4 h-4" aria-hidden="true" />
-                {t('common.delete')}
-              </button>
-            </div>
-          )}
         </div>
       </div>
     );

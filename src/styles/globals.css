@@ -1,10 +1,10 @@
+@import './accessibility.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@import './accessibility.css';
 
 :root {
-  /* Светлая тема */
+  /* Light theme */
   --bg-primary: #ffffff;
   --bg-secondary: #f7f8fa;
   --bg-tertiary: #eceef1;
@@ -41,7 +41,7 @@
 }
 
 .dark {
-  /* Темная тема */
+  /* Dark theme */
   --bg-primary: #0d0d0f;
   --bg-secondary: #18181b;
   --bg-tertiary: #27272a;
@@ -80,17 +80,61 @@
 }
 
 @layer base {
-  * {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
     border-color: var(--border);
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    vertical-align: baseline;
+  }
+
+  html {
+    /* Ensure safe areas for mobile devices */
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)
+      env(safe-area-inset-left);
   }
 
   body {
     background-color: var(--bg-primary);
     color: var(--text-primary);
-    font-family: 'Inter', sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    line-height: 1.5;
   }
 
-  /* Исправление цвета текста в инпутах на темной теме */
+  .container {
+    width: 100%;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    line-height: 1.2;
+    font-weight: 600;
+  }
+
+  input,
+  textarea,
+  select,
+  button {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 16px; /* Prevent iOS zoom on focus */
+  }
+
   .dark input,
   .dark textarea,
   .dark select {
@@ -102,7 +146,6 @@
     color: var(--text-tertiary) !important;
   }
 
-  /* Обеспечение видимости текста в инпутах */
   input,
   textarea,
   select {
@@ -115,7 +158,6 @@
     caret-color: var(--text-primary);
   }
 
-  /* Улучшенные фокус стили для доступности */
   button:focus-visible,
   input:focus-visible,
   a:focus-visible,
@@ -127,7 +169,6 @@
     border-radius: 4px;
   }
 
-  /* Альтернатива для фокуса если :focus-visible не поддерживается */
   button:focus,
   input:focus,
   a:focus,
@@ -138,9 +179,102 @@
     outline-offset: 2px;
     border-radius: 4px;
   }
+
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  a:focus,
+  a:focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  ul,
+  ol {
+    list-style: none;
+  }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: inherit;
+  }
+
+  .responsive-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+    gap: 1rem;
+  }
+
+  .text-responsive {
+    font-size: clamp(0.875rem, 2.5vw, 1rem);
+  }
+
+  .text-responsive-lg {
+    font-size: clamp(1rem, 3vw, 1.25rem);
+  }
+
+  .text-responsive-xl {
+    font-size: clamp(1.125rem, 4vw, 1.5rem);
+  }
+
+  @media (max-width: 768px) {
+    body {
+      font-size: 14px;
+    }
+
+    .container {
+      padding: 0 1rem;
+    }
+
+    .p-mobile {
+      padding: 1rem;
+    }
+
+    .m-mobile {
+      margin: 1rem;
+    }
+
+    .mobile-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 1000;
+      background: var(--bg-primary);
+    }
+  }
+
+  @supports (pointer: coarse) {
+    button,
+    input[type='button'],
+    input[type='submit'],
+    input[type='reset'],
+    a[role='button'] {
+      min-height: 44px;
+      min-width: 44px;
+    }
+  }
 }
 
-/* Анимированный градиент */
+/* Animated gradient */
 .bg-gradient-animated {
   background: linear-gradient(
     90deg,
@@ -165,7 +299,7 @@
   }
 }
 
-/* Анимация пульсации для просроченных задач */
+/* Pulsing glow for overdue tasks */
 @keyframes pulse-glow {
   0%,
   100% {
@@ -180,7 +314,6 @@
   }
 }
 
-/* Медленная пульсация */
 @keyframes pulse-slow {
   0%,
   100% {
@@ -191,7 +324,6 @@
   }
 }
 
-/* Обводка пульсации */
 @keyframes pulse-outline {
   0%,
   100% {
@@ -202,7 +334,6 @@
   }
 }
 
-/* Классы для неонового свечения */
 .glow-error {
   position: relative;
 }
@@ -221,7 +352,6 @@
   z-index: -1;
 }
 
-/* Свечение для задач */
 .glow-task {
   position: relative;
 }
@@ -233,14 +363,13 @@
   left: -2px;
   right: -2px;
   bottom: -2px;
-  border-radius: 1rem; /* Это соответствует rounded-xl */
+  border-radius: 1rem;
   background: linear-gradient(45deg, #ef4444, #f87171, #ef4444);
   z-index: -1;
   animation: gradient-move 3s ease infinite;
   opacity: 0.7;
 }
 
-/* Анимация градиентного текста */
 .text-gradient-animated {
   background: linear-gradient(
     90deg,
@@ -256,7 +385,7 @@
   animation: gradient-move 8s ease infinite;
 }
 
-/* Стили для sonner тостов */
+/* Styles for Sonner toasts */
 [data-sonner-toast] {
   background: var(--bg-elevated) !important;
   border: 1px solid var(--border) !important;
@@ -289,7 +418,7 @@
 }
 
 [data-sonner-toast][data-type='error'] {
-  border-color: var(--error) !important;
+  border-color: var(--error) !importan;
 }
 
 [data-sonner-toast][data-type='error'] [data-icon] {
@@ -317,4 +446,15 @@
   background: var(--bg-secondary) !important;
   border-radius: calc(var(--radius) - 4px) !important;
   border: 1px solid var(--border) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

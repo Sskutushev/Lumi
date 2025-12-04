@@ -5,6 +5,10 @@ import { Task } from '../../types/api.types';
 
 const TASKS_QUERY_KEY = 'tasks';
 
+/**
+ * Custom hook to create a new task.
+ * @returns A TanStack Mutation object for creating a task.
+ */
 export const useCreateTask = () => {
   const queryClient = useQueryClient();
 
@@ -12,7 +16,7 @@ export const useCreateTask = () => {
     mutationFn: (taskData: Omit<Task, 'id' | 'created_at' | 'updated_at'>) =>
       tasksAPI.create(taskData),
     onSuccess: () => {
-      // Инвалидируем все задачи для обновления кэша
+      // Invalidate all tasks to refetch the cache
       queryClient.invalidateQueries({ queryKey: [TASKS_QUERY_KEY] });
     },
   });

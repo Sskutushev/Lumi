@@ -5,34 +5,34 @@ import { Replay } from '@sentry/replay';
 export const initSentry = () => {
   if (process.env.NODE_ENV === 'production') {
     Sentry.init({
-      dsn: process.env.VITE_SENTRY_DSN || '', // В реальном проекте нужно использовать реальный DSN
+      dsn: process.env.VITE_SENTRY_DSN || '', // In a real project, use a real DSN
       integrations: [
-        // new BrowserTracing(), // Временно отключено из-за несовместимости типов
+        // new BrowserTracing(), // Temporarily disabled due to type incompatibility
         new Replay({
-          // Приватность: не записываем чувствительные данные
+          // Privacy: do not record sensitive data
           maskAllText: false,
           blockAllMedia: false,
         }),
       ],
 
-      // Включение трейсов для измерения производительности
-      tracesSampleRate: 0.1, // 10% трейсов в production
+      // Enable traces for performance measurement
+      tracesSampleRate: 0.1, // 10% of traces in production
 
-      // Включение replay для воспроизведения сессий (при ошибке)
-      replaysSessionSampleRate: 0.1, // 10% сессий
-      replaysOnErrorSampleRate: 1.0, // 100% при ошибках
+      // Enable replay for session playback (on error)
+      replaysSessionSampleRate: 0.1, // 10% of sessions
+      replaysOnErrorSampleRate: 1.0, // 100% on errors
 
-      // Настройки окружения
+      // Environment settings
       environment: process.env.NODE_ENV || 'development',
 
-      // Фильтрация ошибок
+      // Error filtering
       beforeSend(event) {
-        // Пример фильтрации определенных типов ошибок
+        // Example of filtering specific error types
         if (event.message?.includes('ResizeObserver loop limit exceeded')) {
-          return null; // Отфильтровать эту ошибку
+          return null; // Filter out this error
         }
 
-        // Добавить пользовательские теги
+        // Add custom tags
         if (window.location.hostname === 'localhost') {
           event.tags = {
             ...event.tags,

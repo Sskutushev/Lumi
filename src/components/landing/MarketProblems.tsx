@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
+import useReducedMotion from '../../hooks/useReducedMotion';
 
 // Import images
 import complexityImg from '../../assets/images/complexity.png';
@@ -8,6 +9,7 @@ import interfaceImg from '../../assets/images/interface.png';
 
 const MarketProblems = () => {
   const { t } = useTranslation();
+  const reducedMotion = useReducedMotion();
 
   const problems = [
     {
@@ -43,8 +45,8 @@ const MarketProblems = () => {
           {problems.map((problem, index) => (
             <motion.div
               key={index}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={reducedMotion ? false : { opacity: 0, y: 20 }}
+              whileInView={reducedMotion ? false : { opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
               viewport={{ once: true }}
               className="relative rounded-2xl bg-bg-secondary/50 backdrop-blur-sm border border-border p-8 hover:bg-bg-tertiary/50 transition-all duration-300 group shadow-lg shadow-accent-primary/10 hover:shadow-2xl hover:shadow-accent-primary/20"
@@ -54,12 +56,8 @@ const MarketProblems = () => {
                 <div className="w-24 h-24 rounded-xl flex items-center justify-center mb-6 group-hover:scale-105 transition-transform duration-300 z-10">
                   <img src={problem.img} alt={problem.title} className="w-24 h-24 object-contain" />
                 </div>
-                <h3 className="text-xl font-bold text-text-primary mb-4 z-10">
-                  {problem.title}
-                </h3>
-                <p className="text-text-secondary z-10">
-                  {problem.description}
-                </p>
+                <h3 className="text-xl font-bold text-text-primary mb-4 z-10">{problem.title}</h3>
+                <p className="text-text-secondary z-10">{problem.description}</p>
               </div>
             </motion.div>
           ))}

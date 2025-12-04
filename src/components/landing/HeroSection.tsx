@@ -1,97 +1,18 @@
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { ArrowRight, CheckCircle } from 'lucide-react';
-import { useState, useEffect, useRef } from 'react';
-import { preloadThemeImages, cacheImage } from '../../lib/utils/imageOptimizer';
-import ruLight from '../../assets/images/ru_light.jpg';
-import ruDark from '../../assets/images/ru_dark.jpg';
-import enLight from '../../assets/images/en_light.jpg';
-import enDark from '../../assets/images/en_dark.jpg';
+import useReducedMotion from '../../hooks/useReducedMotion';
+import { useLazyImage } from '../../hooks/useLazyImage';
+import { getThemedImageUrl } from '../../lib/utils/imageOptimizer';
+import { useTheme } from '../../hooks/useTheme';
 
 const HeroSection = () => {
   const { t, i18n } = useTranslation();
-  const [currentImage, setCurrentImage] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
-  const imageRef = useRef<HTMLImageElement>(null);
-  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
+  const { theme } = useTheme();
+  const reducedMotion = useReducedMotion();
 
-  useEffect(() => {
-    const current = document.documentElement.classList.contains('light') ? 'light' : 'dark';
-    setTheme(current);
-
-    preloadThemeImages('light');
-    preloadThemeImages('dark');
-  }, []);
-
-  // Обновляем изображение при смене языка или темы
-  useEffect(() => {
-    const isDark = theme === 'dark';
-
-    let imagePath = '';
-    if (i18n.language === 'ru') {
-      imagePath = isDark ? ruDark : ruLight;
-    } else {
-      imagePath = isDark ? enDark : enLight;
-    }
-
-    // Кэшируем изображение перед установкой
-    cacheImage(imagePath)
-      .then(() => {
-        setCurrentImage(imagePath);
-        setIsLoading(false);
-      })
-      .catch(() => {
-        setCurrentImage(isDark ? enDark : enLight); // fallback
-        setIsLoading(false);
-      });
-  }, [i18n.language, theme]);
-
-  useEffect(() => {
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-          const hasLight = document.documentElement.classList.contains('light');
-          const newTheme = hasLight ? 'light' : 'dark';
-
-          if (newTheme !== theme) {
-            const isDark = newTheme === 'dark';
-            let imagePath = '';
-
-            if (i18n.language === 'ru') {
-              imagePath = isDark ? ruDark : ruLight;
-            } else {
-              imagePath = isDark ? enDark : enLight;
-            }
-
-            // Cache the new image and switch
-            cacheImage(imagePath)
-              .then(() => {
-                setCurrentImage(imagePath);
-                setTheme(newTheme);
-              })
-              .catch(() => {
-                setCurrentImage(isDark ? enDark : enLight); // fallback
-                setTheme(newTheme);
-              });
-          }
-        }
-      });
-    });
-
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['class'],
-    });
-
-    return () => {
-      observer.disconnect();
-    };
-  }, [theme, i18n.language]);
-
-  // Обработчик загрузки изображения
-  const handleImageLoad = () => {
-    setIsLoading(false);
-  };
+  const imageUrl = getThemedImageUrl(i18n.language, theme);
+  const { imageSrc, imageRef } = useLazyImage({ src: imageUrl });
 
   return (
     <section className="relative min-h-screen flex items-center justify-center px-4 py-16 overflow-hidden">
@@ -99,22 +20,30 @@ const HeroSection = () => {
       <div className="absolute inset-0 -z-10">
         <div className="absolute inset-0 bg-accent-gradient-3 opacity-10" />
         <motion.div
-          animate={{
-            x: [0, 100, 50, 0],
-            y: [0, -50, 100, 0],
-            scale: [1, 1.2, 1, 1.1],
-            rotate: [0, 0, 90, 0],
-          }}
+          animate={
+            reducedMotion
+              ? false
+              : {
+                  x: [0, 100, 50, 0],
+                  y: [0, -50, 100, 0],
+                  scale: [1, 1.2, 1, 1.1],
+                  rotate: [0, 0, 90, 0],
+                }
+          }
           transition={{ duration: 40, repeat: Infinity, repeatType: 'mirror' }}
           className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full bg-accent-primary opacity-10 blur-3xl"
         />
         <motion.div
-          animate={{
-            x: [0, -100, -50, 0],
-            y: [0, 100, -50, 0],
-            scale: [1, 1.3, 1.1, 1],
-            rotate: [0, 90, 0, 0],
-          }}
+          animate={
+            reducedMotion
+              ? false
+              : {
+                  x: [0, -100, -50, 0],
+                  y: [0, 100, -50, 0],
+                  scale: [1, 1.3, 1.1, 1],
+                  rotate: [0, 90, 0, 0],
+                }
+          }
           transition={{ duration: 45, repeat: Infinity, repeatType: 'mirror' }}
           className="absolute bottom-1/4 right-1/4 w-96 h-96 rounded-full bg-accent-secondary opacity-10 blur-3xl"
         />
@@ -122,8 +51,8 @@ const HeroSection = () => {
 
       <div className="max-w-5xl mx-auto text-center space-y-10">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={reducedMotion ? false : { opacity: 0, y: 20 }}
+          animate={reducedMotion ? false : { opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
           className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-bg-secondary/50 backdrop-blur-sm border border-border"
         >
@@ -132,8 +61,8 @@ const HeroSection = () => {
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={reducedMotion ? false : { opacity: 0, y: 20 }}
+          animate={reducedMotion ? false : { opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
           className="text-center max-w-4xl mx-auto"
         >
@@ -162,8 +91,8 @@ const HeroSection = () => {
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={reducedMotion ? false : { opacity: 0, y: 20 }}
+          animate={reducedMotion ? false : { opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3 }}
           className="flex flex-col sm:flex-row items-center justify-center gap-4"
         >
@@ -177,8 +106,8 @@ const HeroSection = () => {
 
         {/* Simple mockup */}
         <motion.div
-          initial={{ opacity: 0, y: 40, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
+          initial={reducedMotion ? false : { opacity: 0, y: 40, scale: 0.95 }}
+          animate={reducedMotion ? false : { opacity: 1, y: 0, scale: 1 }}
           transition={{ delay: 0.5, duration: 0.8, type: 'spring' }}
           className="relative mt-16 max-w-4xl mx-auto"
         >
@@ -194,18 +123,12 @@ const HeroSection = () => {
               </div>
             </div>
             <div className="aspect-video rounded-xl overflow-hidden border border-border relative">
-              {isLoading && (
-                <div className="absolute inset-0 flex items-center justify-center bg-bg-secondary">
-                  <div className="w-8 h-8 border-2 border-accent-primary border-t-transparent rounded-full animate-spin"></div>
-                </div>
-              )}
               <img
                 ref={imageRef}
-                src={currentImage}
+                src={imageSrc}
                 alt="Application interface"
-                className={`w-full h-full object-contain ${isLoading ? 'opacity-0' : 'opacity-100'}`}
-                onLoad={handleImageLoad}
-                onError={() => setIsLoading(false)}
+                className="w-full h-full object-contain"
+                loading="lazy"
                 style={{ transition: 'opacity 0.3s ease-in-out' }}
               />
             </div>

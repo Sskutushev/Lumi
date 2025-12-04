@@ -69,11 +69,17 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
+          // Разделяем vendor библиотеки на отдельные чанки
           'react-vendor': ['react', 'react-dom'],
           'supabase-vendor': ['@supabase/supabase-js'],
-          'query-vendor': ['@tanstack/react-query'],
-          'ui-vendor': ['framer-motion', 'lucide-react', 'sonner'],
-          'i18n-vendor': ['react-i18next', 'i18next'],
+          'query-vendor': ['@tanstack/react-query', '@tanstack/react-query-devtools'],
+          'ui-vendor': ['framer-motion'],
+          'icon-vendor': ['lucide-react'],
+          'notification-vendor': ['sonner'],
+          'i18n-vendor': ['react-i18next', 'i18next', 'i18next-browser-languagedetector'],
+          'utils-vendor': ['zustand', 'uuid'],
+          'security-vendor': ['dompurify'],
+          'monitoring-vendor': ['@sentry/react'],
         },
         // Оптимизируем имена чанков
         entryFileNames: 'assets/[name].[hash].js',

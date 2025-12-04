@@ -75,6 +75,7 @@ const TaskDetailsPopup: React.FC<TaskDetailsPopupProps> = ({
             <button
               onClick={onClose}
               className="p-2 rounded-lg hover:bg-bg-secondary transition-colors"
+              aria-label={t('todo.closeModal') || 'Close modal'}
             >
               <X className="w-5 h-5 text-text-secondary" />
             </button>

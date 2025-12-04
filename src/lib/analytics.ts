@@ -31,7 +31,7 @@ export const initYandexMetrika = (counterId: string) => {
     });
   }
 
-  // Инициализируем наш сервис аналитики
+  // Initialize our analytics service
   analyticsService.initialize();
 };
 
@@ -41,7 +41,7 @@ export const trackEvent = (event: string, params?: object) => {
     window.ym(Number(counterId), 'reachGoal', event, params);
   }
 
-  // Также отслеживаем с помощью нашей аналитики
+  // Also track with our internal analytics service
   analyticsService.trackUserAction(event, params);
 };
 
@@ -51,9 +51,9 @@ export const trackPageView = (url?: string) => {
     window.ym(Number(counterId), 'hit', url || window.location.href);
   }
 
-  // Также отслеживаем с помощью нашей аналитики
+  // Also track with our internal analytics service
   analyticsService.trackPageView(url || window.location.href);
 };
 
-// Экспортируем сервис аналитики для использования в приложении
+// Export the analytics service for use in the application
 export { analyticsService };

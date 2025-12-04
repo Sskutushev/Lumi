@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { useTranslation } from 'react-i18next';
@@ -14,18 +15,23 @@ import MarketProblems from './components/landing/MarketProblems';
 import SolutionBenefits from './components/landing/SolutionBenefits';
 import PetProject from './components/landing/PetProject';
 import Footer from './components/landing/Footer';
-import AuthModal from './components/auth/AuthModal';
-import { LazyTodoDashboardPage, LazyProjectViewPage } from './pages/LazyPages';
+import {
+  LazyTodoDashboardPage,
+  LazyProjectViewPage,
+  LazyAuthCallbackPage,
+} from './pages/LazyPages';
 
 import { profileAPI } from './lib/api/profile.api';
 import { UserProfile } from './types/api.types';
 import NetworkStatus from './components/common/NetworkStatus';
-import ProfileSettings from './components/layout/ProfileSettings';
 
-function App() {
+const AuthModal = lazy(() => import('./components/auth/AuthModal'));
+const ProfileSettings = lazy(() => import('./components/layout/ProfileSettings'));
+
+const MainLayout = () => {
   const [isAuthModalOpen, setAuthModalOpen] = useState(false);
   const [showProfileSettings, setShowProfileSettings] = useState(false);
-  const { user, loading, checkSession } = useAuthStore();
+  const { user, loading } = useAuthStore();
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const { i18n } = useTranslation();
   const { theme, toggleTheme } = useTheme();
@@ -60,30 +66,30 @@ function App() {
   };
 
   useEffect(() => {
-    checkSession();
-  }, [checkSession]);
+    let isMounted = true;
 
-  useEffect(() => {
     const fetchProfile = async () => {
-      if (user) {
+      if (user && isMounted) {
         try {
           const profile = await profileAPI.getProfile(user.id);
-          setUserProfile(profile);
+          if (isMounted) {
+            setUserProfile(profile);
+          }
         } catch (error) {
-          console.error('Failed to fetch user profile:', error);
+          // Only handle non-abort errors if component is still mounted
+          if (isMounted && (error as any).name !== 'AbortError') {
+            console.error('Failed to fetch user profile:', error);
+          }
+          // For AbortError, just return silently since it's expected during component unmount/cancellation
         }
       }
     };
     fetchProfile();
-  }, [user]);
 
-  // Инициализация Яндекс.Метрики
-  useEffect(() => {
-    if (import.meta.env.PROD && import.meta.env.VITE_YM_COUNTER_ID) {
-      initYandexMetrika(import.meta.env.VITE_YM_COUNTER_ID);
-      trackPageView();
-    }
-  }, [import.meta.env.VITE_YM_COUNTER_ID]);
+    return () => {
+      isMounted = false;
+    };
+  }, [user]);
 
   if (loading) {
     return (
@@ -124,25 +130,33 @@ function App() {
   }
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <div className={`min-h-screen bg-bg-primary text-text-primary ${theme}`}>
-        <Header
-          user={user}
-          userProfile={userProfile}
-          onSignIn={handleSignIn}
-          onSignOut={handleSignOut}
-          onChangeLanguage={changeLanguage}
-          onToggleTheme={toggleTheme}
-          currentTheme={theme}
-          onOpenProfileSettings={handleOpenProfileSettings}
-        />
-        <main>
-          <HeroSection />
-          <MarketProblems />
-          <SolutionBenefits />
-          <PetProject />
-        </main>
-        <Footer />
+    <div
+      className={`min-h-screen bg-bg-primary text-text-primary ${theme}`}
+      style={{
+        paddingLeft: 'env(safe-area-inset-left)',
+        paddingRight: 'env(safe-area-inset-right)',
+        paddingTop: 'env(safe-area-inset-top)',
+        paddingBottom: 'env(safe-area-inset-bottom)',
+      }}
+    >
+      <Header
+        user={user}
+        userProfile={userProfile}
+        onSignIn={handleSignIn}
+        onSignOut={handleSignOut}
+        onChangeLanguage={changeLanguage}
+        onToggleTheme={toggleTheme}
+        currentTheme={theme}
+        onOpenProfileSettings={handleOpenProfileSettings}
+      />
+      <main className="w-full">
+        <HeroSection />
+        <MarketProblems />
+        <SolutionBenefits />
+        <PetProject />
+      </main>
+      <Footer />
+      <Suspense fallback={null}>
         {isAuthModalOpen && <AuthModal onClose={() => setAuthModalOpen(false)} />}
         {showProfileSettings && (
           <ProfileSettings
@@ -150,14 +164,42 @@ function App() {
             onClose={() => setShowProfileSettings(false)}
           />
         )}
-        <Toaster
-          position="bottom-right"
-          theme={theme === 'dark' ? 'dark' : 'light'}
-          richColors
-          closeButton
-        />
-        <NetworkStatus />
-      </div>
+      </Suspense>
+      <Toaster
+        position="bottom-right"
+        theme={theme === 'dark' ? 'dark' : 'light'}
+        richColors
+        closeButton
+      />
+      <NetworkStatus />
+    </div>
+  );
+};
+
+function App() {
+  const { checkSession } = useAuthStore();
+  const location = useLocation();
+
+  useEffect(() => {
+    // Don't check session on the auth callback page, as the supabase client handles it.
+    if (location.pathname !== '/auth/callback') {
+      checkSession();
+    }
+  }, [checkSession, location.pathname]);
+
+  useEffect(() => {
+    if (import.meta.env.PROD && import.meta.env.VITE_YM_COUNTER_ID) {
+      initYandexMetrika(import.meta.env.VITE_YM_COUNTER_ID);
+      trackPageView();
+    }
+  }, [import.meta.env.VITE_YM_COUNTER_ID]);
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <Routes>
+        <Route path="/auth/callback" element={<LazyAuthCallbackPage />} />
+        <Route path="/*" element={<MainLayout />} />
+      </Routes>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );

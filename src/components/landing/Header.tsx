@@ -102,6 +102,7 @@ const Header = ({
               <div className="relative">
                 <button
                   onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                  aria-label={t('common.openUserMenu', 'Open user menu')}
                   className="w-10 h-10 rounded-full bg-accent-gradient-1 flex items-center justify-center text-white font-medium overflow-hidden"
                 >
                   {userProfile?.avatar_url ? (
@@ -182,6 +183,7 @@ const Header = ({
             <button
               onClick={() => setIsMenuOpen(true)}
               className="p-2 rounded-lg hover:bg-bg-secondary transition-colors"
+              aria-label={t('common.openNavigationMenu', 'Open navigation menu')}
             >
               <Menu className="w-6 h-6 text-text-secondary" />
             </button>

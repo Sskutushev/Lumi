@@ -1,5 +1,7 @@
 import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
+import path from 'path';
+import path from 'path';
 
 export default defineConfig({
   plugins: [react()],
@@ -8,10 +10,23 @@ export default defineConfig({
     globals: true,
     setupFiles: './src/test/setup.ts',
     css: true,
-    testTimeout: 10000, // Увеличиваем таймаут до 10 секунд
-    hookTimeout: 15000, // Увеличиваем таймаут для хуков
-    clearMocks: true, // Автоматически очищаем моки после каждого теста
-    teardownTimeout: 10000, // Увеличиваем таймаут для завершения тестов
-    isolate: true, // Изолируем тесты друг от друга
+    testTimeout: 10000, // Increase timeout to 10 seconds
+    hookTimeout: 15000, // Increase timeout for hooks
+    clearMocks: true, // Automatically clear mocks after each test
+    teardownTimeout: 10000, // Increase timeout for teardown
+    isolate: true, // Isolate tests from each other
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'html', 'json'],
+      lines: 60,
+      functions: 60,
+      branches: 60,
+      statements: 60,
+    },
+  },
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
   },
 });

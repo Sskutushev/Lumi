@@ -1,10 +1,10 @@
-// Типы для API слоя
+// API layer types
 
 export interface UserProfile {
-  id: string; // uuid, ссылка на auth.users
+  id: string; // uuid, references auth.users
   full_name?: string;
   avatar_url?: string;
-  storage_used: number; // в байтах
+  storage_used: number; // in bytes
   created_at: string;
   updated_at: string;
 }
@@ -81,7 +81,7 @@ export interface ProjectStats {
 }
 
 export interface StorageStats {
-  used: number; // в байтах
+  used: number; // in bytes
   limit: number; // 5GB = 5 * 1024 * 1024 * 1024
   percentage: number;
 }

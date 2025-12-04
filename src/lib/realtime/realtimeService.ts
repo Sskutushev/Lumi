@@ -12,7 +12,7 @@ class RealtimeService {
   private callbacks: Map<string, any> = new Map(); // Store original callbacks by key
 
   private constructor() {
-    // Инициализация BroadcastChannel для синхронизации между вкладками
+    // Initialize BroadcastChannel for cross-tab synchronization
     if (typeof window !== 'undefined' && window.BroadcastChannel) {
       this.broadcastChannel = new BroadcastChannel('lumi_realtime');
       this.broadcastChannel.onmessage = (event) => {
@@ -28,14 +28,14 @@ class RealtimeService {
     return RealtimeService.instance;
   }
 
-  // Подписка на реалтайм обновления задач
+  // Subscribe to real-time task updates
   subscribeToTasks(
     userId: string,
     callback: (task: Task, eventType: 'INSERT' | 'UPDATE' | 'DELETE') => void
   ) {
     const channelKey = `tasks-${userId}`;
 
-    // Сохраняем оригинальный колбэк для возможного переподключения
+    // Store the original callback for potential reconnection
     this.callbacks.set(channelKey, callback);
 
     const channel = supabase
@@ -49,10 +49,10 @@ class RealtimeService {
           filter: `user_id=eq.${userId}`,
         },
         (payload) => {
-          // Сбрасываем попытки переподключения при успешном получении данных
+          // Reset reconnect attempts on successful data reception
           this.resetReconnectAttempts(channelKey);
 
-          // Отправить обновление в другие вкладки
+          // Send update to other tabs
           if (this.broadcastChannel) {
             this.broadcastChannel.postMessage({
               type: 'TASK_UPDATE',
@@ -61,16 +61,21 @@ class RealtimeService {
             });
           }
 
-          // Вызвать локальный коллбэк
+          // Invoke local callback
           const record = (payload.new || payload.old) as any;
           if (record?.id) {
             callback(record as Task, payload.eventType as 'INSERT' | 'UPDATE' | 'DELETE');
           }
         }
       )
-      .subscribe();
+      .subscribe((status, err) => {
+        if (err) {
+          console.error(`Realtime subscription error for channel ${channelKey}:`, err);
+          this.reconnect(channelKey);
+        }
+      });
 
-    // Сохраняем канал для возможного отписания
+    // Store the channel for potential unsubscription
     this.channels.set(channelKey, channel);
     this.subscriptions.set(channelKey, () => {
       supabase.removeChannel(channel);
@@ -79,14 +84,14 @@ class RealtimeService {
     return channel;
   }
 
-  // Подписка на реалтайм обновления проектов
+  // Subscribe to real-time project updates
   subscribeToProjects(
     userId: string,
     callback: (projectId: string, eventType: 'INSERT' | 'UPDATE' | 'DELETE') => void
   ) {
     const channelKey = `projects-${userId}`;
 
-    // Сохраняем оригинальный колбэк для возможного переподключения
+    // Store the original callback for potential reconnection
     this.callbacks.set(channelKey, callback);
 
     const channel = supabase
@@ -100,10 +105,10 @@ class RealtimeService {
           filter: `user_id=eq.${userId}`,
         },
         (payload) => {
-          // Сбрасываем попытки переподключения при успешном получении данных
+          // Reset reconnect attempts on successful data reception
           this.resetReconnectAttempts(channelKey);
 
-          // Отправить обновление в другие вкладки
+          // Send update to other tabs
           if (this.broadcastChannel) {
             this.broadcastChannel.postMessage({
               type: 'PROJECT_UPDATE',
@@ -117,9 +122,14 @@ class RealtimeService {
           }
         }
       )
-      .subscribe();
+      .subscribe((status, err) => {
+        if (err) {
+          console.error(`Realtime subscription error for channel ${channelKey}:`, err);
+          this.reconnect(channelKey);
+        }
+      });
 
-    // Сохраняем канал для возможного отписания
+    // Store the channel for potential unsubscription
     this.channels.set(channelKey, channel);
     this.subscriptions.set(channelKey, () => {
       supabase.removeChannel(channel);
@@ -128,7 +138,7 @@ class RealtimeService {
     return channel;
   }
 
-  // Отписка от обновлений
+  // Unsubscribe from updates
   unsubscribe(key: string | RealtimeChannel) {
     if (typeof key === 'string') {
       // If key is a string, look up in the subscriptions map
@@ -145,31 +155,31 @@ class RealtimeService {
     }
   }
 
-  // Метод для переподключения
+  // Method to handle reconnection
   async reconnect(channelKey: string, maxAttempts = 3) {
     const attempts = this.reconnectAttempts.get(channelKey) || 0;
 
     if (attempts < maxAttempts) {
-      // Увеличиваем количество попыток
+      // Increment attempt count
       this.reconnectAttempts.set(channelKey, attempts + 1);
 
-      // Вычисляем задержку с экспоненциальным откладыванием
+      // Calculate delay with exponential backoff
       const delay = Math.pow(2, attempts) * 1000;
 
       console.log(
         `Attempting to reconnect to channel ${channelKey}, attempt ${attempts + 1}/${maxAttempts}, delay: ${delay}ms`
       );
 
-      // Ждем заданное время перед повторной попыткой
+      // Wait for the specified delay
       await new Promise((resolve) => setTimeout(resolve, delay));
 
-      // Удаляем текущий канал из Supabase
+      // Remove the existing channel from Supabase
       const existingChannel = this.channels.get(channelKey);
       if (existingChannel) {
         supabase.removeChannel(existingChannel);
       }
 
-      // Восстанавливаем подписку в зависимости от типа канала
+      // Restore the subscription based on channel type
       if (channelKey.startsWith('tasks-')) {
         const userId = channelKey.replace('tasks-', '');
         const reconnectCallback = this.callbacks.get(channelKey);
@@ -189,18 +199,18 @@ class RealtimeService {
       }
     } else {
       console.log(`Max reconnection attempts reached for channel ${channelKey}`);
-      // Сброс попыток, чтобы дать шанс в будущем
+      // Reset attempts to allow future retries
       this.reconnectAttempts.delete(channelKey);
-      // Можно выбросить событие об ошибке подключения
+      // An event could be emitted here to notify the UI
     }
   }
 
-  // Метод для сброса попыток переподключения
+  // Method to reset reconnection attempts
   resetReconnectAttempts(channelKey: string) {
     this.reconnectAttempts.delete(channelKey);
   }
 
-  // Отправка сообщения в канал для синхронизации между вкладками
+  // Send a message to the broadcast channel for cross-tab sync
   broadcastMessage(message: any) {
     if (this.broadcastChannel) {
       this.broadcastChannel.postMessage({
@@ -211,21 +221,21 @@ class RealtimeService {
     }
   }
 
-  // Обработка сообщений из BroadcastChannel
+  // Handle messages from the BroadcastChannel
   private handleBroadcastMessage(data: any) {
     if (data.source === 'local') {
-      // Это сообщение пришло из другой вкладки, не пересылать его обратно
+      // This message came from the current tab, don't process it again
       return;
     }
 
-    // Обработка реалтайм обновлений
+    // Process real-time updates from other tabs
     switch (data.type) {
       case 'TASK_UPDATE':
-        // Обновление задачи пришло из другого источника
+        // A task was updated in another source
         console.log('Task update from other tab or user:', data.data);
         break;
       case 'PROJECT_UPDATE':
-        // Обновление проекта пришло из другого источника
+        // A project was updated in another source
         console.log('Project update from other tab or user:', data.data);
         break;
       default:
@@ -233,7 +243,7 @@ class RealtimeService {
     }
   }
 
-  // Присоединение к presence-каналу для отслеживания онлайн-статуса
+  // Join a presence channel to track online status
   joinPresenceChannel(channelName: string, userId: string, userData: any) {
     const channel = supabase.channel(channelName, {
       config: {
@@ -245,7 +255,7 @@ class RealtimeService {
 
     channel.subscribe(async (status) => {
       if (status === 'SUBSCRIBED') {
-        // Как только подписка установлена, отслеживаем пользователя
+        // Once subscribed, track the user's presence
         await channel.track({
           user_id: userId,
           ...userData,
@@ -257,14 +267,14 @@ class RealtimeService {
     return channel;
   }
 
-  // Получение списка пользователей в канале
+  // Get a list of users in a presence channel
   getPresenceUsers(channelName: string) {
     const channel = supabase.channel(channelName);
     const presenceState = channel.presenceState();
     return presenceState;
   }
 
-  // Очистка всех подписок
+  // Clean up all subscriptions
   cleanup() {
     this.subscriptions.forEach((unsubscribeFn) => {
       unsubscribeFn();

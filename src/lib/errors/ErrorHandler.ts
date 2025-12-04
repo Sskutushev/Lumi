@@ -3,9 +3,9 @@ import { AppError, ErrorType } from './errorTypes';
 
 export class ErrorHandler {
   static handle(error: any): AppError {
-    // Определяем тип ошибки на основе различных признаков
+    // Determine error type based on various signatures
 
-    // Проверяем, является ли ошибка ошибкой сети
+    // Check for network errors
     if (this.isNetworkError(error)) {
       return {
         type: ErrorType.NetworkError,
@@ -15,7 +15,7 @@ export class ErrorHandler {
       };
     }
 
-    // Проверяем, является ли ошибка ошибкой авторизации
+    // Check for authentication errors
     if (this.isAuthError(error)) {
       return {
         type: ErrorType.AuthError,
@@ -25,7 +25,7 @@ export class ErrorHandler {
       };
     }
 
-    // Проверяем, является ли ошибка ошибкой валидации
+    // Check for validation errors
     if (this.isValidationError(error)) {
       return {
         type: ErrorType.ValidationError,
@@ -34,7 +34,7 @@ export class ErrorHandler {
       };
     }
 
-    // Проверяем, является ли ошибка ошибкой квоты
+    // Check for quota errors
     if (this.isQuotaError(error)) {
       return {
         type: ErrorType.QuotaError,
@@ -44,7 +44,7 @@ export class ErrorHandler {
       };
     }
 
-    // Проверяем, является ли ошибка ошибкой "не найдено"
+    // Check for not found errors
     if (this.isNotFoundError(error)) {
       return {
         type: ErrorType.NotFoundError,
@@ -54,7 +54,7 @@ export class ErrorHandler {
       };
     }
 
-    // Проверяем, является ли ошибка ошибкой конфликта
+    // Check for conflict errors
     if (this.isConflictError(error)) {
       return {
         type: ErrorType.ConflictError,
@@ -64,7 +64,7 @@ export class ErrorHandler {
       };
     }
 
-    // Проверяем, является ли ошибка серверной ошибкой
+    // Check for server errors
     if (this.isServerError(error)) {
       return {
         type: ErrorType.ServerError,
@@ -74,7 +74,7 @@ export class ErrorHandler {
       };
     }
 
-    // Если не удается определить конкретный тип ошибки
+    // Fallback for unknown errors
     return {
       type: ErrorType.UnknownError,
       message: error.message || 'An unknown error occurred',
