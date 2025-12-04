@@ -14,13 +14,12 @@ export const tasksAPI = {
    * @returns A promise that resolves to an array of tasks.
    */
   async getAll(userId: string, projectId?: string): Promise<Task[]> {
-    const controller = abortControllerService.create(
-      `tasks-getAll-${userId}-${projectId || 'all'}`
-    );
+    const controllerId = `tasks-getAll-${userId}-${projectId || 'all'}`;
+    abortControllerService.create(controllerId);
     try {
       let query = supabase
         .from('tasks')
-        .select('*', { signal: controller.signal })
+        .select('*')
         .eq('user_id', userId)
         .order('created_at', { ascending: false });
 
@@ -39,8 +38,7 @@ export const tasksAPI = {
       }
       return []; // Return empty array on abort
     } finally {
-      controller.abort();
-      abortControllerService.cleanup(`tasks-getAll-${userId}-${projectId || 'all'}`);
+      abortControllerService.cleanup(controllerId);
     }
   },
 
@@ -50,13 +48,10 @@ export const tasksAPI = {
    * @returns A promise that resolves to the task object.
    */
   async getById(id: string): Promise<Task> {
-    const controller = abortControllerService.create(`tasks-getById-${id}`);
+    const controllerId = `tasks-getById-${id}`;
+    abortControllerService.create(controllerId);
     try {
-      const { data, error } = await supabase
-        .from('tasks')
-        .select('*', { signal: controller.signal })
-        .eq('id', id)
-        .single();
+      const { data, error } = await supabase.from('tasks').select('*').eq('id', id).single();
 
       if (error) throw error;
       return data as Task;
@@ -67,8 +62,7 @@ export const tasksAPI = {
       }
       throw error;
     } finally {
-      controller.abort();
-      abortControllerService.cleanup(`tasks-getById-${id}`);
+      abortControllerService.cleanup(controllerId);
     }
   },
 
@@ -78,7 +72,8 @@ export const tasksAPI = {
    * @returns A promise that resolves to the newly created task.
    */
   async create(task: CreateTaskDTO): Promise<Task> {
-    const controller = abortControllerService.create(`tasks-create`);
+    const controllerId = `tasks-create`;
+    abortControllerService.create(controllerId);
     try {
       validateUserInput(task, taskInputSchema);
 
@@ -90,7 +85,7 @@ export const tasksAPI = {
 
       const { data, error } = await supabase
         .from('tasks')
-        .insert([sanitizedTask], { signal: controller.signal })
+        .insert([sanitizedTask])
         .select()
         .single();
 
@@ -103,8 +98,7 @@ export const tasksAPI = {
       }
       throw error;
     } finally {
-      controller.abort();
-      abortControllerService.cleanup(`tasks-create`);
+      abortControllerService.cleanup(controllerId);
     }
   },
 
@@ -115,7 +109,8 @@ export const tasksAPI = {
    * @returns A promise that resolves to the updated task.
    */
   async update(id: string, updates: UpdateTaskDTO): Promise<Task> {
-    const controller = abortControllerService.create(`tasks-update-${id}`);
+    const controllerId = `tasks-update-${id}`;
+    abortControllerService.create(controllerId);
     try {
       const updateSchema = taskInputSchema.partial();
       validateUserInput(updates, updateSchema);
@@ -146,7 +141,7 @@ export const tasksAPI = {
 
       const { data, error } = await supabase
         .from('tasks')
-        .update(sanitizedUpdates, { signal: controller.signal })
+        .update(sanitizedUpdates)
         .eq('id', id)
         .select()
         .single();
@@ -160,8 +155,7 @@ export const tasksAPI = {
       }
       throw error;
     } finally {
-      controller.abort();
-      abortControllerService.cleanup(`tasks-update-${id}`);
+      abortControllerService.cleanup(controllerId);
     }
   },
 
@@ -171,12 +165,10 @@ export const tasksAPI = {
    * @returns A promise that resolves when the operation is complete.
    */
   async delete(id: string): Promise<void> {
-    const controller = abortControllerService.create(`tasks-delete-${id}`);
+    const controllerId = `tasks-delete-${id}`;
+    abortControllerService.create(controllerId);
     try {
-      const { error } = await supabase
-        .from('tasks')
-        .delete({ signal: controller.signal })
-        .eq('id', id);
+      const { error } = await supabase.from('tasks').delete().eq('id', id);
 
       if (error) throw error;
     } catch (error) {
@@ -185,8 +177,7 @@ export const tasksAPI = {
         throw ErrorHandler.handle(error);
       }
     } finally {
-      controller.abort();
-      abortControllerService.cleanup(`tasks-delete-${id}`);
+      abortControllerService.cleanup(controllerId);
     }
   },
 

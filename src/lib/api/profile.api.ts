@@ -13,21 +13,19 @@ export const profileAPI = {
    * @returns A promise that resolves to the newly created user profile.
    */
   async createProfile(userId: string): Promise<UserProfile> {
-    const controller = abortControllerService.create(`profile-create-${userId}`);
+    const controllerId = `profile-create-${userId}`;
+    abortControllerService.create(controllerId);
     try {
       const { data, error } = await supabase
         .from('users_profile')
-        .insert(
-          [
-            {
-              id: userId,
-              full_name: '',
-              avatar_url: null,
-              storage_used: 0,
-            },
-          ],
-          { signal: controller.signal }
-        )
+        .insert([
+          {
+            id: userId,
+            full_name: '',
+            avatar_url: null,
+            storage_used: 0,
+          },
+        ])
         .select()
         .single();
 
@@ -35,14 +33,13 @@ export const profileAPI = {
       return data as UserProfile;
     } catch (error) {
       if ((error as any).name === 'AbortError') {
-        // For AbortError, we still want to throw it but skip logging since it's expected during cancellation
         throw error;
       } else {
         Logger.error('Failed to create profile:', error);
         throw ErrorHandler.handle(error);
       }
     } finally {
-      abortControllerService.cleanup(`profile-create-${userId}`);
+      abortControllerService.cleanup(controllerId);
     }
   },
 
@@ -52,7 +49,8 @@ export const profileAPI = {
    * @returns A promise that resolves to the user profile.
    */
   async getProfile(userId: string): Promise<UserProfile> {
-    const _controller = abortControllerService.create(`profile-get-${userId}`);
+    const controllerId = `profile-get-${userId}`;
+    abortControllerService.create(controllerId);
     try {
       // Upsert does not support abortSignal, so we perform it without cancellation.
       // Perform upsert without awaiting to prevent blocking
@@ -78,9 +76,7 @@ export const profileAPI = {
 
       const { data, error } = await supabase
         .from('users_profile')
-        .select('id, full_name, avatar_url, storage_used, created_at, updated_at', {
-          signal: _controller.signal,
-        })
+        .select('id, full_name, avatar_url, storage_used, created_at, updated_at')
         .eq('id', userId)
         .single();
 
@@ -95,8 +91,7 @@ export const profileAPI = {
         throw ErrorHandler.handle(error);
       }
     } finally {
-      _controller.abort();
-      abortControllerService.cleanup(`profile-get-${userId}`);
+      abortControllerService.cleanup(controllerId);
     }
   },
 
@@ -107,11 +102,12 @@ export const profileAPI = {
    * @returns A promise that resolves to the updated user profile.
    */
   async updateProfile(userId: string, data: UpdateProfileDTO): Promise<UserProfile> {
-    const _controller = abortControllerService.create(`profile-update-${userId}`);
+    const controllerId = `profile-update-${userId}`;
+    abortControllerService.create(controllerId);
     try {
       const { data: updatedData, error } = await supabase
         .from('users_profile')
-        .update(data, { signal: _controller.signal })
+        .update(data)
         .eq('id', userId)
         .select()
         .single();
@@ -121,7 +117,7 @@ export const profileAPI = {
           // Profile not found, try to insert
           const { data: newData, error: newError } = await supabase
             .from('users_profile')
-            .insert([{ ...data, id: userId }], { signal: _controller.signal })
+            .insert([{ ...data, id: userId }])
             .select()
             .single();
 
@@ -135,15 +131,13 @@ export const profileAPI = {
       return updatedData as UserProfile;
     } catch (error) {
       if ((error as any).name === 'AbortError') {
-        // For AbortError, we still want to throw it but skip logging since it's expected during cancellation
         throw error;
       } else {
         Logger.error('Failed to update profile:', error);
         throw ErrorHandler.handle(error);
       }
     } finally {
-      _controller.abort();
-      abortControllerService.cleanup(`profile-update-${userId}`);
+      abortControllerService.cleanup(controllerId);
     }
   },
 
@@ -198,7 +192,8 @@ export const profileAPI = {
    * @returns A promise that resolves to an object with storage statistics.
    */
   async getStorageStats(userId: string): Promise<StorageStats> {
-    const controller = abortControllerService.create(`profile-getStats-${userId}`);
+    const controllerId = `profile-getStats-${userId}`;
+    abortControllerService.create(controllerId);
     try {
       const profile = await this.getProfile(userId);
 
@@ -211,15 +206,13 @@ export const profileAPI = {
       };
     } catch (error) {
       if ((error as any).name === 'AbortError') {
-        // For AbortError, we still want to throw it but skip logging since it's expected during cancellation
         throw error;
       } else {
         Logger.error('Failed to get storage stats:', error);
         throw ErrorHandler.handle(error);
       }
     } finally {
-      controller.abort();
-      abortControllerService.cleanup(`profile-getStats-${userId}`);
+      abortControllerService.cleanup(controllerId);
     }
   },
 };
