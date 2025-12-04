@@ -1,30 +1,26 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Task, Project } from '../../types/api.types';
+import { Task } from '../../types/api.types';
 import TaskItem from '../TaskItem';
 import EmptyState from '../common/EmptyState';
 import { CheckCircle } from 'lucide-react';
 
 interface TasksListProps {
   filteredTasks?: Task[];
-  projects: Project[];
   handleUpdateTask: (id: string, updates: Partial<Task>) => void;
   handleDeleteTask: (id: string) => void;
   toggleComplete: (id: string) => void;
   setSelectedTask: (task: Task) => void;
-  currentView: string;
   addTaskFocus?: () => void;
 }
 
 const TasksList: React.FC<TasksListProps> = React.memo(
   ({
     filteredTasks,
-    projects,
     handleUpdateTask,
     handleDeleteTask,
     toggleComplete,
     setSelectedTask,
-    currentView,
     addTaskFocus,
   }) => {
     const { t } = useTranslation();

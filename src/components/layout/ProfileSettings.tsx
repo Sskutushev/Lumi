@@ -75,18 +75,23 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ isOpen, onClose }) =>
 
       const [profile, storageStatsData, stats] = results;
 
-      if (isMountedRef.current && profile && typeof profile === 'object' && !profile.__aborted) {
+      if (
+        isMountedRef.current &&
+        profile &&
+        typeof profile === 'object' &&
+        !(profile as any).__aborted
+      ) {
         setUserData((prev) => ({
           ...prev,
-          name: profile.full_name || '',
+          name: (profile as UserProfile).full_name || '',
           email: user.email || '',
           currentPassword: '',
           newPassword: '',
-          avatar: profile.avatar_url || '',
+          avatar: (profile as UserProfile).avatar_url || '',
         }));
 
-        setStorageStats(storageStatsData);
-        setUserStats(stats);
+        setStorageStats(storageStatsData as StorageStats);
+        setUserStats(stats as UserStats);
       }
     } catch (error) {
       // Only show error if component is still mounted and it's not an AbortError

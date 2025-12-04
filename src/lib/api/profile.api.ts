@@ -53,12 +53,10 @@ export const profileAPI = {
     const controller = abortControllerService.create(`profile-get-${userId}`);
     try {
       // Upsert does not support abortSignal, so we perform it without cancellation.
-      // Since this is an upsert, we don't need to wait for it to complete before making the select query
       // Perform upsert without awaiting to prevent blocking
-      // We'll handle the upsert in a different way compatible with newer Supabase versions
-      supabase
-        .from('users_profile')
-        .upsert(
+      // Handle upsert in a way compatible with Supabase SDK
+      try {
+        await supabase.from('users_profile').upsert(
           [
             {
               id: userId,
@@ -70,14 +68,11 @@ export const profileAPI = {
           {
             onConflict: 'id',
           }
-        )
-        .then(() => {
-          // Upsert succeeded, nothing to log on success
-        })
-        .catch((err) => {
-          // Log the error but don't throw it, as upsert is just for ensuring the record exists
-          Logger.warn('Profile upsert failed, continuing with select query:', err);
-        });
+        );
+      } catch (err) {
+        // Log the error but don't throw it, as upsert is just for ensuring the record exists
+        Logger.warn('Profile upsert failed, continuing with select query:', err);
+      }
 
       const { data, error } = await supabase
         .from('users_profile')

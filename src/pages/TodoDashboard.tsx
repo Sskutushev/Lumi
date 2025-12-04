@@ -109,19 +109,6 @@ const TodoDashboard: React.FC<TodoDashboardProps> = ({ onSignOut, onProjectSelec
     [tasks, handleUpdateTask]
   );
 
-  // Map currentView to status filter
-  const statusFilter = useMemo(() => {
-    switch (currentView) {
-      case 'completed':
-        return 'completed';
-      case 'important': // This should show overdue tasks
-        return 'pending'; // Overdue tasks are pending tasks past their due date
-      case 'all':
-      default:
-        return 'all';
-    }
-  }, [currentView]);
-
   // Combine currentView with advancedFilters
   const combinedFilters = useMemo(() => {
     // Check the Sidebar component - 'important' tab is actually for overdue tasks
@@ -154,11 +141,25 @@ const TodoDashboard: React.FC<TodoDashboardProps> = ({ onSignOut, onProjectSelec
     // Ensure tasks and projects are arrays before filtering
     let result = filterAndSortTasks(tasks || [], projects || [], combinedFilters);
 
-    // Special handling for 'important' view - show overdue tasks
-    // Overdue tasks are incomplete tasks with due date in the past
+    // Special handling for different views
     if (currentView === 'important') {
+      // For 'important' view, show overdue tasks - incomplete tasks with due date in the past
       result = result.filter((task) => {
         return !task.completed && task.due_date && new Date(task.due_date) < new Date();
+      });
+    } else if (currentView === 'upcoming') {
+      // For 'upcoming' view, show tasks due within 3 days
+      const today = new Date();
+      const threeDaysFromNow = new Date();
+      threeDaysFromNow.setDate(today.getDate() + 3);
+
+      result = result.filter((task) => {
+        return (
+          !task.completed &&
+          task.due_date &&
+          new Date(task.due_date) >= today &&
+          new Date(task.due_date) <= threeDaysFromNow
+        );
       });
     }
 

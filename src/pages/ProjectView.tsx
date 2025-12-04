@@ -1,14 +1,15 @@
 // src/pages/ProjectView.tsx
-import React, { useState, useCallback, lazy, Suspense } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, MoreHorizontal, CheckCircle, Plus, FolderOpen, Calendar } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { projectsAPI } from '../lib/api/projects.api';
 import { Task, Project, ProjectStats } from '../types/api.types';
 import { useTasks } from '../hooks/queries/useTasks';
 import { useCreateTask } from '../hooks/mutations/useCreateTask';
 import { useUpdateTask } from '../hooks/mutations/useUpdateTask';
+import { useDeleteTask } from '../hooks/mutations/useDeleteTask';
 import TaskDetailsPopup from '../components/layout/TaskDetailsPopup';
 import EmptyState from '../components/common/EmptyState';
 import SkeletonLoader from '../components/common/SkeletonLoader';
@@ -33,6 +34,7 @@ const ProjectView: React.FC<ProjectViewProps> = ({ project, onBack }) => {
 
   const createTaskMutation = useCreateTask();
   const updateTaskMutation = useUpdateTask();
+  const deleteTaskMutation = useDeleteTask();
 
   const [showTaskCreation, setShowTaskCreation] = useState(false);
   const [newTaskTitle, setNewTaskTitle] = useState('');
@@ -74,6 +76,13 @@ const ProjectView: React.FC<ProjectViewProps> = ({ project, onBack }) => {
       updateTaskMutation.mutate({ id, data: updates });
     },
     [updateTaskMutation]
+  );
+
+  const deleteTask = useCallback(
+    (id: string) => {
+      deleteTaskMutation.mutate(id);
+    },
+    [deleteTaskMutation]
   );
 
   if (loading) {
@@ -209,7 +218,7 @@ const ProjectView: React.FC<ProjectViewProps> = ({ project, onBack }) => {
                     key={task.id || `task-${index}`} // Use task id or fallback to index-based key
                     task={task}
                     onUpdate={updateTask}
-                    onDelete={handleDeleteTask}
+                    onDelete={deleteTask}
                     onToggleComplete={() => toggleTaskCompletion(task)}
                     onEditDetails={() => setSelectedTask(task)}
                   />
