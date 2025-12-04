@@ -80,7 +80,7 @@ const TaskItem = React.memo(
           <button
             onClick={handleToggleComplete}
             onKeyDown={handleKeyDown}
-            className={`flex-shrink-0 w-6 h-6 rounded-lg flex items-center justify-center mt-0.5 ${task.completed ? 'bg-gradient-animated' : 'border border-border bg-transparent'}`}
+            className={`flex-shrink-0 w-6 h-6 rounded-lg flex items-center justify-center mt-0.5 ${task.completed ? 'bg-gradient-animated' : 'border-1.5 border-gray-400 bg-transparent'}`}
             aria-label={task.completed ? t('todo.markAsIncomplete') : t('todo.markAsComplete')}
             aria-checked={task.completed}
             role="checkbox"
@@ -95,13 +95,13 @@ const TaskItem = React.memo(
                 onChange={(e) => setEditingTitle(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSave()}
                 onBlur={handleSave}
-                className="w-full px-2 py-1 rounded border border-border bg-transparent focus:outline-none focus:border-accent-primary"
+                className="w-full px-2 py-1 rounded bg-transparent focus:outline-none focus:border-accent-primary"
                 autoFocus
                 aria-label={t('todo.editTaskName')}
               />
             ) : (
               <p
-                className={`cursor-pointer font-medium px-2 py-1 rounded border border-border ${task.completed ? 'line-through text-text-tertiary' : 'text-text-primary'}`}
+                className={`cursor-pointer font-medium px-2 py-1 rounded ${task.completed ? 'line-through text-text-tertiary' : 'text-text-primary'}`}
                 onClick={() => onEditDetails(task)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {

@@ -38,7 +38,7 @@ const TasksHeader: React.FC<TasksHeaderProps> = ({
             <input
               type="text"
               placeholder={t('todo.searchPlaceholder') || 'Search tasks...'}
-              className="pl-10 pr-4 py-2 rounded-xl border border-border bg-transparent focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20 focus:outline-none outline-none transition-all text-text-primary min-w-[180px]"
+              className="pl-10 pr-4 py-2 rounded-xl border-1.5 border-gray-400 bg-transparent focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20 focus:outline-none outline-none transition-all text-text-primary min-w-[180px]"
               value={advancedFilters.searchQuery}
               onChange={(e) =>
                 setAdvancedFilters((prev) => ({ ...prev, searchQuery: e.target.value }))
@@ -61,7 +61,7 @@ const TasksHeader: React.FC<TasksHeaderProps> = ({
             onChange={(e) => setNewTask(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && addTask()}
             placeholder={t('todo.addTaskPlaceholder') || 'Add a new task...'}
-            className="w-full px-4 py-3 rounded-xl border border-border bg-transparent focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20 focus:outline-none outline-none transition-all placeholder:text-text-tertiary text-text-primary"
+            className="w-full px-4 py-3 rounded-xl border-1.5 border-gray-400 bg-transparent focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20 focus:outline-none outline-none transition-all placeholder:text-text-tertiary text-text-primary"
           />
           <button
             onClick={addTask}

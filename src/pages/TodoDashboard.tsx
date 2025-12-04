@@ -198,7 +198,9 @@ const TodoDashboard: React.FC<TodoDashboardProps> = ({ onSignOut, onProjectSelec
 
         <main className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="md:col-span-1">
-            <Sidebar currentView={currentView} setCurrentView={setCurrentView} tasks={tasks} />
+            <div className="mb-2.5">
+              <Sidebar currentView={currentView} setCurrentView={setCurrentView} tasks={tasks} />
+            </div>
             <ProjectsList
               projects={projects}
               onProjectSelect={onProjectSelect}

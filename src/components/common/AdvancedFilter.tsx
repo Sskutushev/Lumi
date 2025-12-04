@@ -94,7 +94,7 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="p-2 rounded-lg border border-border bg-transparent hover:bg-bg-secondary focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20 focus:outline-none flex items-center gap-2 relative"
+        className="p-2 rounded-lg border-1.5 border-gray-400 bg-transparent hover:bg-bg-secondary focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20 focus:outline-none flex items-center gap-2 relative"
         aria-label={t('todo.advancedFilters') || 'Advanced filters'}
       >
         <FilterIcon className="w-5 h-5 text-text-secondary" />
@@ -141,7 +141,7 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({
                     value={filters.searchQuery}
                     onChange={(e) => handleFilterChange('searchQuery', e.target.value)}
                     placeholder={t('todo.searchPlaceholder') || 'Search tasks...'}
-                    className="w-full px-3 py-2 rounded-lg border border-border bg-bg-tertiary/50 focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20 outline-none transition-all text-text-primary text-sm"
+                    className="w-full px-3 py-2 rounded-lg border-1.5 border-gray-400 bg-bg-tertiary/50 focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20 outline-none transition-all text-text-primary text-sm"
                   />
                 </div>
               </div>
@@ -156,7 +156,7 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({
                     <button
                       key={status}
                       onClick={() => handleFilterChange('status', status)}
-                      className={`px-3 py-1.5 rounded-lg text-xs capitalize ${
+                      className={`px-3 py-1.5 rounded-lg text-xs capitalize border-1.5 border-gray-400 ${
                         filters.status === status
                           ? 'bg-accent-primary text-white'
                           : 'bg-bg-secondary text-text-secondary hover:bg-bg-tertiary'
@@ -183,7 +183,7 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({
                           filters.priority === priority ? null : priority
                         )
                       }
-                      className={`px-3 py-1.5 rounded-lg text-xs capitalize flex items-center gap-1 ${
+                      className={`px-3 py-1.5 rounded-lg text-xs capitalize flex items-center gap-1 border-1.5 border-gray-400 ${
                         filters.priority === priority
                           ? 'bg-accent-primary text-white'
                           : 'bg-bg-secondary text-text-secondary hover:bg-bg-tertiary'
@@ -204,7 +204,7 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({
                 <div className="space-y-1 max-h-32 overflow-y-auto">
                   <button
                     onClick={() => handleFilterChange('project_id', null)}
-                    className={`w-full text-left px-3 py-1.5 rounded-lg text-sm ${
+                    className={`w-full text-left px-3 py-1.5 rounded-lg text-sm border-1.5 border-gray-400 ${
                       !filters.project_id
                         ? 'bg-accent-primary/10 text-accent-primary font-medium'
                         : 'hover:bg-bg-secondary'
@@ -216,12 +216,13 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({
                     <button
                       key={project.id}
                       onClick={() => handleFilterChange('project_id', project.id)}
-                      className={`w-full text-left px-3 py-1.5 rounded-lg text-sm truncate ${
+                      className={`w-full text-left px-3 py-1.5 rounded-lg text-sm truncate border-1.5 border-gray-400 ${
                         filters.project_id === project.id
                           ? 'bg-accent-primary/10 text-accent-primary font-medium'
                           : 'hover:bg-bg-secondary'
                       }`}
                     >
+                      {' '}
                       {project.name}
                     </button>
                   ))}
@@ -238,7 +239,7 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({
                     <button
                       key={sortBy}
                       onClick={() => handleFilterChange('sortBy', sortBy)}
-                      className={`px-3 py-1.5 rounded-lg text-xs capitalize ${
+                      className={`px-3 py-1.5 rounded-lg text-xs capitalize border-1.5 border-gray-400 ${
                         filters.sortBy === sortBy
                           ? 'bg-accent-primary text-white'
                           : 'bg-bg-secondary text-text-secondary hover:bg-bg-tertiary'
@@ -256,7 +257,7 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({
                 <div className="mt-2 flex gap-2">
                   <button
                     onClick={() => handleFilterChange('sortOrder', 'asc')}
-                    className={`px-3 py-1.5 rounded-lg text-xs ${
+                    className={`px-3 py-1.5 rounded-lg text-xs border-1.5 border-gray-400 ${
                       filters.sortOrder === 'asc'
                         ? 'bg-accent-primary text-white'
                         : 'bg-bg-secondary text-text-secondary hover:bg-bg-tertiary'
@@ -266,7 +267,7 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({
                   </button>
                   <button
                     onClick={() => handleFilterChange('sortOrder', 'desc')}
-                    className={`px-3 py-1.5 rounded-lg text-xs ${
+                    className={`px-3 py-1.5 rounded-lg text-xs border-1.5 border-gray-400 ${
                       filters.sortOrder === 'desc'
                         ? 'bg-accent-primary text-white'
                         : 'bg-bg-secondary text-text-secondary hover:bg-bg-tertiary'
@@ -285,7 +286,7 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({
                     value={newFilterName}
                     onChange={(e) => setNewFilterName(e.target.value)}
                     placeholder={t('todo.saveFilterPlaceholder') || 'Save filter as...'}
-                    className="flex-1 px-3 py-1.5 rounded-lg border border-border bg-bg-tertiary/50 focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20 outline-none transition-all text-text-primary text-sm"
+                    className="flex-1 px-3 py-1.5 rounded-lg border-1.5 border-gray-400 bg-bg-tertiary/50 focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20 outline-none transition-all text-text-primary text-sm"
                   />
                   <button
                     onClick={saveCurrentFilter}
@@ -333,7 +334,7 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({
             <div className="px-4 pt-4 border-t border-border flex justify-between">
               <button
                 onClick={clearFilters}
-                className="px-3 py-1.5 rounded-lg bg-bg-secondary text-text-primary text-sm flex items-center gap-1"
+                className="px-3 py-1.5 rounded-lg bg-bg-secondary text-text-primary text-sm flex items-center gap-1 border-1.5 border-gray-400"
               >
                 <RotateCcw className="w-4 h-4" />
                 {t('common.clear') || 'Clear'}
