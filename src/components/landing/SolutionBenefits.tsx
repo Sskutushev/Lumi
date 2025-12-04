@@ -87,7 +87,7 @@ const SolutionBenefits = () => {
             initial={reducedMotion ? 'hidden' : 'hidden'}
             whileInView={reducedMotion ? 'visible' : 'visible'}
             viewport={{ once: true }}
-            className="md:col-span-2 rounded-xl bg-gradient-to-br from-accent-primary/10 to-accent-secondary/10 border border-border p-3 flex flex-col justify-center text-left"
+            className="md:col-span-2 rounded-xl bg-gradient-to-br from-accent-primary/10 to-accent-secondary/10 border-2 border-border p-3 flex flex-col justify-center text-left"
           >
             <div className="w-20 h-20 rounded-xl bg-white/10 flex items-center justify-center mb-2 flex-shrink-0">
               <img src={simpleImg} alt="Simple" className="w-24 h-24 object-contain" />
@@ -117,7 +117,7 @@ const SolutionBenefits = () => {
             initial={reducedMotion ? 'hidden' : 'hidden'}
             whileInView={reducedMotion ? 'visible' : 'visible'}
             viewport={{ once: true }}
-            className="md:col-span-2 rounded-xl bg-bg-elevated border border-border p-3 flex flex-col justify-center text-left"
+            className="md:col-span-2 rounded-xl bg-bg-elevated border-2 border-border p-3 flex flex-col justify-center text-left"
           >
             <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center mb-2 flex-shrink-0">
               <img src={freeImg} alt="Free" className="w-16 h-16 object-contain" />
@@ -147,7 +147,7 @@ const SolutionBenefits = () => {
             initial={reducedMotion ? 'hidden' : 'hidden'}
             whileInView={reducedMotion ? 'visible' : 'visible'}
             viewport={{ once: true }}
-            className="md:col-span-1 rounded-xl bg-bg-elevated border border-border p-2 flex flex-col justify-center text-left"
+            className="md:col-span-1 rounded-xl bg-bg-elevated border-2 border-border p-2 flex flex-col justify-center text-left"
           >
             <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center mb-1 flex-shrink-0">
               <img src={focusImg} alt="Focus" className="w-14 h-14 object-contain" />
@@ -163,7 +163,7 @@ const SolutionBenefits = () => {
             initial={reducedMotion ? 'hidden' : 'hidden'}
             whileInView={reducedMotion ? 'visible' : 'visible'}
             viewport={{ once: true }}
-            className="md:col-span-2 rounded-xl bg-gradient-to-r from-accent-tertiary/10 to-accent-primary/10 border border-border p-3 flex flex-col justify-center text-left"
+            className="md:col-span-2 rounded-xl bg-gradient-to-r from-accent-tertiary/10 to-accent-primary/10 border-2 border-border p-3 flex flex-col justify-center text-left"
           >
             <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center mb-2 flex-shrink-0">
               <img src={whyImg} alt="Why Lumi" className="w-16 h-16 object-contain" />
@@ -191,7 +191,7 @@ const SolutionBenefits = () => {
             initial={reducedMotion ? 'hidden' : 'hidden'}
             whileInView={reducedMotion ? 'visible' : 'visible'}
             viewport={{ once: true }}
-            className="md:col-span-1 rounded-xl bg-bg-elevated border border-border p-2 flex flex-col justify-center text-left"
+            className="md:col-span-1 rounded-xl bg-bg-elevated border-2 border-border p-2 flex flex-col justify-center text-left"
           >
             <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center mb-1 flex-shrink-0">
               <img src={secureImg} alt="Security" className="w-14 h-14 object-contain" />
