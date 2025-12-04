@@ -26,7 +26,7 @@ export const profileAPI = {
           },
         ])
         .select()
-        .abortSignal(controller.signal)
+        .abortSignal(_controller.signal)
         .single();
 
       if (error) throw error;
@@ -50,7 +50,7 @@ export const profileAPI = {
    * @returns A promise that resolves to the user profile.
    */
   async getProfile(userId: string): Promise<UserProfile> {
-    const controller = abortControllerService.create(`profile-get-${userId}`);
+    const _controller = abortControllerService.create(`profile-get-${userId}`);
     try {
       // Upsert does not support abortSignal, so we perform it without cancellation.
       // Perform upsert without awaiting to prevent blocking
@@ -78,7 +78,7 @@ export const profileAPI = {
         .from('users_profile')
         .select('id, full_name, avatar_url, storage_used, created_at, updated_at')
         .eq('id', userId)
-        .abortSignal(controller.signal)
+        .abortSignal(_controller.signal)
         .single();
 
       if (error) throw error;
@@ -103,14 +103,14 @@ export const profileAPI = {
    * @returns A promise that resolves to the updated user profile.
    */
   async updateProfile(userId: string, data: UpdateProfileDTO): Promise<UserProfile> {
-    const controller = abortControllerService.create(`profile-update-${userId}`);
+    const _controller = abortControllerService.create(`profile-update-${userId}`);
     try {
       const { data: updatedData, error } = await supabase
         .from('users_profile')
         .update(data)
         .eq('id', userId)
         .select()
-        .abortSignal(controller.signal)
+        .abortSignal(_controller.signal)
         .single();
 
       if (error) {
@@ -120,7 +120,7 @@ export const profileAPI = {
             .from('users_profile')
             .insert([{ ...data, id: userId }])
             .select()
-            .abortSignal(controller.signal)
+            .abortSignal(_controller.signal)
             .single();
 
           if (newError) throw ErrorHandler.handle(newError);
@@ -151,7 +151,7 @@ export const profileAPI = {
    * @returns A promise that resolves to the updated user profile.
    */
   async uploadAvatar(userId: string, file: File): Promise<UserProfile> {
-    const controller = abortControllerService.create(`profile-uploadAvatar-${userId}`);
+    const _controller = abortControllerService.create(`profile-uploadAvatar-${userId}`);
     try {
       if (file.size > MAX_AVATAR_SIZE_BYTES) {
         throw new Error(`File size exceeds ${MAX_AVATAR_SIZE_BYTES / 1024 / 1024}MB limit`);

@@ -16,7 +16,7 @@ export const useProfile = (userId: string) => {
     queryFn: () => profileAPI.getProfile(userId),
     enabled: !!userId,
     // Don't retry on abort errors
-    retry: (failureCount, error) => {
+    retry: (_failureCount, error) => {
       // Don't retry if it's an AbortError
       return (error as any).name !== 'AbortError';
     },

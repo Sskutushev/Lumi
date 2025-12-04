@@ -2,7 +2,7 @@
 import React, { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Plus, FolderOpen } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { projectsAPI } from '../lib/api/projects.api';
 import { Task, Project, ProjectStats } from '../types/api.types';

@@ -68,7 +68,7 @@ class RealtimeService {
           }
         }
       )
-      .subscribe((status, err) => {
+      .subscribe((_status, err) => {
         if (err) {
           console.error(`Realtime subscription error for channel ${channelKey}:`, err);
           this.reconnect(channelKey);
@@ -122,7 +122,7 @@ class RealtimeService {
           }
         }
       )
-      .subscribe((status, err) => {
+      .subscribe((_status, err) => {
         if (err) {
           console.error(`Realtime subscription error for channel ${channelKey}:`, err);
           this.reconnect(channelKey);

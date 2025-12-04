@@ -6,7 +6,7 @@ import { useAuthStore } from '../../store/authStore';
 import { profileAPI, formatBytes } from '../../lib/api/profile.api';
 import { tasksAPI } from '../../lib/api/tasks.api';
 import { supabase } from '../../lib/supabase';
-import { StorageStats, UserStats } from '../../types/api.types';
+import { StorageStats, UserStats, UserProfile } from '../../types/api.types';
 import { useQueryClient } from '@tanstack/react-query';
 import { MAX_AVATAR_SIZE_BYTES, STORAGE_WARNING_THRESHOLD } from '../../lib/constants';
 

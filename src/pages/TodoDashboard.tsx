@@ -187,7 +187,7 @@ const TodoDashboard: React.FC<TodoDashboardProps> = ({ onSignOut, onProjectSelec
             </h1>
           </div>
           <UserMenu
-            userProfile={userProfile}
+            userProfile={userProfile || null}
             user={user}
             isUserMenuOpen={isUserMenuOpen}
             setIsUserMenuOpen={setIsUserMenuOpen}
