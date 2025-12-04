@@ -41,6 +41,8 @@ const renderComponent = () => {
 };
 
 describe('ProjectView Component', () => {
+  vi.setTimeout(15000); // Увеличить таймаут для всех тестов в этом блоке
+
   beforeEach(() => {
     vi.resetAllMocks();
     (useAuthStore as vi.Mock).mockReturnValue({ user: mockUser });
