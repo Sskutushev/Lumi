@@ -76,8 +76,12 @@ const MainLayout = () => {
             setUserProfile(profile);
           }
         } catch (error) {
-          // Only handle non-abort errors if component is still mounted
-          if (isMounted && (error as any).name !== 'AbortError') {
+          // Check if the error or its originalError property is an AbortError
+          const isAbortError =
+            (error as any).name === 'AbortError' ||
+            ((error as any).originalError && (error as any).originalError.name === 'AbortError');
+
+          if (isMounted && !isAbortError) {
             console.error('Failed to fetch user profile:', error);
           }
           // For AbortError, just return silently since it's expected during component unmount/cancellation
