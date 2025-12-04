@@ -5,12 +5,12 @@ import { useEffect, useState } from 'react';
 export const preloadThemeImages = (theme: 'light' | 'dark') => {
   const imageMap: Record<string, Record<string, string>> = {
     ru: {
-      light: '/src/assets/images/ru_light.jpg',
-      dark: '/src/assets/images/ru_dark.jpg',
+      light: '/images/ru_light.jpg',
+      dark: '/images/ru_dark.jpg',
     },
     en: {
-      light: '/src/assets/images/en_light.jpg',
-      dark: '/src/assets/images/en_dark.jpg',
+      light: '/images/en_light.jpg',
+      dark: '/images/en_dark.jpg',
     },
   };
 
@@ -122,12 +122,12 @@ export const switchThemeImages = (newTheme: 'light' | 'dark') => {
 export const getThemedImageUrl = (language: string, theme: 'light' | 'dark'): string => {
   const imageMap: Record<string, Record<string, string>> = {
     ru: {
-      light: '/src/assets/images/ru_light.jpg',
-      dark: '/src/assets/images/ru_dark.jpg',
+      light: '/images/ru_light.jpg',
+      dark: '/images/ru_dark.jpg',
     },
     en: {
-      light: '/src/assets/images/en_light.jpg',
-      dark: '/src/assets/images/en_dark.jpg',
+      light: '/images/en_light.jpg',
+      dark: '/images/en_dark.jpg',
     },
   };
 
