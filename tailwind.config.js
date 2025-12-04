@@ -27,6 +27,9 @@ export default {
         border: 'var(--border)',
         'border-hover': 'var(--border-hover)',
       },
+      borderWidth: {
+        1.5: '1.5px',
+      },
       fontFamily: {
         primary: ['Inter', 'system-ui', 'sans-serif'],
         mono: ['JetBrains Mono', 'monospace'],
