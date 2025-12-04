@@ -87,7 +87,7 @@ const SolutionBenefits = () => {
             initial={reducedMotion ? 'hidden' : 'hidden'}
             whileInView={reducedMotion ? 'visible' : 'visible'}
             viewport={{ once: true }}
-            className="md:col-span-2 rounded-xl bg-gradient-to-br from-accent-primary/10 to-accent-secondary/10 border-1.5 border-gray-500 p-3 flex flex-col justify-center text-left"
+            className="md:col-span-2 rounded-xl bg-gradient-to-br from-accent-primary/10 to-accent-secondary/10 border-1.5 border-gray-400 p-3 flex flex-col justify-center text-left"
           >
             <div className="w-20 h-20 rounded-xl bg-white/10 flex items-center justify-center mb-2 flex-shrink-0">
               <img src={simpleImg} alt="Simple" className="w-24 h-24 object-contain" />
@@ -102,7 +102,7 @@ const SolutionBenefits = () => {
               {['Simple UI', 'Quick Setup', 'No Learning Curve', 'Intuitive'].map((tag, idx) => (
                 <span
                   key={idx}
-                  className="px-1.5 py-0.5 rounded bg-bg-primary/50 text-text-secondary border-1.5 border-gray-500 text-xs"
+                  className="px-1.5 py-0.5 rounded bg-bg-primary/50 text-text-secondary border-1.5 border-gray-400 text-xs"
                 >
                   {tag}
                 </span>
@@ -117,7 +117,7 @@ const SolutionBenefits = () => {
             initial={reducedMotion ? 'hidden' : 'hidden'}
             whileInView={reducedMotion ? 'visible' : 'visible'}
             viewport={{ once: true }}
-            className="md:col-span-2 rounded-xl bg-bg-elevated border-1.5 border-gray-500 p-3 flex flex-col justify-center text-left"
+            className="md:col-span-2 rounded-xl bg-bg-elevated border-1.5 border-gray-400 p-3 flex flex-col justify-center text-left"
           >
             <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center mb-2 flex-shrink-0">
               <img src={freeImg} alt="Free" className="w-16 h-16 object-contain" />
@@ -132,7 +132,7 @@ const SolutionBenefits = () => {
               {['All Features', 'Forever Free', 'No Limits', 'Open Source'].map((tag, idx) => (
                 <span
                   key={idx}
-                  className="px-1.5 py-0.5 rounded bg-success/10 text-success border-1.5 border-gray-500 text-xs"
+                  className="px-1.5 py-0.5 rounded bg-success/10 text-success border-1.5 border-gray-400 text-xs"
                 >
                   {tag}
                 </span>
@@ -141,7 +141,14 @@ const SolutionBenefits = () => {
           </motion.div>
 
           {/* Small Cards - Individual Benefits */}
-          <motion.div className="md:col-span-1 rounded-xl bg-bg-elevated border-1.5 border-gray-500 p-2 flex flex-col justify-center text-left">
+          <motion.div
+            custom={2}
+            variants={cardVariants}
+            initial={reducedMotion ? 'hidden' : 'hidden'}
+            whileInView={reducedMotion ? 'visible' : 'visible'}
+            viewport={{ once: true }}
+            className="md:col-span-1 rounded-xl bg-bg-elevated border-1.5 border-gray-400 p-2 flex flex-col justify-center text-left"
+          >
             <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center mb-1 flex-shrink-0">
               <img src={focusImg} alt="Focus" className="w-14 h-14 object-contain" />
             </div>
@@ -156,7 +163,7 @@ const SolutionBenefits = () => {
             initial={reducedMotion ? 'hidden' : 'hidden'}
             whileInView={reducedMotion ? 'visible' : 'visible'}
             viewport={{ once: true }}
-            className="md:col-span-2 rounded-xl bg-gradient-to-r from-accent-tertiary/10 to-accent-primary/10 border-1.5 border-gray-500 p-3 flex flex-col justify-center text-left"
+            className="md:col-span-2 rounded-xl bg-gradient-to-r from-accent-tertiary/10 to-accent-primary/10 border-1.5 border-gray-400 p-3 flex flex-col justify-center text-left"
           >
             <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center mb-2 flex-shrink-0">
               <img src={whyImg} alt="Why Lumi" className="w-16 h-16 object-contain" />
@@ -169,7 +176,7 @@ const SolutionBenefits = () => {
               {['React', 'TypeScript', 'Supabase', 'Tailwind', 'Framer Motion'].map((tech, idx) => (
                 <div
                   key={idx}
-                  className="px-2 py-1 rounded bg-bg-primary/50 text-text-secondary border-1.5 border-gray-500 text-xs"
+                  className="px-2 py-1 rounded bg-bg-primary/50 text-text-secondary border-1.5 border-gray-400 text-xs"
                 >
                   {tech}
                 </div>
@@ -184,7 +191,7 @@ const SolutionBenefits = () => {
             initial={reducedMotion ? 'hidden' : 'hidden'}
             whileInView={reducedMotion ? 'visible' : 'visible'}
             viewport={{ once: true }}
-            className="md:col-span-1 rounded-xl bg-bg-elevated border-1.5 border-gray-500 p-2 flex flex-col justify-center text-left"
+            className="md:col-span-1 rounded-xl bg-bg-elevated border-1.5 border-gray-400 p-2 flex flex-col justify-center text-left"
           >
             <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center mb-1 flex-shrink-0">
               <img src={secureImg} alt="Security" className="w-14 h-14 object-contain" />
