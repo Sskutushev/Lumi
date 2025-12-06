@@ -21,10 +21,12 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18' # Or your project's Node.js version
+          node-version: '20' # Changed to Node 20 to ensure TextEncoder/TextDecoder compatibility
 
       - name: Install dependencies
         run: npm install
 
       - name: Run tests
         run: npm test
+        env:
+          NODE_OPTIONS: '--experimental-vm-modules' # Enable experimental vm modules if needed
