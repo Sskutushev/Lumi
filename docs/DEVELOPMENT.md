@@ -1,91 +1,91 @@
-# Руководство по разработке
+# Development Guide
 
-## Начало работы
+## Getting Started
 
-### Установка зависимостей
+### Installing Dependencies
 
 ```bash
 npm install
 ```
 
-### Переменные окружения
+### Environment Variables
 
-Создайте файл `.env.local` на основе `.env.example`:
+Create a `.env.local` file based on `.env.example`:
 
 ```env
 VITE_SUPABASE_URL=your_supabase_url_here
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key_here
-VITE_YM_COUNTER_ID=your_yandex_metrika_counter_id (опционально)
-VITE_SENTRY_DSN=your_sentry_dsn (опционально)
+VITE_YM_COUNTER_ID=your_yandex_metrika_counter_id (optional)
+VITE_SENTRY_DSN=your_sentry_dsn (optional)
 ```
 
-### Запуск в режиме разработки
+### Running in Development Mode
 
 ```bash
 npm run dev
 ```
 
-## Структура проекта
+## Project Structure
 
-### Компоненты
+### Components
 
-- `src/components/common/` - переиспользуемые компоненты
-- `src/components/layout/` - компоненты макета
-- `src/components/auth/` - компоненты аутентификации
-- `src/components/landing/` - компоненты лендинга
+- `src/components/common/` - reusable components
+- `src/components/layout/` - layout components
+- `src/components/auth/` - authentication components
+- `src/components/landing/` - landing page components
 
-### Хуки
+### Hooks
 
-- `src/hooks/queries/` - React Query хуки для запросов
-- `src/hooks/mutations/` - React Query хуки для мутаций
-- `src/hooks/use*` - кастомные хуки
+- `src/hooks/queries/` - React Query hooks for queries
+- `src/hooks/mutations/` - React Query hooks for mutations
+- `src/hooks/use*` - custom hooks
 
-### API слой
+### API Layer
 
-- `src/lib/api/` - модули для взаимодействия с API
-- `src/lib/query/` - конфигурация React Query
-- `src/lib/errors/` - обработка ошибок
-- `src/lib/security/` - утилиты безопасности
-- `src/lib/realtime/` - работа с реалтайм обновлениями
+- `src/lib/api/` - modules for API interaction
+- `src/lib/query/` - React Query configuration
+- `src/lib/errors/` - error handling
+- `src/lib/security/` - security utilities
+- `src/lib/realtime/` - real-time updates
 
-## Процесс разработки
+## Development Process
 
-### Добавление новой функциональности
+### Adding New Functionality
 
-1. Создайте типы данных в `src/types/api.types.ts`
-2. Реализуйте API слой в `src/lib/api/`
-3. Создайте React Query хуки в `src/hooks/`
-4. Разработайте компоненты в `src/components/`
-5. Интегрируйте в страницы в `src/pages/`
+1. Create data types in `src/types/api.types.ts`
+2. Implement the API layer in `src/lib/api/`
+3. Create React Query hooks in `src/hooks/`
+4. Develop components in `src/components/`
+5. Integrate into pages in `src/pages/`
 
-### Тестирование
+### Testing
 
-#### Unit тесты
+#### Unit Tests
 
 ```bash
 npm run test
 ```
 
-#### Тестирование компонентов
+#### Component Testing
 
-Используется React Testing Library:
+Uses React Testing Library:
 
-- `src/**/__tests__/*` или `src/**/*test.*`
+- `src/**/__tests__/*` or `src/**/*test.*`
 
-### Стили и форматирование
+### Styling and Formatting
 
 #### TypeScript
 
-- Используется строгая типизация
-- Все функции должны иметь определенные типы параметров и возвращаемых значений
+- Strict typing is used
+- All functions must have defined parameter and return types
 
-#### Линтинг
+#### Linting
 
 ```bash
 npm run lint
 ```
 
-#### Форматирование
+#### Formatting
 
 ```bash
 npm run format
@@ -93,24 +93,24 @@ npm run format
 
 ## Git Workflow
 
-### Ветки
+### Branches
 
-- `main` - основная ветка, сюда только через PR
-- `feature/*` - для новой функциональности
-- `bugfix/*` - для исправления багов
-- `hotfix/*` - для критических исправлений
+- `main` - main branch, only via PR
+- `feature/*` - for new functionality
+- `bugfix/*` - for bug fixes
+- `hotfix/*` - for critical fixes
 
 ### Commit messages
 
-Используем conventional commits:
+We use conventional commits:
 
-- `feat:` - новая функциональность
-- `fix:` - исправление багов
-- `refactor:` - рефакторинг
-- `docs:` - документация
-- `test:` - тесты
+- `feat:` - new feature
+- `fix:` - bug fix
+- `refactor:` - refactoring
+- `docs:` - documentation
+- `test:` - tests
 
-Пример:
+Example:
 
 ```
 feat(auth): add social login with Google and GitHub
@@ -118,26 +118,26 @@ feat(auth): add social login with Google and GitHub
 
 ### Pull Requests
 
-- Заголовок должен описывать изменения
-- В описании укажите:
-  - Что было изменено
-  - Зачем были внесены изменения
-  - Как протестировать изменения
+- Title should describe changes
+- In the description, specify:
+  - What was changed
+  - Why changes were made
+  - How to test changes
 
-## Качество кода
+## Code Quality
 
-### Проверки
+### Checks
 
-Перед созданием PR убедитесь, что:
+Before creating a PR, ensure that:
 
-- Все тесты проходят
-- Код соответствует линтеру
-- Типы описаны корректно
-- Нет ошибок в консоли
+- All tests pass
+- Code adheres to the linter
+- Types are correctly described
+- There are no console errors
 
-### Код-ревью
+### Code Review
 
-- Проверьте производительность
-- Оцените безопасность
-- Убедитесь в доступности
-- Проверьте покрытие тестами
+- Check performance
+- Evaluate security
+- Ensure accessibility
+- Check test coverage

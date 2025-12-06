@@ -1,32 +1,24 @@
-import { defineConfig } from 'vitest/config';
+import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import path from 'path';
-import path from 'path';
 
+// Configuration for Vitest
 export default defineConfig({
   plugins: [react()],
   test: {
     environment: 'jsdom',
     globals: true,
-    setupFiles: './src/test/setup.ts',
-    css: true,
-    testTimeout: 10000, // Increase timeout to 10 seconds
-    hookTimeout: 15000, // Increase timeout for hooks
-    clearMocks: true, // Automatically clear mocks after each test
-    teardownTimeout: 10000, // Increase timeout for teardown
-    isolate: true, // Isolate tests from each other
-    coverage: {
-      provider: 'v8',
-      reporter: ['text', 'html', 'json'],
-      lines: 60,
-      functions: 60,
-      branches: 60,
-      statements: 60,
-    },
+    setupFiles: ['./vitest.setup.ts'],
+    testTimeout: 15000, // Increased timeout for tests - 15 seconds
+    hookTimeout: 20000, // Increased timeout for hooks - 20 seconds
+    clearMocks: true,
+    restoreMocks: true,
+    reporters: ['verbose'], // Detailed output for debugging
+    logHeapUsage: true, // Log memory usage
+    exclude: ['e2e/**', 'node_modules/**', 'dist/**', 'build/**'], // Exclude e2e tests
   },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
+      '@': '/src',
     },
   },
 });

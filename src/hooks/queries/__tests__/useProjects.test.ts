@@ -46,6 +46,10 @@ describe('useCreateProject', () => {
 
     // In a real scenario, we would check if the query was invalidated.
     // For this mock, we just check for success.
-    expect(projectsAPI.create).toHaveBeenCalledWith({ user_id: '1', name: 'New Project' });
+    // The mutation function receives the variables as the first argument
+    expect(projectsAPI.create).toHaveBeenCalledWith(
+      { user_id: '1', name: 'New Project' },
+      expect.any(Object) // Additional mutation parameters (client, meta, etc.)
+    );
   });
 });

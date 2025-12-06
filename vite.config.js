@@ -8,14 +8,14 @@ export default defineConfig({
     react(),
     visualizer({
       filename: './dist/stats.html',
-      open: false, // Не открывать автоматически
-      template: 'treemap', // Тип визуализация: treemap, sunburst, network
+      open: false, // Do not open automatically
+      template: 'treemap', // Visualization type: treemap, sunburst, network
     }),
     VitePWA({
       registerType: 'autoUpdate',
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
-        // Стратегия кэширования для API вызовов
+        // Caching strategy for API calls
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/.*\/.*$/,
@@ -24,7 +24,7 @@ export default defineConfig({
               cacheName: 'api-cache',
               expiration: {
                 maxEntries: 50,
-                maxAgeSeconds: 300, // 5 минут
+                maxAgeSeconds: 300, // 5 minutes
               },
               cacheableResponse: {
                 statuses: [0, 200],
@@ -63,8 +63,8 @@ export default defineConfig({
     },
   },
   build: {
-    sourcemap: false, // Отключаем sourcemaps в production для уменьшения размера
-    cssCodeSplit: false, // Объединяем CSS в один файл
+    sourcemap: false, // Disable sourcemaps in production to reduce size
+    cssCodeSplit: false, // Combine CSS into a single file
     rollupOptions: {
       output: {
         manualChunks: {
@@ -74,7 +74,7 @@ export default defineConfig({
           'ui-vendor': ['framer-motion', 'lucide-react', 'sonner'],
           'i18n-vendor': ['react-i18next', 'i18next'],
         },
-        // Оптимизируем имена чанков
+        // Optimize chunk names
         entryFileNames: 'assets/[name].[hash].js',
         chunkFileNames: 'assets/[name].[hash].js',
         assetFileNames: function (assetInfo) {
@@ -94,14 +94,14 @@ export default defineConfig({
     chunkSizeWarningLimit: 1000,
   },
   esbuild: {
-    // Оптимизации esbuild
+    // Esbuild optimizations
     minifyIdentifiers: true,
     minifySyntax: true,
     minifyWhitespace: true,
-    pure: ['console.log', 'console.debug', 'console.info'], // Удаляем указанные вызовы из production сборки
+    pure: ['console.log', 'console.debug', 'console.info'], // Remove specified calls from production build
   },
   define: {
-    // Удаляем отладочную информацию в production
+    // Remove debug information in production
     'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'production'),
   },
 });

@@ -36,11 +36,14 @@ export const projectInputSchema = z.object({
 export const sanitizeInput = (input: string): string => {
   // Use DOMPurify to sanitize input. If DOMPurify is not available, return an empty string for safety.
   if (typeof DOMPurify !== 'undefined' && DOMPurify.sanitize) {
-    const sanitized = DOMPurify.sanitize(input, {
-      ALLOWED_TAGS: [],
-      ALLOWED_ATTR: [],
-    });
-    return sanitized.trim();
+    // First, remove null characters
+    const cleanInput = input.replace(/\x00/g, '');
+
+    // Sanitize the input
+    const sanitized = DOMPurify.sanitize(cleanInput);
+
+    // Normalize whitespace and trim
+    return sanitized.replace(/\s+/g, ' ').trim();
   }
   // Fallback: if DOMPurify is not available for some reason, return empty string.
   return '';

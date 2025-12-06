@@ -5,7 +5,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Цвета из плана
+        // Colors from the plan
         'bg-primary': 'var(--bg-primary)',
         'bg-secondary': 'var(--bg-secondary)',
         'bg-tertiary': 'var(--bg-tertiary)',
@@ -56,11 +56,11 @@ export default {
         '2xl': 'var(--shadow-2xl)',
       },
       screens: {
-        sm: '640px', // Мобильные устройства
-        md: '768px', // Планшеты
-        lg: '1024px', // Ноутбуки
-        xl: '1280px', // Большие экраны
-        '2xl': '1536px', // Очень большие экраны
+        sm: '640px', // Mobile devices
+        md: '768px', // Tablets
+        lg: '1024px', // Laptops
+        xl: '1280px', // Large screens
+        '2xl': '1536px', // Extra large screens
       },
       spacing: {
         'safe-top': 'env(safe-area-inset-top)',
@@ -71,7 +71,7 @@ export default {
     },
   },
   plugins: [
-    // Плагин для обеспечения кроссбраузерной совместимости
+    // Plugin for ensuring cross-browser compatibility
     require('@tailwindcss/forms')({
       strategy: 'class',
     }),

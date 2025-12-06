@@ -71,10 +71,11 @@ export const filterAndSortTasks = (
 
     switch (filters.sortBy) {
       case 'priority':
-        // Match priorities with numeric values for sorting
+        // Match priorities with numeric values for sorting (high = 3, medium = 2, low = 1)
         const priorityOrder: Record<string, number> = { high: 3, medium: 2, low: 1 };
-        comparison =
-          (priorityOrder[b.priority || 'low'] || 0) - (priorityOrder[a.priority || 'low'] || 0);
+        const priorityA = priorityOrder[a.priority || 'low'] || 0;
+        const priorityB = priorityOrder[b.priority || 'low'] || 0;
+        comparison = priorityA - priorityB; // Ascending: low first
         break;
       case 'date':
         if (a.due_date && b.due_date) {

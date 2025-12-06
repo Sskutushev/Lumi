@@ -3,7 +3,7 @@ import '@testing-library/jest-dom';
 import { afterEach, vi } from 'vitest';
 import { supabaseMock } from '../__mocks__/supabase';
 
-// Мокаем BroadcastChannel для тестов
+// Mock BroadcastChannel for tests
 if (typeof window !== 'undefined') {
   // Create a mock BroadcastChannel for tests
   class MockBroadcastChannel {
@@ -53,22 +53,22 @@ if (typeof window !== 'undefined') {
     value: MockBroadcastChannel,
   });
 
-  // Мокаем navigator.onLine
+  // Mock navigator.onLine
   Object.defineProperty(navigator, 'onLine', {
     writable: true,
     value: true,
   });
 }
 
-// Глобально мокаем модуль, который экспортирует клиент Supabase
+// Globally mock the module that exports the Supabase client
 vi.mock('../src/lib/supabase', () => ({
   supabase: supabaseMock,
 }));
 
-// Этот хук будет выполняться после каждого теста
+// This hook will run after each test
 afterEach(() => {
-  // Очищает DOM
+  // Cleans up the DOM
   cleanup();
-  // Сбрасывает все моки, чтобы тесты были изолированы друг от друга
+  // Resets all mocks to isolate tests from each other
   vi.resetAllMocks();
 });

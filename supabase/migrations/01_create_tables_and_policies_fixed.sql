@@ -1,4 +1,4 @@
--- Таблица профилей пользователей
+-- User profiles table
 CREATE TABLE IF NOT EXISTS users_profile (
     id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
     full_name TEXT,
@@ -8,16 +8,16 @@ CREATE TABLE IF NOT EXISTS users_profile (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Комментарии к таблице users_profile
-COMMENT ON TABLE users_profile IS 'Профили пользователей';
-COMMENT ON COLUMN users_profile.id IS 'Ссылка на id в auth.users';
-COMMENT ON COLUMN users_profile.full_name IS 'Полное имя пользователя';
-COMMENT ON COLUMN users_profile.avatar_url IS 'URL аватара пользователя';
-COMMENT ON COLUMN users_profile.storage_used IS 'Количество используемого хранилища в байтах';
-COMMENT ON COLUMN users_profile.created_at IS 'Дата создания профиля';
-COMMENT ON COLUMN users_profile.updated_at IS 'Дата последнего обновления профиля';
+-- Comments for users_profile table
+COMMENT ON TABLE users_profile IS 'User profiles';
+COMMENT ON COLUMN users_profile.id IS 'Reference to id in auth.users';
+COMMENT ON COLUMN users_profile.full_name IS 'Full name of the user';
+COMMENT ON COLUMN users_profile.avatar_url IS 'URL of the user''s avatar';
+COMMENT ON COLUMN users_profile.storage_used IS 'Amount of storage used in bytes';
+COMMENT ON COLUMN users_profile.created_at IS 'Profile creation date';
+COMMENT ON COLUMN users_profile.updated_at IS 'Profile last update date';
 
--- Таблица проектов
+-- Projects table
 CREATE TABLE IF NOT EXISTS projects (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -29,18 +29,18 @@ CREATE TABLE IF NOT EXISTS projects (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Комментарии к таблице projects
-COMMENT ON TABLE projects IS 'Проекты пользователей';
-COMMENT ON COLUMN projects.id IS 'Уникальный идентификатор проекта';
-COMMENT ON COLUMN projects.user_id IS 'Ссылка на пользователя, владеющего проектом';
-COMMENT ON COLUMN projects.name IS 'Название проекта (максимум 100 символов)';
-COMMENT ON COLUMN projects.description IS 'Описание проекта (максимум 500 символов)';
-COMMENT ON COLUMN projects.tasks_count IS 'Количество задач в проекте';
-COMMENT ON COLUMN projects.completed_tasks_count IS 'Количество завершенных задач в проекте';
-COMMENT ON COLUMN projects.created_at IS 'Дата создания проекта';
-COMMENT ON COLUMN projects.updated_at IS 'Дата последнего обновления проекта';
+-- Comments for projects table
+COMMENT ON TABLE projects IS 'User projects';
+COMMENT ON COLUMN projects.id IS 'Unique project identifier';
+COMMENT ON COLUMN projects.user_id IS 'Reference to the user who owns the project';
+COMMENT ON COLUMN projects.name IS 'Project name (maximum 100 characters)';
+COMMENT ON COLUMN projects.description IS 'Project description (maximum 500 characters)';
+COMMENT ON COLUMN projects.tasks_count IS 'Number of tasks in the project';
+COMMENT ON COLUMN projects.completed_tasks_count IS 'Number of completed tasks in the project';
+COMMENT ON COLUMN projects.created_at IS 'Project creation date';
+COMMENT ON COLUMN projects.updated_at IS 'Project last update date';
 
--- Таблица задач
+-- Tasks table
 CREATE TABLE IF NOT EXISTS tasks (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -56,27 +56,27 @@ CREATE TABLE IF NOT EXISTS tasks (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Комментарии к таблице tasks
-COMMENT ON TABLE tasks IS 'Задачи пользователей';
-COMMENT ON COLUMN tasks.id IS 'Уникальный идентификатор задачи';
-COMMENT ON COLUMN tasks.user_id IS 'Ссылка на пользователя, владеющего задачей';
-COMMENT ON COLUMN tasks.project_id IS 'Ссылка на проект, к которому принадлежит задача';
-COMMENT ON COLUMN tasks.title IS 'Заголовок задачи (максимум 200 символов)';
-COMMENT ON COLUMN tasks.description IS 'Краткое описание задачи (максимум 1000 символов)';
-COMMENT ON COLUMN tasks.detailed_description IS 'Подробное описание задачи (максимум 5000 символов)';
-COMMENT ON COLUMN tasks.completed IS 'Статус завершения задачи';
-COMMENT ON COLUMN tasks.priority IS 'Приоритет задачи (low, medium, high)';
-COMMENT ON COLUMN tasks.start_date IS 'Дата начала задачи';
-COMMENT ON COLUMN tasks.due_date IS 'Дата завершения задачи';
-COMMENT ON COLUMN tasks.created_at IS 'Дата создания задачи';
-COMMENT ON COLUMN tasks.updated_at IS 'Дата последнего обновления задачи';
+-- Comments for tasks table
+COMMENT ON TABLE tasks IS 'User tasks';
+COMMENT ON COLUMN tasks.id IS 'Unique task identifier';
+COMMENT ON COLUMN tasks.user_id IS 'Reference to the user who owns the task';
+COMMENT ON COLUMN tasks.project_id IS 'Reference to the project the task belongs to';
+COMMENT ON COLUMN tasks.title IS 'Task title (maximum 200 characters)';
+COMMENT ON COLUMN tasks.description IS 'Brief task description (maximum 1000 characters)';
+COMMENT ON COLUMN tasks.detailed_description IS 'Detailed task description (maximum 5000 characters)';
+COMMENT ON COLUMN tasks.completed IS 'Task completion status';
+COMMENT ON COLUMN tasks.priority IS 'Task priority (low, medium, high)';
+COMMENT ON COLUMN tasks.start_date IS 'Task start date';
+COMMENT ON COLUMN tasks.due_date IS 'Task due date';
+COMMENT ON COLUMN tasks.created_at IS 'Task creation date';
+COMMENT ON COLUMN tasks.updated_at IS 'Task last update date';
 
--- Включение RLS для всех таблиц
+-- Enable RLS for all tables
 ALTER TABLE users_profile ENABLE ROW LEVEL SECURITY;
 ALTER TABLE projects ENABLE ROW LEVEL SECURITY;
 ALTER TABLE tasks ENABLE ROW LEVEL SECURITY;
 
--- Политики безопасности для таблицы users_profile
+-- Security policies for users_profile table
 DROP POLICY IF EXISTS "Users can view own profile" ON users_profile;
 CREATE POLICY "Users can view own profile" ON users_profile
 FOR SELECT TO authenticated
@@ -93,7 +93,7 @@ CREATE POLICY "Users can insert own profile" ON users_profile
 FOR INSERT TO authenticated
 WITH CHECK (auth.uid() = id);
 
--- Политики безопасности для таблицы projects
+-- Security policies for projects table
 DROP POLICY IF EXISTS "Users can view own projects" ON projects;
 CREATE POLICY "Users can view own projects" ON projects
 FOR SELECT TO authenticated
@@ -115,7 +115,7 @@ CREATE POLICY "Users can delete own projects" ON projects
 FOR DELETE TO authenticated
 USING (auth.uid() = user_id);
 
--- Политики безопасности для таблицы tasks
+-- Security policies for tasks table
 DROP POLICY IF EXISTS "Users can view own tasks" ON tasks;
 CREATE POLICY "Users can view own tasks" ON tasks
 FOR SELECT TO authenticated
@@ -137,7 +137,7 @@ CREATE POLICY "Users can delete own tasks" ON tasks
 FOR DELETE TO authenticated
 USING (auth.uid() = user_id);
 
--- Функция для подсчета используемого хранилища
+-- Function to calculate used storage
 CREATE OR REPLACE FUNCTION calculate_user_storage(user_id_param UUID)
 RETURNS BIGINT
 LANGUAGE plpgsql
@@ -158,7 +158,7 @@ BEGIN
 END;
 $$;
 
--- Функция для обновления статистики проекта
+-- Function to update project statistics
 CREATE OR REPLACE FUNCTION update_project_stats(project_id_param UUID)
 RETURNS VOID
 LANGUAGE plpgsql
@@ -181,7 +181,7 @@ BEGIN
 END;
 $$;
 
--- Триггер для обновления storage_used при изменении задач
+-- Trigger to update storage_used on task change
 CREATE OR REPLACE FUNCTION update_user_storage_trigger()
 RETURNS TRIGGER
 LANGUAGE plpgsql
@@ -190,7 +190,7 @@ DECLARE
     old_size BIGINT;
     new_size BIGINT;
 BEGIN
-    -- Подсчет старого размера для UPDATE/DELETE
+    -- Calculate old size for UPDATE/DELETE
     IF TG_OP = 'UPDATE' OR TG_OP = 'DELETE' THEN
         old_size := COALESCE(LENGTH(OLD.title), 0) +
                     COALESCE(LENGTH(OLD.description), 0) +
@@ -199,7 +199,7 @@ BEGIN
         old_size := 0;
     END IF;
 
-    -- Подсчет нового размера для INSERT/UPDATE
+    -- Calculate new size for INSERT/UPDATE
     IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
         new_size := COALESCE(LENGTH(NEW.title), 0) +
                     COALESCE(LENGTH(NEW.description), 0) +
@@ -208,19 +208,19 @@ BEGIN
         new_size := 0;
     END IF;
 
-    -- Обновление storage_used в профиле пользователя
+    -- Update storage_used in user profile
     IF TG_OP = 'INSERT' THEN
-        -- При INSERT добавляем новый размер
+        -- On INSERT, add the new size
         UPDATE users_profile
         SET storage_used = storage_used + new_size
         WHERE id = NEW.user_id;
     ELSIF TG_OP = 'UPDATE' THEN
-        -- При UPDATE обновляем разницу
+        -- On UPDATE, update the difference
         UPDATE users_profile
         SET storage_used = storage_used - old_size + new_size
         WHERE id = NEW.user_id;
     ELSIF TG_OP = 'DELETE' THEN
-        -- При DELETE вычитаем старый размер
+        -- On DELETE, subtract the old size
         UPDATE users_profile
         SET storage_used = storage_used - old_size
         WHERE id = OLD.user_id;
@@ -234,32 +234,32 @@ BEGIN
 END;
 $$;
 
--- Триггер для обновления статистики проекта при изменении задач
+-- Trigger to update project statistics on task change
 CREATE OR REPLACE FUNCTION update_project_stats_trigger()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 AS $$
 BEGIN
-    -- Обновляем статистику проекта, если задача принадлежит проекту
+    -- Update project statistics if task belongs to a project
     IF NEW.project_id IS NOT NULL THEN
         PERFORM update_project_stats(NEW.project_id);
     END IF;
 
-    -- Если задача изменялась (а не только создавалась), возможно изменился проект
+    -- If task was modified (not just created), project might have changed
     IF TG_OP = 'UPDATE' AND NEW.project_id IS DISTINCT FROM OLD.project_id THEN
-        -- Обновляем старый проект, если задача была перемещена
+        -- Update old project if task was moved
         IF OLD.project_id IS NOT NULL THEN
             PERFORM update_project_stats(OLD.project_id);
         END IF;
     END IF;
 
-    -- Обновляем статистику старого проекта, если задача была перемещена
+    -- Update old project's statistics if task was moved
     IF TG_OP = 'UPDATE' AND OLD.project_id IS NOT NULL AND OLD.project_id IS DISTINCT FROM NEW.project_id THEN
         PERFORM update_project_stats(OLD.project_id);
     END IF;
 
     IF TG_OP = 'DELETE' THEN
-        -- Обновляем статистику проекта при удалении задачи
+        -- Update project statistics on task deletion
         IF OLD.project_id IS NOT NULL THEN
             PERFORM update_project_stats(OLD.project_id);
         END IF;
@@ -270,7 +270,7 @@ BEGIN
 END;
 $$;
 
--- Создание триггеров
+-- Create triggers
 DROP TRIGGER IF EXISTS user_storage_trigger ON tasks;
 CREATE TRIGGER user_storage_trigger
     AFTER INSERT OR UPDATE OR DELETE ON tasks
@@ -283,7 +283,7 @@ CREATE TRIGGER project_stats_trigger
     FOR EACH ROW
     EXECUTE FUNCTION update_project_stats_trigger();
 
--- Триггер для обновления поля updated_at
+-- Trigger to update updated_at field
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -292,7 +292,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Триггеры для обновления updated_at
+-- Triggers for updating updated_at
 DROP TRIGGER IF EXISTS update_users_profile_updated_at ON users_profile;
 CREATE TRIGGER update_users_profile_updated_at
     BEFORE UPDATE ON users_profile
@@ -311,7 +311,7 @@ CREATE TRIGGER update_tasks_updated_at
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
--- Функция для создания профиля при регистрации пользователя (обновленная)
+-- Function to create profile on user registration (updated)
 CREATE OR REPLACE FUNCTION create_profile_for_new_user()
 RETURNS TRIGGER
 LANGUAGE plpgsql
@@ -321,15 +321,15 @@ BEGIN
     INSERT INTO users_profile (id, full_name, avatar_url, storage_used)
     VALUES (
         NEW.id,
-        -- Используем COALESCE для безопасного извлечения данных.
-        -- Пробуем 'full_name', затем 'name', затем email, и в крайнем случае пустую строку.
+        -- Use COALESCE for safe data extraction.
+        -- Try 'full_name', then 'name', then email, and finally an empty string as a fallback.
         COALESCE(
             NEW.raw_user_meta_data->>'full_name',
             NEW.raw_user_meta_data->>'name',
             NEW.email,
             ''
         ),
-        -- Для avatar_url также используем COALESCE, возвращая NULL если ничего нет.
+        -- Also use COALESCE for avatar_url, returning NULL if nothing is there.
         COALESCE(NEW.raw_user_meta_data->>'avatar_url', NULL),
         0
     );
@@ -337,20 +337,20 @@ BEGIN
 END;
 $$;
 
--- Триггер для автоматического создания профиля при регистрации пользователя
+-- Trigger to automatically create profile on user registration
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
     AFTER INSERT ON auth.users
     FOR EACH ROW
     EXECUTE FUNCTION create_profile_for_new_user();
 
--- Дополнительная политика для Storage (разрешаем пользователям загружать в их папки)
+-- Additional policy for Storage (allow users to upload to their folders)
 INSERT INTO storage.buckets (id, name, public, avif_autodetection, file_size_limit, allowed_mime_types)
 VALUES ('avatars', 'avatars', true, false, 5242880,
         '{"image/png", "image/jpg", "image/jpeg", "image/gif", "image/webp"}')
 ON CONFLICT (id) DO NOTHING;
 
--- Политики для Storage
+-- Policies for Storage
 DROP POLICY IF EXISTS "Allow users to read own avatars" ON storage.objects;
 CREATE POLICY "Allow users to read own avatars" ON storage.objects FOR SELECT
 TO authenticated

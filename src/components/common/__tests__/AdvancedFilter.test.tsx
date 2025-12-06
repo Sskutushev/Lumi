@@ -1,6 +1,6 @@
 // src/components/common/__tests__/AdvancedFilter.test.tsx
 import { render, fireEvent, screen } from '@testing-library/react';
-import { AdvancedFilter } from '../AdvancedFilter';
+import AdvancedFilter from '../AdvancedFilter';
 import { describe, it, expect, vi } from 'vitest';
 import React from 'react';
 
@@ -25,12 +25,12 @@ describe('AdvancedFilter', () => {
     const filterButton = screen.getByLabelText('Advanced filters');
     fireEvent.click(filterButton);
 
-    expect(screen.getByText('Search')).toBeInTheDocument();
+    expect(screen.getByText('Advanced filters')).toBeInTheDocument();
 
-    const closeButton = screen.getByLabelText('Close');
+    const closeButton = screen.getByLabelText('common.close');
     fireEvent.click(closeButton);
 
-    expect(screen.queryByText('Search')).not.toBeInTheDocument();
+    expect(screen.queryByText('Advanced filters')).not.toBeInTheDocument();
   });
 
   it('should call onFiltersChange when a filter is changed', () => {
@@ -42,9 +42,13 @@ describe('AdvancedFilter', () => {
     const filterButton = screen.getByLabelText('Advanced filters');
     fireEvent.click(filterButton);
 
-    const searchInput = screen.getByPlaceholderText('Search tasks...');
-    fireEvent.change(searchInput, { target: { value: 'Test' } });
+    // Test changing a filter - let's change the status filter
+    const statusButtons = screen.getAllByRole('button');
+    const pendingButton =
+      statusButtons.find((btn) => btn.textContent?.includes('pending')) ||
+      screen.getByText('todo.pending');
+    fireEvent.click(pendingButton);
 
-    expect(onFiltersChange).toHaveBeenCalledWith({ ...mockFilters, searchQuery: 'Test' });
+    expect(onFiltersChange).toHaveBeenCalledWith({ ...mockFilters, status: 'pending' });
   });
 });
