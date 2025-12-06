@@ -119,17 +119,15 @@ export const switchThemeImages = (newTheme: 'light' | 'dark') => {
 };
 
 // Utility to get the correct image URL based on language and theme
-export const getThemedImageUrl = (language: string, theme: 'light' | 'dark'): string => {
-  const imageMap: Record<string, Record<string, string>> = {
-    ru: {
-      light: '/images/ru_light.jpg',
-      dark: '/images/ru_dark.jpg',
-    },
-    en: {
-      light: '/images/en_light.jpg',
-      dark: '/images/en_dark.jpg',
-    },
-  };
+export const getThemedImageUrls = (
+  language: string,
+  theme: 'light' | 'dark'
+): { desktop: string; mobile: string } => {
+  const lang = language === 'ru' ? 'ru' : 'en';
+  const themeKey = theme === 'dark' ? 'dark' : 'light';
 
-  return imageMap[language]?.[theme] || imageMap.en[theme];
+  const desktop = `/images/${lang}_${themeKey}.jpg`;
+  const mobile = `/images/${lang}_${themeKey}_mobile.jpg`;
+
+  return { desktop, mobile };
 };

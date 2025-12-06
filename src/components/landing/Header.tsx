@@ -39,7 +39,9 @@ const Header = ({
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-bg-primary/80 backdrop-blur-xl border-b border-border/30 py-4">
+    <header
+      className={`sticky top-0 z-50 w-full ${isMenuOpen ? 'bg-bg-primary' : 'bg-bg-primary/80 backdrop-blur-xl'} border-b border-border/30 py-4`}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-12">
           {/* Logo */}
@@ -198,7 +200,7 @@ const Header = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="md:hidden fixed inset-0 bg-bg-primary/95 backdrop-blur-xl z-50 pt-20"
+            className="md:hidden fixed top-20 inset-x-0 bottom-0 bg-bg-primary z-50"
           >
             <div className="flex justify-end px-4 pb-4">
               <button
@@ -236,7 +238,7 @@ const Header = ({
               <div className="flex flex-col gap-4 w-full max-w-xs mt-8">
                 <button
                   onClick={toggleLanguage}
-                  className="px-4 py-2 rounded-lg bg-bg-secondary hover:bg-bg-tertiary transition-colors flex items-center gap-2"
+                  className="px-4 py-2 rounded-lg bg-bg-secondary hover:bg-bg-tertiary transition-colors flex items-center justify-center gap-2"
                 >
                   {i18n.language === 'en' ? (
                     <>

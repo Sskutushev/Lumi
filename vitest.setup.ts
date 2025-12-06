@@ -1,5 +1,12 @@
 import '@testing-library/jest-dom';
-import { vi } from 'vitest';
+import { vi, afterAll, afterEach } from 'vitest';
+import { realtimeService } from './src/lib/realtime/realtimeService';
+
+// Глобальное завершение всех процессов после тестов
+afterAll(() => {
+  // Отключаем все активные подписки на real-time, чтобы Vitest мог завершиться
+  realtimeService.disconnect();
+});
 
 // Установить фиксированный часовой пояс для тестов
 process.env.TZ = 'UTC';

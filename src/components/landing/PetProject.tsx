@@ -56,15 +56,20 @@ const PetProject = () => {
             className={`relative cursor-pointer w-full h-80 [perspective:1000px]`}
             onClick={() => setIsFlipped(!isFlipped)}
           >
-            <div className={`relative w-full h-full transition-transform duration-700 [transform-style:preserve-3d] ${isFlipped ? '[transform:rotateY(180deg)]' : ''}`}>
+            <div
+              className={`relative w-full h-full transition-transform duration-700 [transform-style:preserve-3d] ${isFlipped ? '[transform:rotateY(180deg)]' : ''}`}
+            >
               {/* Front of card */}
-              <div className={`absolute inset-0 bg-bg-secondary/50 backdrop-blur-sm border border-border rounded-2xl p-8 flex flex-col items-center justify-center shadow-lg shadow-accent-primary/10 hover:shadow-2xl hover:shadow-accent-primary/20 [backface-visibility:hidden]`}>
+              <div
+                className={`absolute inset-0 bg-bg-secondary/50 backdrop-blur-sm border border-border rounded-2xl p-8 flex flex-col items-center justify-center shadow-lg shadow-accent-primary/10 hover:shadow-2xl hover:shadow-accent-primary/20 [backface-visibility:hidden]`}
+              >
                 <div className="w-16 h-16 rounded-2xl bg-accent-gradient-1 flex items-center justify-center mx-auto mb-6">
                   <Code className="w-8 h-8 text-white" />
                 </div>
                 <h3 className="text-2xl font-bold text-text-primary mb-4">Open Source</h3>
                 <p className="text-text-secondary mb-6 text-center">
-                  This project is completely open source and available on GitHub for anyone to explore.
+                  This project is completely open source and available on GitHub for anyone to
+                  explore.
                 </p>
                 <div className="flex flex-wrap justify-center gap-4">
                   <div className="px-4 py-2 rounded-lg bg-bg-tertiary text-text-secondary text-sm">
@@ -80,33 +85,35 @@ const PetProject = () => {
               </div>
 
               {/* Back of card */}
-              <div className={`absolute inset-0 bg-bg-secondary/50 backdrop-blur-sm border border-border rounded-2xl p-8 flex flex-col justify-center shadow-lg shadow-accent-primary/10 hover:shadow-2xl hover:shadow-accent-primary/20 [backface-visibility:hidden] [transform:rotateY(180deg)]`}>
-                <div className="flex flex-col md:flex-row gap-6 items-center w-full">
+              <div
+                className={`absolute inset-0 bg-bg-secondary/50 backdrop-blur-sm border border-border rounded-2xl p-4 sm:p-6 flex flex-col justify-center shadow-lg shadow-accent-primary/10 hover:shadow-2xl hover:shadow-accent-primary/20 [backface-visibility:hidden] [transform:rotateY(180deg)]`}
+              >
+                <div className="flex flex-col md:flex-row gap-4 items-center w-full">
                   {/* Left Column */}
-                  <div className="flex flex-col gap-4 flex-1 items-center md:items-start">
-                    <div className="px-4 py-2 rounded-lg bg-bg-tertiary text-text-secondary text-sm">
+                  <div className="flex flex-col gap-2 flex-1 items-center md:items-start">
+                    <div className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg bg-bg-tertiary text-text-secondary text-xs sm:text-sm">
                       React & TypeScript
                     </div>
-                    <div className="px-4 py-2 rounded-lg bg-bg-tertiary text-text-secondary text-sm">
+                    <div className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg bg-bg-tertiary text-text-secondary text-xs sm:text-sm">
                       Supabase Realtime
                     </div>
-                    <div className="px-4 py-2 rounded-lg bg-bg-tertiary text-text-secondary text-sm">
+                    <div className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg bg-bg-tertiary text-text-secondary text-xs sm:text-sm">
                       Tailwind CSS
                     </div>
                     <a
                       href="https://github.com/Sskutushev/Lumi"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="mt-4 flex items-center gap-2 group relative px-6 py-3 rounded-xl bg-gradient-animated text-white font-semibold shadow-lg shadow-accent-primary/30 hover:shadow-xl hover:shadow-accent-primary/40 hover:scale-105 transition-all duration-300"
+                      className="mt-2 flex items-center gap-2 group relative px-4 sm:px-6 py-2 sm:py-3 rounded-xl bg-gradient-animated text-white font-semibold shadow-lg shadow-accent-primary/30 hover:shadow-xl hover:shadow-accent-primary/40 hover:scale-105 transition-all duration-300"
                     >
-                      <Github className="w-5 h-5" />
-                      GitHub
+                      <Github className="w-4 h-4 sm:w-5 sm:h-5" />
+                      <span className="text-sm sm:text-base">GitHub</span>
                     </a>
                   </div>
 
                   {/* Right Column (Code) */}
-                  <div className="flex-1 bg-bg-tertiary rounded-xl p-4 text-left w-full">
-                    <pre className="text-xs text-text-tertiary overflow-x-auto">
+                  <div className="flex-1 bg-bg-tertiary rounded-xl p-3 text-left w-full">
+                    <pre className="text-[10px] sm:text-xs text-text-tertiary overflow-x-auto">
                       <code>{`// Real-time updates
 supabase
   .channel('tasks')

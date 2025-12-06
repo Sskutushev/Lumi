@@ -3,16 +3,75 @@ import { motion } from 'framer-motion';
 import { ArrowRight, CheckCircle } from 'lucide-react';
 import useReducedMotion from '../../hooks/useReducedMotion';
 import { useLazyImage } from '../../hooks/useLazyImage';
-import { getThemedImageUrl } from '../../lib/utils/imageOptimizer';
+import { getThemedImageUrls } from '../../lib/utils/imageOptimizer';
 import { useTheme } from '../../hooks/useTheme';
+
+const DesktopMockup = ({ src }: { src: string }) => {
+  const { imageSrc, imageRef } = useLazyImage({ src });
+  return (
+    <motion.div
+      initial={useReducedMotion() ? false : { opacity: 0, y: 40, scale: 0.95 }}
+      animate={useReducedMotion() ? false : { opacity: 1, y: 0, scale: 1 }}
+      transition={{ delay: 0.5, duration: 0.8, type: 'spring' }}
+      className="relative mt-16 max-w-4xl mx-auto"
+    >
+      <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-border bg-bg-secondary/30 backdrop-blur-sm p-4">
+        <div className="flex items-center gap-3 mb-4 px-3">
+          <div className="flex gap-1.5">
+            <div className="w-3 h-3 rounded-full bg-red-500"></div>
+            <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+            <div className="w-3 h-3 rounded-full bg-green-500"></div>
+          </div>
+          <div className="flex-1 px-4 py-1.5 rounded-lg bg-bg-tertiary text-sm text-text-tertiary text-center font-medium">
+            https://lumi-orcin.vercel.app/
+          </div>
+        </div>
+        <div className="aspect-video rounded-xl overflow-hidden border border-border relative">
+          <img
+            ref={imageRef}
+            src={imageSrc}
+            alt="Application interface"
+            className="w-full h-full object-contain"
+            loading="lazy"
+            style={{ transition: 'opacity 0.3s ease-in-out' }}
+          />
+        </div>
+      </div>
+      <div className="absolute -bottom-1/4 -left-1/4 -right-1/4 h-1/2 -z-10 bg-gradient-to-t from-accent-primary/10 to-transparent blur-3xl" />
+    </motion.div>
+  );
+};
+
+const MobileMockup = ({ src }: { src: string }) => {
+  const { imageSrc, imageRef } = useLazyImage({ src });
+  return (
+    <motion.div
+      initial={useReducedMotion() ? false : { opacity: 0, y: 40, scale: 0.95 }}
+      animate={useReducedMotion() ? false : { opacity: 1, y: 0, scale: 1 }}
+      transition={{ delay: 0.5, duration: 0.8, type: 'spring' }}
+      className="relative mt-12 max-w-xs mx-auto"
+    >
+      <div className="relative rounded-[2rem] overflow-hidden shadow-2xl border-8 border-bg-tertiary bg-bg-tertiary">
+        <img
+          ref={imageRef}
+          src={imageSrc}
+          alt="Application mobile interface"
+          className="w-full h-full object-contain rounded-[1.5rem]"
+          loading="lazy"
+          style={{ transition: 'opacity 0.3s ease-in-out' }}
+        />
+      </div>
+      <div className="absolute -bottom-1/4 -left-1/4 -right-1/4 h-1/2 -z-10 bg-gradient-to-t from-accent-primary/10 to-transparent blur-3xl" />
+    </motion.div>
+  );
+};
 
 const HeroSection = () => {
   const { t, i18n } = useTranslation();
   const { theme } = useTheme();
   const reducedMotion = useReducedMotion();
 
-  const imageUrl = getThemedImageUrl(i18n.language, theme);
-  const { imageSrc, imageRef } = useLazyImage({ src: imageUrl });
+  const imageUrls = getThemedImageUrls(i18n.language, theme);
 
   return (
     <section className="relative min-h-screen flex items-center justify-center px-4 py-16 overflow-hidden">
@@ -49,7 +108,7 @@ const HeroSection = () => {
         />
       </div>
 
-      <div className="max-w-5xl mx-auto text-center space-y-10">
+      <div className="max-w-7xl mx-auto text-center space-y-8 px-6 lg:px-8">
         <motion.div
           initial={reducedMotion ? false : { opacity: 0, y: 20 }}
           animate={reducedMotion ? false : { opacity: 1, y: 0 }}
@@ -67,27 +126,22 @@ const HeroSection = () => {
           className="text-center max-w-4xl mx-auto"
         >
           <h1
-            className="text-4xl md:text-5xl lg:text-7xl font-bold mb-10 whitespace-nowrap overflow-x-hidden"
-            style={{ lineHeight: '1.2', overflow: 'visible' }}
+            className="text-5xl sm:text-6xl lg:text-6xl font-bold mb-10"
+            style={{ lineHeight: '1.1' }}
           >
             <span
-              className="text-gradient-animated bg-clip-text inline-block"
+              className="text-gradient-animated bg-clip-text"
               style={{
-                lineHeight: '1.2',
-                display: 'inline-block',
-                overflow: 'visible',
+                lineHeight: '1.1',
                 paddingBottom: '0.1em',
-                whiteSpace: 'nowrap',
               }}
             >
-              {t('landing.hero.title').split('.')[0]}.{' '}
-              {t('landing.hero.title')
-                .split('.')
-                .slice(1)
-                .join('.')
-                .replace(/^[\s.]+/, '')}
+              {t('landing.hero.title')}
             </span>
           </h1>
+          <p className="mt-6 text-lg max-w-2xl mx-auto text-text-secondary">
+            {t('landing.hero.subtitle')}
+          </p>
         </motion.div>
 
         <motion.div
@@ -104,37 +158,12 @@ const HeroSection = () => {
           </button>
         </motion.div>
 
-        {/* Simple mockup */}
-        <motion.div
-          initial={reducedMotion ? false : { opacity: 0, y: 40, scale: 0.95 }}
-          animate={reducedMotion ? false : { opacity: 1, y: 0, scale: 1 }}
-          transition={{ delay: 0.5, duration: 0.8, type: 'spring' }}
-          className="relative mt-16 max-w-4xl mx-auto"
-        >
-          <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-border bg-bg-secondary/30 backdrop-blur-sm p-4">
-            <div className="flex items-center gap-3 mb-4 px-3">
-              <div className="flex gap-1.5">
-                <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                <div className="w-3 h-3 rounded-full bg-green-500"></div>
-              </div>
-              <div className="flex-1 px-4 py-1.5 rounded-lg bg-bg-tertiary text-sm text-text-tertiary text-center font-medium">
-                app.lumi.todo
-              </div>
-            </div>
-            <div className="aspect-video rounded-xl overflow-hidden border border-border relative">
-              <img
-                ref={imageRef}
-                src={imageSrc}
-                alt="Application interface"
-                className="w-full h-full object-contain"
-                loading="lazy"
-                style={{ transition: 'opacity 0.3s ease-in-out' }}
-              />
-            </div>
-          </div>
-          <div className="absolute -bottom-1/4 -left-1/4 -right-1/4 h-1/2 -z-10 bg-gradient-to-t from-accent-primary/10 to-transparent blur-3xl" />
-        </motion.div>
+        <div className="hidden md:block">
+          <DesktopMockup src={imageUrls.desktop} />
+        </div>
+        <div className="md:hidden">
+          <MobileMockup src={imageUrls.mobile} />
+        </div>
       </div>
     </section>
   );
